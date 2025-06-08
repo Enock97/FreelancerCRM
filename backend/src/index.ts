@@ -2,6 +2,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import contactRoutes from './routes/contact.routes';
+import activityRoutes from './routes/activity.routes';
+import dashboardRoutes from './routes/dashboard.routes';
+
 
 dotenv.config();
 
@@ -11,6 +14,8 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/contacts', contactRoutes);
+app.use('/api/activities', activityRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
