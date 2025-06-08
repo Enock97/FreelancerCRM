@@ -1,0 +1,18 @@
+# node & output
+node_modules/
+dist/
+.env
+.env.*.local
+
+# Prisma artifacts
+.prisma/
+*.sqlite
+*.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# System files
+.DS_Store
