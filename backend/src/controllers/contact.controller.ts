@@ -104,3 +104,19 @@ export const deleteContact = async (req: AuthRequest, res: Response): Promise<vo
   if (contact.count === 0) res.status(404).json({ error: 'Not found' });
   res.json({ message: 'Deleted' });
 };
+
+export const getContactSummary = async (req: AuthRequest, res: Response) => {
+  const userId = req.user?.userId;
+  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+  const total = await prisma.contact.count({ where: { userId } });
+
+  const grouped = await prisma.contact.groupBy({
+    by: ['status'],
+    where: { userId },
+    _count: true,
+  });
+
+  res.json({ total, statusBreakdown: grouped });
+};
+
