@@ -5,16 +5,16 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const { token } = useAuth();
+  const { token, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!token) {
+    if (!isLoading && !token) {
       router.push('/login');
     }
-  }, [token]);
+  }, [isLoading, token]);
 
-  if (!token) return null; // optional: render spinner/loading
+  if (isLoading || !token) return null;
 
   return <>{children}</>;
 }

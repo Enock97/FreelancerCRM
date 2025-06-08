@@ -31,7 +31,7 @@ export default function ContactCard({ contact, onDelete, onUpdate, token }: Prop
   const [newActivity, setNewActivity] = useState({ title: '', note: '' });
 
   const fetchActivities = async () => {
-    const res = await fetch(`http://localhost:3000/api/activities/${contact.id}`, {
+    const res = await fetch(`http://localhost:5000/api/activities/${contact.id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -47,7 +47,7 @@ export default function ContactCard({ contact, onDelete, onUpdate, token }: Prop
   };
 
   const handleUpdate = async () => {
-    const res = await fetch(`http://localhost:3000/api/contacts/${contact.id}`, {
+    const res = await fetch(`http://localhost:5000/api/contacts/${contact.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ export default function ContactCard({ contact, onDelete, onUpdate, token }: Prop
   };
 
   const handleDelete = async () => {
-    await fetch(`http://localhost:3000/api/contacts/${contact.id}`, {
+    await fetch(`http://localhost:5000/api/contacts/${contact.id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -73,7 +73,7 @@ export default function ContactCard({ contact, onDelete, onUpdate, token }: Prop
   };
 
   const handleAddActivity = async () => {
-    const res = await fetch(`http://localhost:3000/api/activities/${contact.id}`, {
+    const res = await fetch(`http://localhost:5000/api/activities/${contact.id}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

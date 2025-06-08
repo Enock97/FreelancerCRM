@@ -14,14 +14,15 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/login', {
+      const res = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Noe gikk galt');
+
+      if (!res.ok) throw new Error(data.error || 'Login failed');
 
       login(data.token);
     } catch (err: any) {
@@ -30,26 +31,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div>
-      <h1>Logg inn</h1>
-      <form onSubmit={handleSubmit}>
+    <div style={{ maxWidth: '400px', margin: 'auto', padding: '2rem' }}>
+      <h1>Login</h1>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <input
           type="email"
+          placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="E-post"
           required
+          onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
+          placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Passord"
           required
+          onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Logg inn</button>
+        <button type="submit">Login</button>
       </form>
-      {error && <p>{error}</p>}
     </div>
   );
 }

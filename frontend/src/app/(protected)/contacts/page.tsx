@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../context/AuthContext';
-import Navbar from '../../../components/NavBar';
+import ContactForm from './ContactForm';
 
 interface Contact {
   id: number;
@@ -12,48 +11,92 @@ interface Contact {
   company: string;
   status: string;
   note: string;
-  createdAt: string;
 }
 
 export default function ContactsPage() {
-  const { token, isLoading } = useAuth();
-  const router = useRouter();
+  const { token } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    if (!isLoading && !token) {
-      router.push('/login');
-    }
-  }, [token, isLoading, router]);
+  const fetchContacts = async () => {
+    const res = await fetch('http://localhost:5000/api/contacts', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setContacts(data);
+  };
 
-  useEffect(() => {
-    const fetchContacts = async () => {
-      if (!token) return;
-
-      const res = await fetch('http://localhost:3001/api/contacts', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setContacts(data);
-      } else {
-        console.error('Klarte ikke hente kontakter');
-      }
-    };
-
+  const handleCreate = async (data: Omit<Contact, 'id'>) => {
+    await fetch('http://localhost:5000/api/contacts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    setShowForm(false);
     fetchContacts();
-  }, [token]);
+  };
 
-  if (isLoading || !token) return <p>Laster inn...</p>;
+  const handleUpdate = async (data: Contact) => {
+    await fetch(`http://localhost:5000/api/contacts/${data.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    setEditingContact(null);
+    fetchContacts();
+  };
+
+  const handleDelete = async (id: number) => {
+    await fetch(`http://localhost:5000/api/contacts/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    fetchContacts();
+  };
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
 
   return (
-    <main>
-      <Navbar />
-      <div className="p-4">
-        <h1 className="text-2xl font-bold">Contacts</h1>
-        <p>Her vises dine kontakter.</p>
-      </div>
-    </main>
+    <div>
+      <h2>Kontakter</h2>
+      {showForm && (
+        <ContactForm
+          onSubmit={handleCreate}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
+      {!showForm && (
+        <button onClick={() => setShowForm(true)}>Legg til kontakt</button>
+      )}
+
+      {editingContact && (
+        <ContactForm
+          initialData={editingContact}
+          onSubmit={handleUpdate}
+          onCancel={() => setEditingContact(null)}
+        />
+      )}
+
+      <ul>
+        {contacts.map((contact) => (
+          <li key={contact.id}>
+            <p>{contact.name} - {contact.email}</p>
+            <button onClick={() => setEditingContact(contact)}>Rediger</button>
+            <button onClick={() => handleDelete(contact.id)}>Slett</button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
