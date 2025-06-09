@@ -3,20 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import ContactForm from './ContactForm';
-
-interface Contact {
-  id: number;
-  name: string;
-  email: string;
-  company: string;
-  status: string;
-  note: string;
-}
+import ContactCard from '@/components/ContactCard';
+import { Contact } from '../../../types/types';
 
 export default function ContactsPage() {
   const { token } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   const fetchContacts = async () => {
@@ -27,7 +19,7 @@ export default function ContactsPage() {
     setContacts(data);
   };
 
-  const handleCreate = async (data: Omit<Contact, 'id'>) => {
+  const handleCreate = async (data: Omit<Contact, 'id' | 'createdAt'>) => {
     await fetch('http://localhost:5000/api/contacts', {
       method: 'POST',
       headers: {
@@ -49,16 +41,13 @@ export default function ContactsPage() {
       },
       body: JSON.stringify(data),
     });
-    setEditingContact(null);
     fetchContacts();
   };
 
   const handleDelete = async (id: number) => {
     await fetch(`http://localhost:5000/api/contacts/${id}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
     fetchContacts();
   };
@@ -68,35 +57,35 @@ export default function ContactsPage() {
   }, []);
 
   return (
-    <div>
-      <h2>Kontakter</h2>
-      {showForm && (
+    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+      <h2 className="text-3xl font-bold mb-4">Kontakter</h2>
+
+      {showForm ? (
         <ContactForm
           onSubmit={handleCreate}
           onCancel={() => setShowForm(false)}
         />
-      )}
-      {!showForm && (
-        <button onClick={() => setShowForm(true)}>Legg til kontakt</button>
-      )}
-
-      {editingContact && (
-        <ContactForm
-          initialData={editingContact}
-          onSubmit={handleUpdate}
-          onCancel={() => setEditingContact(null)}
-        />
+      ) : (
+        <button
+          onClick={() => setShowForm(true)}
+          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow"
+        >
+          Legg til kontakt
+        </button>
       )}
 
-      <ul>
+      <div className="space-y-6">
         {contacts.map((contact) => (
-          <li key={contact.id}>
-            <p>{contact.name} - {contact.email}</p>
-            <button onClick={() => setEditingContact(contact)}>Rediger</button>
-            <button onClick={() => handleDelete(contact.id)}>Slett</button>
-          </li>
+          <div className="bg-white p-4 rounded-2xl shadow-md" key={contact.id}>
+            <ContactCard
+              contact={contact}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+              token={token!}
+            />
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

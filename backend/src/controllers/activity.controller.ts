@@ -14,7 +14,8 @@ export const createActivity = async (req: AuthRequest, res: Response): Promise<v
     return;
   }
 
-  const { title, note, contactId } = req.body;
+  const contactId = parseInt(req.params.contactId); // <- Hent fra URL
+  const { title, note } = req.body;
 
   const contact = await prisma.contact.findFirst({
     where: { id: contactId, userId },

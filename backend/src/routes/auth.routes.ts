@@ -5,6 +5,6 @@ import { requireAuth } from '../middlewares/auth.middleware';
 const router = Router();
 
 router.post('/register', registerUser);
-router.post('/login', requireAuth, loginUser);
+router.post('/login', loginUser);
 
 export default router;

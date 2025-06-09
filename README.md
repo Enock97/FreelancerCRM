@@ -1,10 +1,11 @@
-```md
 # FreelancerCRM
-
+```md
 FreelancerCRM er en fullstack CRM-applikasjon rettet mot freelancere og konsulenter som trenger enkel og effektiv kundehåndtering. Applikasjonen lar deg registrere kontakter, endre pipeline-status, sette opp aktiviteter og holde oversikt over leads, tilbud og salg.
+```
 
-## 🛠 Stack
+---
 
+## Stack
 - **Frontend**: React, TypeScript, Tailwind CSS, React Router, Axios
 - **Backend**: Node.js, Express.js, TypeScript, Prisma ORM
 - **Database**: PostgreSQL (via Docker)
@@ -13,7 +14,7 @@ FreelancerCRM er en fullstack CRM-applikasjon rettet mot freelancere og konsulen
 
 ---
 
-## 📦 Komme i gang
+## Komme i gang
 
 ### 1. Klon prosjektet
 ```bash

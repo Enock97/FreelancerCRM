@@ -1,56 +1,112 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { Contact } from '../../../types/types';
 
-interface ContactFormProps {
-  initialData?: {
-    id?: number;
-    name: string;
-    email: string;
-    company: string;
-    status: string;
-    note: string;
-  };
-  onSubmit: (data: any) => void;
-  onCancel?: () => void;
+interface Props {
+  onSubmit: (data: Omit<Contact, 'id' | 'createdAt'>) => void;
+  onCancel: () => void;
+  initialData?: Partial<Contact>;
 }
 
-export default function ContactForm({ initialData, onSubmit, onCancel }: ContactFormProps) {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    company: '',
-    status: '',
-    note: '',
+const STATUS_OPTIONS = [
+  'VENTER_PA_SVAR',
+  'I_SAMTALE',
+  'TENKER_PA_DET',
+  'AVKLART',
+];
+
+export default function ContactForm({ onSubmit, onCancel, initialData = {} }: Props) {
+  const [form, setForm] = useState({
+    name: initialData.name || '',
+    email: initialData.email || '',
+    phone: initialData.phone || '',
+    company: initialData.company || '',
+    status: initialData.status || '',
+    note: initialData.note || '',
   });
 
-  useEffect(() => {
-    if (initialData) setFormData(initialData);
-  }, [initialData]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit(form);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {['name', 'email', 'company', 'status'].map((field) => (
-        <div key={field}>
-          <label>{field}</label>
-          <input name={field} value={formData[field as keyof typeof formData]} onChange={handleChange} />
-        </div>
-      ))}
-      <div>
-        <label>note</label>
-        <textarea name="note" value={formData.note} onChange={handleChange} />
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 bg-white p-6 rounded-2xl shadow-md"
+    >
+      <h2 className="text-xl font-semibold mb-2">Ny kontakt</h2>
+
+      <input
+        name="name"
+        placeholder="Navn"
+        value={form.name}
+        onChange={handleChange}
+        className="w-full border border-gray-300 rounded-lg p-2"
+        required
+      />
+      <input
+        name="email"
+        placeholder="E-post"
+        value={form.email}
+        onChange={handleChange}
+        className="w-full border border-gray-300 rounded-lg p-2"
+        required
+      />
+      <input
+        name="phone"
+        placeholder="Telefonnummer"
+        value={form.phone}
+        onChange={handleChange}
+        className="w-full border border-gray-300 rounded-lg p-2"
+      />
+      <input
+        name="company"
+        placeholder="Firma"
+        value={form.company}
+        onChange={handleChange}
+        className="w-full border border-gray-300 rounded-lg p-2"
+      />
+      <select
+        name="status"
+        value={form.status || ''}
+        onChange={handleChange}
+        className="w-full border border-gray-300 rounded-lg p-2"
+        required
+      >
+        <option value="" disabled>Velg status</option>
+        {STATUS_OPTIONS.map((status) => (
+          <option key={status} value={status}>
+            {status.replace(/_/g, ' ')}
+          </option>
+        ))}
+      </select>
+      <textarea
+        name="note"
+        placeholder="Notat"
+        value={form.note}
+        onChange={handleChange}
+        className="w-full border border-gray-300 rounded-lg p-2"
+      />
+      <div className="flex gap-2">
+        <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700">
+          Lagre
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="bg-gray-500 text-white px-4 py-2 rounded-xl hover:bg-gray-600"
+        >
+          Avbryt
+        </button>
       </div>
-      <button type="submit">Lagre</button>
-      {onCancel && <button type="button" onClick={onCancel}>Avbryt</button>}
     </form>
   );
 }

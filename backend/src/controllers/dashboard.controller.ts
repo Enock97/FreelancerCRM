@@ -24,10 +24,20 @@ export const getDashboardData = async (req: AuthRequest, res: Response): Promise
     }),
   ]);
 
-  const statusCounts = contactsByStatus.reduce<Record<string, number>>((acc, curr) => {
-    acc[curr.status] = curr._count.status;
+  type ContactStatus = 'VENTER_PA_SVAR' | 'I_SAMTALE' | 'TENKER_PA_DET' | 'AVKLART';
+
+  const statusCounts = contactsByStatus.reduce<Record<ContactStatus, number>>((acc, curr) => {
+    if (curr.status) {
+      acc[curr.status as ContactStatus] = curr._count.status;
+    }
     return acc;
-  }, {});
+  }, {
+    VENTER_PA_SVAR: 0,
+    I_SAMTALE: 0,
+    TENKER_PA_DET: 0,
+    AVKLART: 0,
+  });
+
 
   res.json({
     totalContacts,

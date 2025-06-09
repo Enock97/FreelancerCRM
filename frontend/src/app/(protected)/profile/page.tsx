@@ -1,57 +1,142 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../context/AuthContext';
 
-interface User {
-  id: number;
-  email: string;
-}
-
 export default function ProfilePage() {
-  const { token, logout } = useAuth();
-  const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const { token, isLoading, user, logout } = useAuth();
+  const router = useRouter();
+
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+    name: '',
+    phone: '',
+    company: '',
+    location: '',
+  });
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch('http://localhost:3001/api/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    if (!isLoading && !token) router.push('/login');
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to fetch profile');
-
-        setUser(data);
-      } catch (err: any) {
-        if (err.message === 'Unauthorized') logout();
-        else setError(err.message);
-      } finally {
-        setLoading(false);
+    if (token) {
+      const stored = localStorage.getItem('profile_data');
+      if (stored && stored !== 'undefined') {
+        try {
+          setForm((prev) => ({
+            ...JSON.parse(stored),
+            email: user?.email || '',
+            password: '********',
+          }));
+        } catch {
+          setForm((prev) => ({
+            ...prev,
+            email: user?.email || '',
+          }));
+        }
+      } else {
+        setForm((prev) => ({
+          ...prev,
+          email: user?.email || '',
+        }));
       }
-    };
+    }
+  }, [token, isLoading, user]);
 
-    fetchProfile();
-  }, [token, logout]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    const updated = { ...form };
+
+    try {
+      const res = await fetch('http://localhost:5000/api/users/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: updated.email,
+          password: updated.password !== '********' ? updated.password : undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Noe gikk galt');
+      }
+
+      if (updated.password !== '********') {
+        updated.password = '********';
+      }
+
+      localStorage.setItem('profile_data', JSON.stringify(updated));
+      setForm(updated);
+    } catch (err) {
+      console.error('Feil ved lagring:', err);
+    }
+  };
+
+  if (isLoading || !token) return null;
 
   return (
-    <div style={{ maxWidth: '600px', margin: 'auto', padding: '2rem' }}>
-      <h1>Profile</h1>
-      {loading && <p>Loading profile...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {user && (
-        <div>
-          <p><strong>ID:</strong> {user.id}</p>
-          <p><strong>Email:</strong> {user.email}</p>
+    <main className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-md p-6 relative">
+        <h1 className="text-3xl font-bold mb-6 text-center">Min Profil</h1>
+
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block font-medium mb-1">E-post</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              className="w-full border p-2 rounded-lg"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block font-medium mb-1">Passord</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              className="w-full border p-2 rounded-lg"
+            />
+          </div>
+
+          {/* Lokale felt */}
+          {['name', 'phone', 'company', 'location'].map((field) => (
+            <div key={field}>
+              <label htmlFor={field} className="block font-medium mb-1 capitalize">{field}</label>
+              <input
+                id={field}
+                name={field}
+                value={form[field as keyof typeof form]}
+                onChange={handleChange}
+                className="w-full border p-2 rounded-lg"
+              />
+            </div>
+          ))}
         </div>
-      )}
-      <button onClick={logout} style={{ marginTop: '1rem' }}>
-        Log out
-      </button>
-    </div>
+
+        <div className="pt-6 flex justify-end">
+          <button
+            onClick={handleSave}
+            className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700"
+          >
+            Lagre
+          </button>
+        </div>
+      </div>
+    </main>
   );
 }

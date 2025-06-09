@@ -1,14 +1,5 @@
 import { useState, useEffect } from 'react';
-
-export interface Contact {
-  id: number;
-  name: string;
-  email: string;
-  company: string;
-  status: string;
-  note: string;
-  createdAt: string;
-}
+import { Contact } from '../types/types';
 
 interface Activity {
   id: number;
@@ -24,9 +15,20 @@ interface Props {
   token: string;
 }
 
+// Oppdater enumverdier etter din backend
+const STATUS_OPTIONS = [
+  'VENTER_PA_SVAR',
+  'I_SAMTALE',
+  'TENKER_PA_DET',
+  'AVKLART',
+];
+
 export default function ContactCard({ contact, onDelete, onUpdate, token }: Props) {
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState(contact);
+  const [form, setForm] = useState<Contact>({
+    ...contact,
+    status: contact.status || '',
+  });
   const [activities, setActivities] = useState<Activity[]>([]);
   const [newActivity, setNewActivity] = useState({ title: '', note: '' });
 
@@ -42,7 +44,7 @@ export default function ContactCard({ contact, onDelete, onUpdate, token }: Prop
     fetchActivities();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -79,7 +81,7 @@ export default function ContactCard({ contact, onDelete, onUpdate, token }: Prop
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(newActivity),
+      body: JSON.stringify({ ...newActivity, contactId: contact.id }),
     });
     const created = await res.json();
     setActivities(prev => [created, ...prev]);
@@ -92,8 +94,20 @@ export default function ContactCard({ contact, onDelete, onUpdate, token }: Prop
         <>
           <input name="name" value={form.name} onChange={handleChange} className="w-full border p-1" />
           <input name="email" value={form.email} onChange={handleChange} className="w-full border p-1" />
+          <input name="phone" value={form.phone} onChange={handleChange} className="w-full border p-1" />
           <input name="company" value={form.company} onChange={handleChange} className="w-full border p-1" />
-          <input name="status" value={form.status} onChange={handleChange} className="w-full border p-1" />
+          <select
+            name="status"
+            value={form.status || ''}
+            onChange={handleChange}
+            className="w-full border p-1"
+            required
+          >
+            <option value="" disabled>Velg status</option>
+            {STATUS_OPTIONS.map(status => (
+              <option key={status} value={status}>{status.replace(/_/g, ' ')}</option>
+            ))}
+          </select>
           <textarea name="note" value={form.note} onChange={handleChange} className="w-full border p-1" />
           <button onClick={handleUpdate} className="bg-green-500 text-white px-2 py-1 rounded mr-2">Lagre</button>
           <button onClick={() => setEditing(false)} className="bg-gray-400 text-white px-2 py-1 rounded">Avbryt</button>
@@ -101,8 +115,9 @@ export default function ContactCard({ contact, onDelete, onUpdate, token }: Prop
       ) : (
         <>
           <h2 className="text-lg font-semibold">{contact.name}</h2>
-          <p>{contact.email} – {contact.company}</p>
-          <p>Status: {contact.status}</p>
+          <p>{contact.email} – {contact.phone}</p>
+          <p>Firma: {contact.company}</p>
+          <p>Status: {contact.status ? contact.status.replace(/_/g, ' ') : 'Ingen status'}</p>
           <p className="text-sm text-gray-600">{contact.note}</p>
           <div className="space-x-2 mt-2">
             <button onClick={() => setEditing(true)} className="bg-yellow-500 text-white px-2 py-1 rounded">Rediger</button>
@@ -111,7 +126,6 @@ export default function ContactCard({ contact, onDelete, onUpdate, token }: Prop
         </>
       )}
 
-      {/* Aktivitetsskjema */}
       <div className="mt-4 space-y-2">
         <h3 className="font-semibold">Ny aktivitet</h3>
         <input

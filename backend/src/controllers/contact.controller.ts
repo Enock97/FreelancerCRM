@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { AuthPayload } from '../types/jwt';
+import { PrismaClient, ContactStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -10,28 +9,44 @@ interface AuthRequest extends Request {
   };
 }
 
+const isValidStatus = (value: any): value is ContactStatus => {
+  return Object.values(ContactStatus).includes(value);
+};
+
 export const getContacts = async (req: AuthRequest, res: Response): Promise<void> => {
   const userId = req.user?.userId;
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
   const contacts = await prisma.contact.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
   });
+
   res.json(contacts);
 };
 
 export const createContact = async (req: AuthRequest, res: Response): Promise<void> => {
   const userId = req.user?.userId;
   if (!userId) {
-  res.status(401).json({ error: 'Unauthorized' });
-  return; // ← returner for å avbryte videre kjøring
-}
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
 
-  const { name, email, company, status, note } = req.body;
+  const { name, email, phone, company, status, note } = req.body;
+
+  if (!isValidStatus(status)) {
+    res.status(400).json({ error: `Ugyldig statusverdi: ${status}` });
+    return;
+  }
 
   const contact = await prisma.contact.create({
     data: {
       name,
       email,
+      phone,
       company,
       status,
       note,
@@ -45,9 +60,14 @@ export const createContact = async (req: AuthRequest, res: Response): Promise<vo
 export const updateContact = async (req: AuthRequest, res: Response): Promise<void> => {
   const userId = req.user?.userId;
   const contactId = parseInt(req.params.id);
-  const { name, email, company, status, note } = req.body;
+  const { name, email, phone, company, status, note } = req.body;
 
-  const contact = await prisma.contact.updateMany({
+  if (!isValidStatus(status)) {
+    res.status(400).json({ error: `Ugyldig statusverdi: ${status}` });
+    return;
+  }
+
+  const updated = await prisma.contact.updateMany({
     where: {
       id: contactId,
       userId,
@@ -55,13 +75,18 @@ export const updateContact = async (req: AuthRequest, res: Response): Promise<vo
     data: {
       name,
       email,
+      phone,
       company,
       status,
       note,
     },
   });
 
-  if (contact.count === 0) res.status(404).json({ error: 'Not found' });
+  if (updated.count === 0) {
+    res.status(404).json({ error: 'Contact not found' });
+    return;
+  }
+
   res.json({ message: 'Updated' });
 };
 
@@ -89,25 +114,31 @@ export const getContactById = async (req: AuthRequest, res: Response): Promise<v
   res.json(contact);
 };
 
-
 export const deleteContact = async (req: AuthRequest, res: Response): Promise<void> => {
   const userId = req.user?.userId;
   const contactId = parseInt(req.params.id);
 
-  const contact = await prisma.contact.deleteMany({
+  const deleted = await prisma.contact.deleteMany({
     where: {
       id: contactId,
       userId,
     },
   });
 
-  if (contact.count === 0) res.status(404).json({ error: 'Not found' });
+  if (deleted.count === 0) {
+    res.status(404).json({ error: 'Contact not found' });
+    return;
+  }
+
   res.json({ message: 'Deleted' });
 };
 
-export const getContactSummary = async (req: AuthRequest, res: Response) => {
+export const getContactSummary = async (req: AuthRequest, res: Response): Promise<void> => {
   const userId = req.user?.userId;
-  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
 
   const total = await prisma.contact.count({ where: { userId } });
 
@@ -117,6 +148,16 @@ export const getContactSummary = async (req: AuthRequest, res: Response) => {
     _count: true,
   });
 
-  res.json({ total, statusBreakdown: grouped });
-};
+  const statusBreakdown: Record<ContactStatus, number> = {
+    VENTER_PA_SVAR: 0,
+    I_SAMTALE: 0,
+    TENKER_PA_DET: 0,
+    AVKLART: 0,
+  };
 
+  for (const g of grouped) {
+    if (g.status) statusBreakdown[g.status] = g._count;
+  }
+
+  res.json({ total, statusBreakdown });
+};

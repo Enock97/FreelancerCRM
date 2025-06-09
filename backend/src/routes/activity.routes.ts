@@ -4,7 +4,7 @@ import { requireAuth } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-router.post('/', requireAuth, createActivity);
+router.post('/:contactId', requireAuth, createActivity);
 router.get('/:contactId', requireAuth, getActivitiesForContact);
 
 export default router;
