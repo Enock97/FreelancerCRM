@@ -6,7 +6,7 @@ FreelancerCRM er en fullstack CRM-applikasjon rettet mot freelancere og konsulen
 ---
 
 ## Stack
-- **Frontend**: React, TypeScript, Next,js, Tailwind CSS
+- **Frontend**: React, TypeScript, Next.js, Tailwind CSS
 - **Backend**: Express.js (Node.js), TypeScript, Prisma ORM
 - **Database**: PostgreSQL (via Docker)
 - **Autentisering**: JWT
