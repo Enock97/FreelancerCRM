@@ -33,7 +33,7 @@ docker-compose up --build
 ```
 
 - REST-API: `http://localhost:5000/api/health`
-- GraphQL API: http://localhost:5000/api/graphql
+- GraphQL API: `http://localhost:5000/api/graphql`
 - PostgreSQL kjører på `localhost:5432`
 
 ---
