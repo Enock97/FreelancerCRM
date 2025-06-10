@@ -32,7 +32,8 @@ cp .env.example .env
 docker-compose up --build
 ```
 
-- API: `http://localhost:5000/api/health`
+- REST-API: `http://localhost:5000/api/health`
+- GraphQL API: http://localhost:5000/api/graphql
 - PostgreSQL kjører på `localhost:5432`
 
 ---
