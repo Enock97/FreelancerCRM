@@ -1,71 +1,50 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useMutation } from '@apollo/client';
-import { CREATE_CONTACT } from '../../graphql/mutations';
-import { GET_CONTACTS } from '../../graphql/queries';
-import { Contact } from '../../../types/types';
+import { useState } from 'react'
+import { Contact } from '../../../types/types'
+import { STATUS_OPTIONS, StatusKey } from '@/constants/status'
 
-interface Props {
-  onSubmit: (data: Omit<Contact, 'id' | 'createdAt'>) => void;
-  onCancel: () => void;
-  initialData?: Partial<Contact>;
+type Props = {
+  onSubmit: (data: Omit<Contact, 'id' | 'createdAt'>) => void
+  onCancel: () => void
+  initialData?: Contact
 }
 
-const STATUS_OPTIONS = [
-  'VENTER_PA_SVAR',
-  'I_SAMTALE',
-  'TENKER_PA_DET',
-  'AVKLART',
-];
+export default function ContactForm({ onSubmit, onCancel, initialData }: Props) {
+  const [name, setName] = useState(initialData?.name ?? '')
+  const [email, setEmail] = useState(initialData?.email ?? '')
+  const [phone, setPhone] = useState(initialData?.phone ?? '')
+  const [company, setCompany] = useState(initialData?.company ?? '')
+  const [note, setNote] = useState(initialData?.note ?? '')
+  const [status, setStatus] = useState<StatusKey>(
+    (initialData?.status as StatusKey) ?? 'VENTER_PA_SVAR'
+  )
 
-export default function ContactForm({ onCancel }: Props) {
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    status: '',
-    note: '',
-  });
-
-  const [createContact] = useMutation(CREATE_CONTACT, {
-    refetchQueries: [{ query: GET_CONTACTS }],
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await createContact({ variables: { data: form } });
-    onCancel();
-  };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSubmit({ name, email, phone, company, note, status })
+  }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 bg-white p-6 rounded-2xl shadow-md"
-    >
-      <h2 className="text-xl font-semibold mb-2">Ny kontakt</h2>
-      <input name="name" placeholder="Navn" value={form.name} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" required />
-      <input name="email" placeholder="E-post" value={form.email} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" required />
-      <input name="phone" placeholder="Telefonnummer" value={form.phone} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" />
-      <input name="company" placeholder="Firma" value={form.company} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" />
-      <select name="status" value={form.status} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" required>
-        <option value="" disabled>Velg status</option>
-        {STATUS_OPTIONS.map((status) => (
-          <option key={status} value={status}>{status.replace(/_/g, ' ')}</option>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <input className="w-full p-2 border rounded" placeholder="Navn" value={name} onChange={(e) => setName(e.target.value)} required />
+      <input className="w-full p-2 border rounded" placeholder="E-post" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <input className="w-full p-2 border rounded" placeholder="Telefon" value={phone} onChange={(e) => setPhone(e.target.value)} />
+      <input className="w-full p-2 border rounded" placeholder="Firma" value={company} onChange={(e) => setCompany(e.target.value)} />
+      <textarea className="w-full p-2 border rounded" placeholder="Notat" value={note} onChange={(e) => setNote(e.target.value)} />
+      
+      <select className="w-full p-2 border rounded" value={status} onChange={(e) => setStatus(e.target.value as StatusKey)}>
+        {Object.entries(STATUS_OPTIONS).map(([key, label]) => (
+          <option key={key} value={key}>
+            {label}
+          </option>
         ))}
       </select>
-      <textarea name="note" placeholder="Notat" value={form.note} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" />
+
       <div className="flex gap-2">
-        <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700">Lagre</button>
-        <button type="button" onClick={onCancel} className="bg-gray-500 text-white px-4 py-2 rounded-xl hover:bg-gray-600">Avbryt</button>
+        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Lagre</button>
+        <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Avbryt</button>
       </div>
     </form>
-  );
+  )
 }

@@ -6,5 +6,5 @@ export interface Contact {
   company: string;
   note: string;
   status: string;
-  createdAt: string;
+  createdAt?: string;
 }

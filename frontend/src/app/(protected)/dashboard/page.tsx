@@ -20,15 +20,11 @@ import { useQuery, useMutation } from '@apollo/client';
 import { GET_CONTACTS } from '../../graphql/queries';
 import { UPDATE_CONTACT } from '../../graphql/mutations';
 import { Contact } from '../../../types/types';
+import { STATUS_OPTIONS, StatusKey } from '../../../constants/status'
 
-const STATUS_ENUM = {
-  VENTER_PA_SVAR: 'Venter på svar',
-  I_SAMTALE: 'I samtale',
-  TENKER_PA_DET: 'Tenker på det',
-  AVKLART: 'Avklart',
-} as const;
+const STATUS_ENUM = STATUS_OPTIONS
 
-type ContactStatus = keyof typeof STATUS_ENUM;
+type ContactStatus = StatusKey
 
 export default function DashboardPage() {
   const { token, isLoading } = useAuth();

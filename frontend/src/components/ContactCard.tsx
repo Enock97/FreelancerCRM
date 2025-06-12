@@ -14,7 +14,7 @@ type Props = {
   token: string
 }
 
-export default function ContactCard({ contact }: Props) {
+export default function ContactCard({ contact, onUpdate, onDelete }: Props) {
   const [editing, setEditing] = useState(false)
 
   const [updateContact] = useMutation(UPDATE_CONTACT, {
@@ -26,19 +26,20 @@ export default function ContactCard({ contact }: Props) {
   })
 
   const handleSave = async (data: Omit<Contact, 'id' | 'createdAt'>) => {
-    await updateContact({
-      variables: {
-        data: {
-          id: contact.id,
-          ...data,
-        },
-      },
-    })
+    const updatedData = {
+      id: contact.id,
+      ...data,
+      createdAt: contact.createdAt,
+    }
+
+    await updateContact({ variables: { data: updatedData } })
+    onUpdate(updatedData)
     setEditing(false)
   }
 
   const handleDelete = async () => {
     await deleteContact({ variables: { id: contact.id } })
+    onDelete(contact.id)
   }
 
   if (editing) {
