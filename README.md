@@ -90,4 +90,5 @@ npx prisma generate
 
 Enock Ladu – Fullstack Utvikler  
 [LinkedIn Profil](https://www.linkedin.com/in/enock-ladu-b56b0724b/) / Oslo, Norge
-```
+
+---
