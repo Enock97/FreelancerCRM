@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 
 interface UserData {
   email: string;
@@ -41,7 +43,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }): ReactNode =
     setIsLoading(false);
   }, []);
 
-
   const login = (newToken: string, userData: UserData) => {
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(userData));
@@ -58,9 +59,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }): ReactNode =
     router.push('/login');
   };
 
+  const httpLink = createHttpLink({
+    uri: 'http://localhost:5000/api/graphql',
+  });
+
+  const authLink = setContext((_, { headers }) => ({
+    headers: {
+      ...headers,
+      Authorization: token ? `Bearer ${token}` : '',
+    },
+  }));
+
+  const client = new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache(),
+  });
+
   return (
     <AuthContext.Provider value={{ token, login, logout, isLoading, user, setUser }}>
-      {!isLoading && children}
+      {!isLoading && (
+        <ApolloProvider client={client}>
+          {children}
+        </ApolloProvider>
+      )}
     </AuthContext.Provider>
   );
 };

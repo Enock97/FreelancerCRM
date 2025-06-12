@@ -1,60 +1,56 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import ContactForm from './ContactForm';
 import ContactCard from '@/components/ContactCard';
 import { Contact } from '../../../types/types';
+import { useQuery, useMutation } from '@apollo/client';
+import { GET_CONTACTS } from '../../graphql/queries';
+import {
+  CREATE_CONTACT,
+  UPDATE_CONTACT,
+  DELETE_CONTACT,
+} from '../../graphql/mutations';
 
 export default function ContactsPage() {
   const { token } = useAuth();
-  const [contacts, setContacts] = useState<Contact[]>([]);
   const [showForm, setShowForm] = useState(false);
 
-  const fetchContacts = async () => {
-    const res = await fetch('http://localhost:5000/api/contacts', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setContacts(data);
-  };
+  const { data, loading, error, refetch } = useQuery(GET_CONTACTS, {
+    context: { headers: { Authorization: `Bearer ${token}` } },
+  });
 
-  const handleCreate = async (data: Omit<Contact, 'id' | 'createdAt'>) => {
-    await fetch('http://localhost:5000/api/contacts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
+  const [createContact] = useMutation(CREATE_CONTACT, {
+    context: { headers: { Authorization: `Bearer ${token}` } },
+    onCompleted: () => refetch(),
+  });
+
+  const [updateContact] = useMutation(UPDATE_CONTACT, {
+    context: { headers: { Authorization: `Bearer ${token}` } },
+    onCompleted: () => refetch(),
+  });
+
+  const [deleteContact] = useMutation(DELETE_CONTACT, {
+    context: { headers: { Authorization: `Bearer ${token}` } },
+    onCompleted: () => refetch(),
+  });
+
+  const handleCreate = async (input: Omit<Contact, 'id' | 'createdAt'>) => {
+    await createContact({ variables: { data: input } });
     setShowForm(false);
-    fetchContacts();
   };
 
-  const handleUpdate = async (data: Contact) => {
-    await fetch(`http://localhost:5000/api/contacts/${data.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
-    fetchContacts();
+  const handleUpdate = async (input: Contact) => {
+    await updateContact({ variables: { data: input } });
   };
 
   const handleDelete = async (id: number) => {
-    await fetch(`http://localhost:5000/api/contacts/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    fetchContacts();
+    await deleteContact({ variables: { id } });
   };
 
-  useEffect(() => {
-    fetchContacts();
-  }, []);
+  if (loading) return <p>Laster inn...</p>;
+  if (error) return <p className="text-red-600">Feil: {error.message}</p>;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
@@ -75,7 +71,7 @@ export default function ContactsPage() {
       )}
 
       <div className="space-y-6">
-        {contacts.map((contact) => (
+        {data.contacts.map((contact: Contact) => (
           <div className="bg-white p-4 rounded-2xl shadow-md" key={contact.id}>
             <ContactCard
               contact={contact}

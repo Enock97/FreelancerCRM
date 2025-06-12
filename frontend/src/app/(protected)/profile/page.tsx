@@ -1,12 +1,14 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../../../context/AuthContext';
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '../../../context/AuthContext'
+import { useMutation } from '@apollo/client'
+import { UPDATE_USER } from '../../graphql/mutations'
 
 export default function ProfilePage() {
-  const { token, isLoading, user, logout } = useAuth();
-  const router = useRouter();
+  const { token, isLoading, user } = useAuth()
+  const router = useRouter()
 
   const [form, setForm] = useState({
     email: '',
@@ -15,73 +17,59 @@ export default function ProfilePage() {
     phone: '',
     company: '',
     location: '',
-  });
+  })
+
+  const [updateUser] = useMutation(UPDATE_USER)
 
   useEffect(() => {
-    if (!isLoading && !token) router.push('/login');
+    if (!isLoading && !token) router.push('/login')
 
     if (token) {
-      const stored = localStorage.getItem('profile_data');
+      const stored = localStorage.getItem('profile_data')
       if (stored && stored !== 'undefined') {
         try {
-          setForm((prev) => ({
+          setForm(({
             ...JSON.parse(stored),
             email: user?.email || '',
             password: '********',
-          }));
+          }))
         } catch {
           setForm((prev) => ({
             ...prev,
             email: user?.email || '',
-          }));
+          }))
         }
       } else {
         setForm((prev) => ({
           ...prev,
           email: user?.email || '',
-        }));
+        }))
       }
     }
-  }, [token, isLoading, user]);
+  }, [token, isLoading, user, router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleSave = async () => {
-    const updated = { ...form };
+    const input = {
+      email: form.email,
+      password: form.password !== '********' ? form.password : undefined,
+    }
 
     try {
-      const res = await fetch('http://localhost:5000/api/users/update', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          email: updated.email,
-          password: updated.password !== '********' ? updated.password : undefined,
-        }),
-      });
+      await updateUser({ variables: { data: input } })
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Noe gikk galt');
-      }
-
-      if (updated.password !== '********') {
-        updated.password = '********';
-      }
-
-      localStorage.setItem('profile_data', JSON.stringify(updated));
-      setForm(updated);
+      if (input.password) form.password = '********'
+      localStorage.setItem('profile_data', JSON.stringify(form))
     } catch (err) {
-      console.error('Feil ved lagring:', err);
+      console.error('Feil ved lagring:', err)
     }
-  };
+  }
 
-  if (isLoading || !token) return null;
+  if (isLoading || !token) return null
 
   return (
     <main className="min-h-screen bg-gray-50 py-10 px-4">
@@ -113,7 +101,6 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* Lokale felt */}
           {['name', 'phone', 'company', 'location'].map((field) => (
             <div key={field}>
               <label htmlFor={field} className="block font-medium mb-1 capitalize">{field}</label>
@@ -138,5 +125,5 @@ export default function ProfilePage() {
         </div>
       </div>
     </main>
-  );
+  )
 }

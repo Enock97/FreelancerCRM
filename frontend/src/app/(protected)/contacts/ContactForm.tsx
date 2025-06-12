@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { CREATE_CONTACT } from '../../graphql/mutations';
+import { GET_CONTACTS } from '../../graphql/queries';
 import { Contact } from '../../../types/types';
 
 interface Props {
@@ -16,14 +19,18 @@ const STATUS_OPTIONS = [
   'AVKLART',
 ];
 
-export default function ContactForm({ onSubmit, onCancel, initialData = {} }: Props) {
+export default function ContactForm({ onCancel }: Props) {
   const [form, setForm] = useState({
-    name: initialData.name || '',
-    email: initialData.email || '',
-    phone: initialData.phone || '',
-    company: initialData.company || '',
-    status: initialData.status || '',
-    note: initialData.note || '',
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    status: '',
+    note: '',
+  });
+
+  const [createContact] = useMutation(CREATE_CONTACT, {
+    refetchQueries: [{ query: GET_CONTACTS }],
   });
 
   const handleChange = (
@@ -32,9 +39,10 @@ export default function ContactForm({ onSubmit, onCancel, initialData = {} }: Pr
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(form);
+    await createContact({ variables: { data: form } });
+    onCancel();
   };
 
   return (
@@ -43,69 +51,20 @@ export default function ContactForm({ onSubmit, onCancel, initialData = {} }: Pr
       className="space-y-4 bg-white p-6 rounded-2xl shadow-md"
     >
       <h2 className="text-xl font-semibold mb-2">Ny kontakt</h2>
-
-      <input
-        name="name"
-        placeholder="Navn"
-        value={form.name}
-        onChange={handleChange}
-        className="w-full border border-gray-300 rounded-lg p-2"
-        required
-      />
-      <input
-        name="email"
-        placeholder="E-post"
-        value={form.email}
-        onChange={handleChange}
-        className="w-full border border-gray-300 rounded-lg p-2"
-        required
-      />
-      <input
-        name="phone"
-        placeholder="Telefonnummer"
-        value={form.phone}
-        onChange={handleChange}
-        className="w-full border border-gray-300 rounded-lg p-2"
-      />
-      <input
-        name="company"
-        placeholder="Firma"
-        value={form.company}
-        onChange={handleChange}
-        className="w-full border border-gray-300 rounded-lg p-2"
-      />
-      <select
-        name="status"
-        value={form.status || ''}
-        onChange={handleChange}
-        className="w-full border border-gray-300 rounded-lg p-2"
-        required
-      >
+      <input name="name" placeholder="Navn" value={form.name} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" required />
+      <input name="email" placeholder="E-post" value={form.email} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" required />
+      <input name="phone" placeholder="Telefonnummer" value={form.phone} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" />
+      <input name="company" placeholder="Firma" value={form.company} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" />
+      <select name="status" value={form.status} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" required>
         <option value="" disabled>Velg status</option>
         {STATUS_OPTIONS.map((status) => (
-          <option key={status} value={status}>
-            {status.replace(/_/g, ' ')}
-          </option>
+          <option key={status} value={status}>{status.replace(/_/g, ' ')}</option>
         ))}
       </select>
-      <textarea
-        name="note"
-        placeholder="Notat"
-        value={form.note}
-        onChange={handleChange}
-        className="w-full border border-gray-300 rounded-lg p-2"
-      />
+      <textarea name="note" placeholder="Notat" value={form.note} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2" />
       <div className="flex gap-2">
-        <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700">
-          Lagre
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="bg-gray-500 text-white px-4 py-2 rounded-xl hover:bg-gray-600"
-        >
-          Avbryt
-        </button>
+        <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700">Lagre</button>
+        <button type="button" onClick={onCancel} className="bg-gray-500 text-white px-4 py-2 rounded-xl hover:bg-gray-600">Avbryt</button>
       </div>
     </form>
   );

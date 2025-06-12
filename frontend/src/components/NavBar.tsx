@@ -2,13 +2,9 @@
 
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
-import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const { token, logout } = useAuth();
-  const pathname = usePathname();
-
-  const isOnProfilePage = pathname === '/profile';
 
   return (
     <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">

@@ -12,7 +12,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     if (!isLoading && !token) {
       router.push('/login');
     }
-  }, [isLoading, token]);
+  }, [isLoading, token, router]);
 
   if (isLoading || !token) return null;
 
