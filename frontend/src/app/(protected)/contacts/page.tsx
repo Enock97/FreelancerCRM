@@ -53,7 +53,7 @@ export default function ContactsPage() {
   if (error) return <p className="text-red-600">Feil: {error.message}</p>;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6 text-black dark:text-white">
       <h2 className="text-3xl font-bold mb-4">Kontakter</h2>
 
       {showForm ? (
@@ -72,7 +72,7 @@ export default function ContactsPage() {
 
       <div className="space-y-6">
         {data.contacts.map((contact: Contact) => (
-          <div className="bg-white p-4 rounded-2xl shadow-md" key={contact.id}>
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-md" key={contact.id}>
             <ContactCard
               contact={contact}
               onUpdate={handleUpdate}

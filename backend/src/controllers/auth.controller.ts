@@ -55,7 +55,7 @@ export const loginUser = async (req: AuthRequest, res: Response): Promise<void> 
     }
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token });
+    res.json({ 'Successfully logged in, Bearer token:': token });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }

@@ -8,3 +8,9 @@ export interface Contact {
   status: string;
   createdAt?: string;
 }
+
+export interface User {
+  id: number;
+  email: string;
+}
+

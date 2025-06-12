@@ -9,7 +9,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
@@ -20,18 +20,19 @@ export default function RegisterPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      const data: { error?: string } = await res.json();
 
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      if (!res.ok) throw new Error(data.error || 'Registrering feilet');
 
       router.push('/login');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError('Ukjent feil ved registrering');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-8">
+    <div className="max-w-md mx-auto p-8 bg-white dark:bg-gray-900 dark:text-white rounded shadow">
       <h1 className="text-2xl font-bold mb-4">Registrer deg</h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -41,7 +42,7 @@ export default function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700"
         />
         <input
           type="password"
@@ -49,9 +50,12 @@ export default function RegisterPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700"
         />
-        <button type="submit" className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700">
+        <button
+          type="submit"
+          className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"
+        >
           Registrer
         </button>
       </form>

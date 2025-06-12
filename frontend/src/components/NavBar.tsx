@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import DarkModeToggle from '../styles/DarkModeToggle';
 
 export default function Navbar() {
   const { token, logout } = useAuth();
 
   return (
-    <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
+    <nav className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow px-6 py-4 flex justify-between items-center">
       <div className="space-x-4">
         <Link href="/" className="text-lg font-semibold">FreelancerCRM</Link>
         {token && (
@@ -18,14 +19,15 @@ export default function Navbar() {
           </>
         )}
       </div>
-      <div className="space-x-4">
+      <div className="flex items-center space-x-4">
+        <DarkModeToggle />
         {!token ? (
           <>
             <Link href="/login">Logg inn</Link>
             <Link href="/register">Registrer</Link>
           </>
         ) : (
-          <button onClick={logout} className="text-red-600">Logg ut</button>
+          <button onClick={logout} className="text-red-500 hover:text-red-600">Logg ut</button>
         )}
       </div>
     </nav>

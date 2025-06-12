@@ -61,7 +61,6 @@ export default function ProfilePage() {
 
     try {
       await updateUser({ variables: { data: input } })
-
       if (input.password) form.password = '********'
       localStorage.setItem('profile_data', JSON.stringify(form))
     } catch (err) {
@@ -72,8 +71,8 @@ export default function ProfilePage() {
   if (isLoading || !token) return null
 
   return (
-    <main className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-md p-6 relative">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-4 text-black dark:text-white transition-colors">
+      <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 relative">
         <h1 className="text-3xl font-bold mb-6 text-center">Min Profil</h1>
 
         <div className="space-y-4">
@@ -85,7 +84,7 @@ export default function ProfilePage() {
               type="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full border p-2 rounded-lg"
+              className="w-full border p-2 rounded-lg bg-white dark:bg-gray-900 dark:text-white"
             />
           </div>
 
@@ -97,7 +96,7 @@ export default function ProfilePage() {
               type="password"
               value={form.password}
               onChange={handleChange}
-              className="w-full border p-2 rounded-lg"
+              className="w-full border p-2 rounded-lg bg-white dark:bg-gray-900 dark:text-white"
             />
           </div>
 
@@ -109,7 +108,7 @@ export default function ProfilePage() {
                 name={field}
                 value={form[field as keyof typeof form]}
                 onChange={handleChange}
-                className="w-full border p-2 rounded-lg"
+                className="w-full border p-2 rounded-lg bg-white dark:bg-gray-900 dark:text-white"
               />
             </div>
           ))}

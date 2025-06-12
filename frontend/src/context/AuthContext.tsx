@@ -7,7 +7,7 @@ import { setContext } from '@apollo/client/link/context';
 
 interface UserData {
   email: string;
-  password: string;
+  password?: string;
 }
 
 interface AuthContextType {

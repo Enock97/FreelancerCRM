@@ -26,14 +26,14 @@ export default function ContactForm({ onSubmit, onCancel, initialData }: Props) 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <input className="w-full p-2 border rounded" placeholder="Navn" value={name} onChange={(e) => setName(e.target.value)} required />
-      <input className="w-full p-2 border rounded" placeholder="E-post" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      <input className="w-full p-2 border rounded" placeholder="Telefon" value={phone} onChange={(e) => setPhone(e.target.value)} />
-      <input className="w-full p-2 border rounded" placeholder="Firma" value={company} onChange={(e) => setCompany(e.target.value)} />
-      <textarea className="w-full p-2 border rounded" placeholder="Notat" value={note} onChange={(e) => setNote(e.target.value)} />
+    <form onSubmit={handleSubmit} className="space-y-4 text-black dark:text-white">
+      <input className="w-full p-2 border rounded bg-white dark:bg-gray-900 dark:text-white" placeholder="Navn" value={name} onChange={(e) => setName(e.target.value)} required />
+      <input className="w-full p-2 border rounded bg-white dark:bg-gray-900 dark:text-white" placeholder="E-post" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <input className="w-full p-2 border rounded bg-white dark:bg-gray-900 dark:text-white" placeholder="Telefon" value={phone} onChange={(e) => setPhone(e.target.value)} />
+      <input className="w-full p-2 border rounded bg-white dark:bg-gray-900 dark:text-white" placeholder="Firma" value={company} onChange={(e) => setCompany(e.target.value)} />
+      <textarea className="w-full p-2 border rounded bg-white dark:bg-gray-900 dark:text-white" placeholder="Notat" value={note} onChange={(e) => setNote(e.target.value)} />
       
-      <select className="w-full p-2 border rounded" value={status} onChange={(e) => setStatus(e.target.value as StatusKey)}>
+      <select className="w-full p-2 border rounded bg-white dark:bg-gray-900 dark:text-white" value={status} onChange={(e) => setStatus(e.target.value as StatusKey)}>
         {Object.entries(STATUS_OPTIONS).map(([key, label]) => (
           <option key={key} value={key}>
             {label}

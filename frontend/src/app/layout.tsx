@@ -9,8 +9,8 @@ import { DndProvider } from 'react-dnd';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body className="flex flex-col min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white transition-colors duration-300">
+    <html lang="en" className="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white">
+      <body className="flex flex-col min-h-screen transition-colors duration-300">
         <DndProvider backend={HTML5Backend}>
           <AuthProvider>
             <Navbar />

@@ -38,10 +38,7 @@ export default function DashboardPage() {
 
   const contacts: Contact[] = data?.contacts ?? [];
 
-  const handleDelete = () => {
-    refetch();
-  };
-
+  const handleDelete = () => refetch();
   const handleUpdate = async (updated: Contact) => {
     await updateContact({ variables: { data: updated } });
     refetch();
@@ -68,7 +65,7 @@ export default function DashboardPage() {
   if (error) return <p className="text-red-500">Feil ved henting av data</p>;
 
   return (
-    <main className="p-6">
+    <main className="p-6 text-black dark:text-white">
       <h1 className="text-3xl font-bold mb-4">CRM Kanban Dashboard</h1>
 
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -79,9 +76,7 @@ export default function DashboardPage() {
                 {label} ({contacts.filter((c) => c.status === enumKey).length})
               </h2>
               <SortableContext
-                items={contacts
-                  .filter((c) => c.status === enumKey)
-                  .map((c) => c.id.toString())}
+                items={contacts.filter((c) => c.status === enumKey).map((c) => c.id.toString())}
                 strategy={verticalListSortingStrategy}
               >
                 <div className="space-y-4">
@@ -106,18 +101,12 @@ export default function DashboardPage() {
   );
 }
 
-function DroppableColumn({
-  id,
-  children,
-}: {
-  id: string;
-  children: React.ReactNode;
-}) {
+function DroppableColumn({ id, children }: { id: string; children: React.ReactNode }) {
   const { setNodeRef } = useDroppable({ id });
   return (
     <div
       ref={setNodeRef}
-      className="bg-gray-100 p-4 rounded shadow min-h-[100px]"
+      className="bg-gray-100 dark:bg-gray-800 p-4 rounded shadow min-h-[100px] transition-colors"
     >
       {children}
     </div>

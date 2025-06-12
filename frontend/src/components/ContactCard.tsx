@@ -53,7 +53,7 @@ export default function ContactCard({ contact, onUpdate, onDelete }: Props) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 bg-white dark:bg-gray-800 text-black dark:text-white p-4 rounded shadow transition-colors duration-300">
       <h3 className="text-xl font-semibold">{contact.name}</h3>
       <p><span className="font-medium">E-post:</span> {contact.email}</p>
       <p><span className="font-medium">Telefon:</span> {contact.phone}</p>
