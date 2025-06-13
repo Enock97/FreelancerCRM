@@ -65,7 +65,7 @@ npm run dev
 Opprett `.env` i `backend/` med følgende verdier:
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/freelancecrm"
+DATABASE_URL="postgresql://myuser:mysecretpassword@localhost:5432/mydb"
 JWT_SECRET="your-secret-string"
 PORT=5000
 ```
