@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 RUN npm ci
+ENV NODE_ENV=production
 
 COPY . .
 RUN npm run build
@@ -12,7 +13,6 @@ RUN npx prisma generate
 # ---------- Runtime -------------------------------------------------
 FROM node:20-slim AS runtime
 WORKDIR /app
-ENV NODE_ENV=production
 
 # Install OpenSSL + dev libs required by Prisma engines
 RUN apt-get update && apt-get install -y openssl libssl-dev

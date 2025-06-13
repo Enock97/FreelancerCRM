@@ -5,6 +5,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
+ENV NODE_ENV=production
+
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -13,7 +15,6 @@ RUN npm run build
 # ---------- Runtime stage -----------------------------------------------
 FROM node:20-alpine
 WORKDIR /app
-ENV NODE_ENV=production
 
 # 1. standalone server and static assets
 COPY --from=builder /app/.next/standalone ./
