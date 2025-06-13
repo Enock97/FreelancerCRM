@@ -1,5 +1,5 @@
 # ---------- Build stage -------------------------------------------------
-FROM node:20-alpine AS builder
+FROM node:18-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
@@ -13,13 +13,15 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # ---------- Runtime stage -----------------------------------------------
-FROM node:20-alpine
+FROM node:18-alpine
 WORKDIR /app
 
-# 1. standalone server and static assets
+# Standalone Next.js output + statiske filer
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static     ./.next/static
 COPY --from=builder /app/public           ./public
+
+# Nødvendige moduler
 COPY --from=builder /app/node_modules     ./node_modules
 
 EXPOSE 3000
