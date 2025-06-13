@@ -3,7 +3,7 @@
 import '../styles/globals.css';
 import { ReactNode } from 'react';
 import { AuthProvider } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
+import Navbar from '@/components/Navbar';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 
