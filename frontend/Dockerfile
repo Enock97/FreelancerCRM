@@ -9,11 +9,6 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN echo "┌── /app/src ───────────────────────────────────" \
- && ls -R src \
- && echo "└── /app/src/components ───────────────────────" \
- && ls -R src/components
-
 RUN npm run build
 
 # ---------- Runtime stage -----------------------------------------------

@@ -52,8 +52,9 @@ k8s/*-secret.yml
 # minikube docker cache / output
 *.iso
 .minikube/
-
+kubeconfig.*
 kubeconfig.b64
+kubeconfig.inlined*
 *.64
 # evt. lokalt kubeconfig-dump
 local-kubeconfig.yaml
