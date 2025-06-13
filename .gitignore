@@ -1,0 +1,69 @@
+# ──────────────────────────
+# Felles node / build-artefakter
+node_modules/
+dist/
+build/
+*.log
+
+# Next.js
+frontend/.next/
+frontend/.turbo/
+
+# Prisma generert cache
+**/.prisma/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Miljøfiler
+.env
+.env.*
+**/.env
+**/.env.*
+k8s/*secret*.yaml
+*.secret.yaml
+
+# Docker bind-mount
+postgres_data/
+
+# ─── Kubernetes & Helm ───────────────────────────────────────────
+k8s/pg-secrets.yaml   # inneholder passord, holdes kun lokalt
+*.kubeconfig
+*.tgz                 # helm-pakker
+# ─── Docker ──────────────────────────────────────────────────────
+*.localbuild          # egne tmp-filer
+# ─── Node / general ──────────────────────────────────────────────
+node_modules/
+*.env
+.env*
+dist/
+build/
+
+# ── Kubernetes & lokale dev-filer ─────────────────────────────
+k8s/.kubeconfig*
+*.tmp
+*.log
+k8s/pg-secret.yaml
+k8s/*-secret.yaml
+k8s/*-secret.yml
+
+# minikube docker cache / output
+*.iso
+.minikube/
+
+kubeconfig.b64
+*.64
+# evt. lokalt kubeconfig-dump
+local-kubeconfig.yaml
+
+# --- k8s ----------------------------------------------------------
+k8s/pg-secret.yaml        # ALDRI i Git
+# artefakter
+*.tmpl
+*.swp
+# --- Docker -------------------------------------------------------
+**/node_modules
+**/npm-debug.log*
+**/.env*

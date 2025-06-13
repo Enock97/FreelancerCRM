@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: freelancercrm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: backend
+          image: ghcr.io/enock97/freelancercrm-backend:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: pg-secret, key: POSTGRES_USER } }
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: pg-secret, key: POSTGRES_PASSWORD } }
+            - name: POSTGRES_DB
+              valueFrom: { secretKeyRef: { name: pg-secret, key: POSTGRES_DB } }
+            - name: DB_HOST
+              valueFrom: { configMapKeyRef: { name: backend-config, key: DB_HOST } }
+            - name: DB_PORT
+              valueFrom: { configMapKeyRef: { name: backend-config, key: DB_PORT } }
+            # Prisma trenger DATABASE_URL => bygg den on-the-fly
+            - name: DATABASE_URL
+              value: >-
+                postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(POSTGRES_DB)
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret      # evt. egen secret
+                  key: POSTGRES_PASSWORD  
+          lifecycle:
+            postStart:
+              exec:
+                command: ["sh", "-c", "npx prisma migrate deploy || true"]

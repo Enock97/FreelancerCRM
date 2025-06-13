@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: freelancercrm
+spec:
+  type: NodePort        # ⇢ minikube service backend --url
+  selector:
+    app: backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+      nodePort: 30500   # valgfritt; minikube bruker 30000-32767
