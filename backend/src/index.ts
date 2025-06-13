@@ -34,7 +34,7 @@ const bootstrap = async () => {
 
   app.listen(PORT,'0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`GraphQL running at http://localhost:${PORT}/graphql`);
+    console.log(`GraphQL running at ${PORT}/graphql`);
   });
 };
 
