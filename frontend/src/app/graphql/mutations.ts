@@ -1,15 +1,15 @@
 import { gql } from '@apollo/client';
 
 export const CREATE_CONTACT = gql`
-  mutation CreateContact($data: CreateContactInput!) {
+  mutation CreateContact($data: ContactInput!) {
     createContact(data: $data) {
       id
       name
       email
       phone
       company
-      status
       note
+      status
       createdAt
     }
   }
@@ -37,12 +37,13 @@ export const DELETE_CONTACT = gql`
 `;
 
 export const CREATE_ACTIVITY = gql`
-  mutation CreateActivity($data: CreateActivityInput!) {
+  mutation CreateActivity($data: ActivityInput!) {
     createActivity(data: $data) {
       id
       title
       note
       createdAt
+      contactId
     }
   }
 `;
@@ -50,7 +51,13 @@ export const CREATE_ACTIVITY = gql`
 export const UPDATE_USER = gql`
   mutation UpdateUser($data: UpdateUserInput!) {
     updateUser(data: $data) {
+      id
       email
+      name
+      phone
+      company
+      location
     }
   }
-`
+`;
+

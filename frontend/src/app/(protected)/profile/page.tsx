@@ -63,25 +63,24 @@ export default function ProfilePage() {
   }
 
   const handleSave = async () => {
-    const input = {
-      email: form.email,
-      password: realPassword !== '' && !realPassword.includes('*') ? realPassword : undefined,
-    }
+    const input: Record<string, string> = {}
+    if (form.email) input.email = form.email
+    if (form.password && !form.password.includes('*')) input.password = form.password
+    if (form.name)     input.name     = form.name
+    if (form.phone)    input.phone    = form.phone
+    if (form.company)  input.company  = form.company
+    if (form.location) input.location = form.location
 
     try {
       await updateUser({ variables: { data: input } })
-      if (input.password) {
-        setForm((prev) => ({
-          ...prev,
-          password: input.password ? '*'.repeat(input.password.length) : prev.password,
-        }));
-        setRealPassword(input.password)
-      }
-      localStorage.setItem('profile_data', JSON.stringify({ ...form, password: realPassword }))
-    } catch (err) {
-      console.error('Feil ved lagring:', err)
+      if (input.password) form.password = '*'.repeat(input.password.length)
+      localStorage.setItem('profile_data', JSON.stringify(form))
+    } catch (e) {
+      console.error('updateUser-error', e)
     }
   }
+
+
 
   if (isLoading || !token) return null
 

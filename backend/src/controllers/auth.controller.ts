@@ -58,7 +58,13 @@ export const loginUser = async (req: AuthRequest, res: Response): Promise<void> 
     }
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ 'Successfully logged in, Bearer token:': token });
+    res.json({
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+    },
+  });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }

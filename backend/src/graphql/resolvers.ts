@@ -73,6 +73,8 @@ export const resolvers: Resolvers<ApolloContext> = {
         throw new Error(`Invalid status: ${data.status}`)
       }
 
+      console.log("Received data:", data)
+
       const contact = await prisma.contact.create({
         data: { ...data, userId: user.userId },
       })
@@ -116,14 +118,12 @@ export const resolvers: Resolvers<ApolloContext> = {
       }
     },
 
-
     deleteContact: async (_, { id }, { user }) => {
-      const deleted = await prisma.contact.deleteMany({
-        where: { id, userId: user.userId },
-      })
-
+      await prisma.activity.deleteMany({ where: { contactId: id, userId: user.userId } })
+      const deleted = await prisma.contact.deleteMany({ where: { id, userId: user.userId } })
       return deleted.count > 0
     },
+
 
     createActivity: async (_, { data }, { user }) => {
       const contact = await prisma.contact.findFirst({
@@ -141,5 +141,26 @@ export const resolvers: Resolvers<ApolloContext> = {
         createdAt: activity.createdAt.toISOString(),
       }
     },
+
+    updateUser: async (_, { data }, { user }) => {
+    const cleanedData: Record<string, any> = {};
+    for (const key in data) {
+      const value = data[key as keyof typeof data];
+      if (value !== null && value !== undefined) {
+        cleanedData[key] = value;
+      }
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: user.userId },
+      data: cleanedData,
+    });
+
+    return updated;
+  },
+
+
+
+
   },
 }

@@ -1,57 +1,78 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useAuth } from '../../../context/AuthContext';
-import ContactForm from './ContactForm';
-import ContactCard from '@/components/ContactCard';
-import { Contact } from '../../../types/types';
-import { useQuery, useMutation } from '@apollo/client';
-import { GET_CONTACTS } from '../../graphql/queries';
+import { useState, useEffect } from 'react'
+import { useAuth } from '../../../context/AuthContext'
+import ContactForm from './ContactForm'
+import ContactCard from '@/components/ContactCard'
+import { Contact } from '../../../types/types'
+import { useQuery, useMutation } from '@apollo/client'
+import { GET_CONTACTS } from '../../graphql/queries'
 import {
   CREATE_CONTACT,
   UPDATE_CONTACT,
   DELETE_CONTACT,
-} from '../../graphql/mutations';
+} from '../../graphql/mutations'
+import { ContactInputType } from '@/types/contactInput'
 
 export default function ContactsPage() {
-  const { token } = useAuth();
-  const [showForm, setShowForm] = useState(false);
+  const { token } = useAuth()
+  const [showForm, setShowForm] = useState(false)
 
   const { data, loading, error, refetch } = useQuery(GET_CONTACTS, {
     skip: !token,
     context: { headers: { Authorization: `Bearer ${token}` } },
-  });
+  })
 
   const [createContact] = useMutation(CREATE_CONTACT, {
     context: { headers: { Authorization: `Bearer ${token}` } },
     onCompleted: () => refetch(),
-  });
+  })
 
   const [updateContact] = useMutation(UPDATE_CONTACT, {
     context: { headers: { Authorization: `Bearer ${token}` } },
     onCompleted: () => refetch(),
-  });
+  })
 
   const [deleteContact] = useMutation(DELETE_CONTACT, {
     context: { headers: { Authorization: `Bearer ${token}` } },
     onCompleted: () => refetch(),
-  });
+  })
 
-  const handleCreate = async (input: Omit<Contact, 'id' | 'createdAt'>) => {
-    await createContact({ variables: { data: input } });
-    setShowForm(false);
-  };
+  const handleCreate = async (input: ContactInputType) => {
+    try {
+      await createContact({ variables: { data: input } })
+      setShowForm(false)
+    } catch (e) {
+      console.error('createContact-error', e)
+    }
+  }
+
 
   const handleUpdate = async (input: Contact) => {
-    await updateContact({ variables: { data: input } });
-  };
+    try {
+      await updateContact({ variables: { data: input } })
+    } catch (e) {
+      console.error('Update contact error:', e)
+    }
+  }
 
   const handleDelete = async (id: number) => {
-    await deleteContact({ variables: { id } });
-  };
+    try {
+      await deleteContact({ variables: { id } })
+    } catch (e) {
+      console.error('Delete contact error:', e)
+    }
+  }
 
-  if (loading) return <p>Laster inn...</p>;
-  if (error) return <p className="text-red-600">Feil: {error.message}</p>;
+  useEffect(() => {
+    if (!loading && !token) {
+      window.location.href = '/login'
+    }
+  }, [loading, token])
+
+  if (loading) return <p>Laster kontakter...</p>
+  if (error) return <p>Feil ved henting av kontakter: {error.message}</p>
+  if (!data || !data.contacts) return <p>Ingen kontakter funnet.</p>
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6 text-black dark:text-white">
@@ -84,5 +105,5 @@ export default function ContactsPage() {
         ))}
       </div>
     </div>
-  );
+  )
 }

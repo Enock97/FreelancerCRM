@@ -56,11 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
   const login = (newToken: string, userData: UserData) => {
-    if (!newToken || !userData?.email) {
-      console.error('Ugyldig token eller brukerdata ved login', newToken, userData);
-      return;
-    }
-
+    localStorage.clear();
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(userData));
     setToken(newToken);
@@ -80,17 +76,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     uri: `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
   });
 
-  const authLink = setContext((_, { headers }) => ({
-    headers: {
-      ...headers,
-      Authorization: token ? `Bearer ${token}` : '',
-    },
-  }));
+  const authLink = setContext((_, { headers }) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+
+    return {
+      headers: {
+        ...headers,
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    }
+  })
+
 
   const client = new ApolloClient({
     link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
-  });
+  })
+
 
   return (
     <AuthContext.Provider value={{ token, login, logout, isLoading, user, setUser }}>

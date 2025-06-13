@@ -38,6 +38,25 @@ const typeDefs = gql`
     note: String
   }
 
+  type User {
+    id: Int!
+    email: String!
+    name: String
+    phone: String
+    company: String
+    location: String
+    password: String
+  }
+
+  input UpdateUserInput {
+    email: String
+    password: String
+    name: String
+    phone: String
+    company: String
+    location: String
+  }
+
   type Activity {
     id: Int!
     title: String!
@@ -75,6 +94,7 @@ const typeDefs = gql`
     updateContact(data: ContactUpdateInput!): Contact!
     deleteContact(id: Int!): Boolean!
     createActivity(data: ActivityInput!): Activity!
+    updateUser(data: UpdateUserInput!): User
   }
 `;
 

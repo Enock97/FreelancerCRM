@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { ApolloContext } from '../apolloContext';
+import { ApolloContext } from '../types/apolloContext';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -83,6 +83,7 @@ export type Mutation = {
   createContact: Contact;
   deleteContact: Scalars['Boolean']['output'];
   updateContact: Contact;
+  updateUser?: Maybe<User>;
 };
 
 
@@ -103,6 +104,11 @@ export type MutationDeleteContactArgs = {
 
 export type MutationUpdateContactArgs = {
   data: ContactUpdateInput;
+};
+
+
+export type MutationUpdateUserArgs = {
+  data: UpdateUserInput;
 };
 
 export type Query = {
@@ -127,6 +133,26 @@ export type StatusCount = {
   __typename?: 'StatusCount';
   count: Scalars['Int']['output'];
   status: Scalars['String']['output'];
+};
+
+export type UpdateUserInput = {
+  company?: InputMaybe<Scalars['String']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type User = {
+  __typename?: 'User';
+  company?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  id: Scalars['Int']['output'];
+  location?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  password?: Maybe<Scalars['String']['output']>;
+  phone?: Maybe<Scalars['String']['output']>;
 };
 
 
@@ -213,6 +239,8 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   StatusCount: ResolverTypeWrapper<StatusCount>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  UpdateUserInput: UpdateUserInput;
+  User: ResolverTypeWrapper<User>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -229,6 +257,8 @@ export type ResolversParentTypes = {
   Query: {};
   StatusCount: StatusCount;
   String: Scalars['String']['output'];
+  UpdateUserInput: UpdateUserInput;
+  User: User;
 };
 
 export type ActivityResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Activity'] = ResolversParentTypes['Activity']> = {
@@ -264,6 +294,7 @@ export type MutationResolvers<ContextType = ApolloContext, ParentType extends Re
   createContact?: Resolver<ResolversTypes['Contact'], ParentType, ContextType, RequireFields<MutationCreateContactArgs, 'data'>>;
   deleteContact?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteContactArgs, 'id'>>;
   updateContact?: Resolver<ResolversTypes['Contact'], ParentType, ContextType, RequireFields<MutationUpdateContactArgs, 'data'>>;
+  updateUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'data'>>;
 };
 
 export type QueryResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -279,6 +310,17 @@ export type StatusCountResolvers<ContextType = ApolloContext, ParentType extends
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type UserResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+  company?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  location?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  password?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = ApolloContext> = {
   Activity?: ActivityResolvers<ContextType>;
   Contact?: ContactResolvers<ContextType>;
@@ -286,5 +328,6 @@ export type Resolvers<ContextType = ApolloContext> = {
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   StatusCount?: StatusCountResolvers<ContextType>;
+  User?: UserResolvers<ContextType>;
 };
 

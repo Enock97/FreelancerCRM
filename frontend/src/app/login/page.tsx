@@ -1,68 +1,71 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { User } from '../../types/types';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '../../context/AuthContext'
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const router = useRouter()
+  const { login } = useAuth()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError('');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
-      });
+      })
 
-      const data: { token: string; user: User; error?: string } = await res.json();
+      const result = await res.json()
+      if (!res.ok || !result.token || !result.user) {
+        setError('Login feilet: ugyldig respons')
+        return
+      }
 
-      if (!res.ok || !data.token || !data.user) throw new Error(data.error || 'Login failed');
-      login(data.token, data.user);
+      // Fjern gammel localStorage (valgfritt, men ryddig)
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      localStorage.removeItem('profile_data')
 
-
-      login(data.token, data.user); // login funksjonen tar seg av redirect til /dashboard
+      login(result.token, result.user)
+      router.push('/dashboard')
     } catch (err) {
-      if (err instanceof Error) setError(err.message);
-      else setError('Ukjent feil ved innlogging');
+      console.log('Error:' + err)
+      setError('Login feilet: nettverksfeil eller serverproblem')
     }
-  };
+  }
 
   return (
-    <div className="max-w-md mx-auto p-8 bg-white dark:bg-gray-900 dark:text-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Logg inn</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+    <div className="p-4 max-w-md mx-auto">
+      <h1 className="text-2xl mb-4">Logg inn</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="email"
-          placeholder="E-post"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700"
+          placeholder="E-post"
+          className="w-full border px-3 py-2"
         />
         <input
           type="password"
-          placeholder="Passord"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700"
+          placeholder="Passord"
+          className="w-full border px-3 py-2"
         />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-        >
+        {error && <p className="text-red-600">{error}</p>}
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2">
           Logg inn
         </button>
       </form>
     </div>
-  );
+  )
 }
