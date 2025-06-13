@@ -9,4 +9,6 @@ COPY . .
 
 RUN npm run build
 
-CMD ["npm", "run", "start"]
+RUN npx prisma generate
+
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
