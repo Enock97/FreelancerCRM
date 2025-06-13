@@ -1,32 +1,36 @@
+# ======= backend/Dockerfile =======
+
 # ---------- Builder -------------------------------------------------
 FROM node:18 AS builder
 WORKDIR /app
 
+# Install all deps (including devDeps, so tsc is available)
 COPY package*.json ./
 RUN npm ci
 
-ENV NODE_ENV=production
-
 COPY . .
 
-# Bygg TypeScript via npm script ("build": "npm exec tsc")
+# Build TypeScript and generate Prisma client
 RUN npm run build
-
-# Generer Prisma-klient
 RUN npx prisma generate
 
 # ---------- Runtime -------------------------------------------------
 FROM node:18-slim AS runtime
 WORKDIR /app
 
-# Installér OpenSSL + libssl for Prisma native bindings
-RUN apt-get update && apt-get install -y openssl libssl-dev
+# Install OpenSSL + libssl for Prisma native bindings
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends openssl libssl-dev \
+ && rm -rf /var/lib/apt/lists/*
 
-# Prod-avhengigheter
+# Switch to production mode for the runtime
+ENV NODE_ENV=production
+
+# Install only production dependencies
 COPY --from=builder /app/package*.json ./
 RUN npm ci --omit=dev
 
-# Bygget kode og prisma-binaries
+# Copy built code and Prisma artifacts
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
