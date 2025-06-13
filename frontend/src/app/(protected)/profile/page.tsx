@@ -19,6 +19,7 @@ export default function ProfilePage() {
     location: '',
   })
 
+  const [showPassword, setShowPassword] = useState(false)
   const [updateUser] = useMutation(UPDATE_USER)
 
   useEffect(() => {
@@ -28,21 +29,24 @@ export default function ProfilePage() {
       const stored = localStorage.getItem('profile_data')
       if (stored && stored !== 'undefined') {
         try {
-          setForm(({
-            ...JSON.parse(stored),
+          const parsed = JSON.parse(stored)
+          setForm({
+            ...parsed,
             email: user?.email || '',
-            password: '********',
-          }))
+            password: '*'.repeat(parsed.password?.length || 8),
+          })
         } catch {
           setForm((prev) => ({
             ...prev,
             email: user?.email || '',
+            password: '********',
           }))
         }
       } else {
         setForm((prev) => ({
           ...prev,
           email: user?.email || '',
+          password: '********',
         }))
       }
     }
@@ -56,12 +60,14 @@ export default function ProfilePage() {
   const handleSave = async () => {
     const input = {
       email: form.email,
-      password: form.password !== '********' ? form.password : undefined,
+      password: form.password.includes('*') ? undefined : form.password,
     }
 
     try {
       await updateUser({ variables: { data: input } })
-      if (input.password) form.password = '********'
+      if (input.password) {
+        form.password = '*'.repeat(input.password.length)
+      }
       localStorage.setItem('profile_data', JSON.stringify(form))
     } catch (err) {
       console.error('Feil ved lagring:', err)
@@ -90,14 +96,23 @@ export default function ProfilePage() {
 
           <div>
             <label htmlFor="password" className="block font-medium mb-1">Passord</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              className="w-full border p-2 rounded-lg bg-white dark:bg-gray-900 dark:text-white"
-            />
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={handleChange}
+                className="w-full border p-2 pr-10 rounded-lg bg-white dark:bg-gray-900 dark:text-white"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-600 dark:text-gray-300"
+              >
+                {showPassword ? 'Skjul' : 'Vis'}
+              </button>
+            </div>
           </div>
 
           {['name', 'phone', 'company', 'location'].map((field) => (

@@ -11,7 +11,10 @@ interface AuthRequest extends Request {
 }
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'changeme';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('Missing JWT_SECRET environment variable');
+}
 
 export const registerUser = async (req: AuthRequest, res: Response): Promise<void> => {
   const { email, password } = req.body;
