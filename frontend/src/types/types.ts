@@ -5,9 +5,9 @@ export interface Contact {
   id: number
   name: string
   email: string
-  phone?: string | null
-  company?: string | null
-  note?: string | null
+  phone?: string
+  company?: string
+  note?: string
   status: StatusKey            
   createdAt: string
 }
