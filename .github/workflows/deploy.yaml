@@ -6,8 +6,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BACKEND: ${{ env.REGISTRY }}/enock97/freelancercrm-backend
-  IMAGE_FRONTEND: ${{ env.REGISTRY }}/enock97/freelancercrm-frontend
+  IMAGE_BACKEND_LATEST: ghcr.io/enock97/freelancercrm-backend:latest
+  IMAGE_FRONTEND_LATEST: ghcr.io/enock97/freelancercrm-frontend:latest
   KUBE_NAMESPACE: freelancercrm
 
 jobs:
@@ -23,33 +23,48 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_PAT }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
 
-      - name: Build + push backend
+      - name: Set image tags
+        id: vars
+        run: echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Build & push backend
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           push: true
-          tags: ${{ env.IMAGE_BACKEND }}:latest
+          tags: |
+            ${{ env.IMAGE_BACKEND_LATEST }}
+            ghcr.io/enock97/freelancercrm-backend:${{ steps.vars.outputs.sha }}
 
-      - name: Build + push frontend
+      - name: Build & push frontend
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
-          tags: ${{ env.IMAGE_FRONTEND }}:latest
+          tags: |
+            ${{ env.IMAGE_FRONTEND_LATEST }}
+            ghcr.io/enock97/freelancercrm-frontend:${{ steps.vars.outputs.sha }}
 
   deploy:
     needs: build-push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
-      - name: Decode kube-config
-        run: echo "${{ secrets.KUBE_CONFIG_B64 }}" | base64 -d > $HOME/.kube/config
+        with:
+          version: 'latest'
+
+      - name: Decode kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo -n "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+
       - name: Deploy manifests
         run: |
-          kubectl apply -f k8s/ # alt i mappa
+          kubectl apply -f k8s/
           kubectl rollout status deploy/backend   -n ${{ env.KUBE_NAMESPACE }}
-          kubectl rollout status deploy/frontend -n ${{ env.KUBE_NAMESPACE }}
+          kubectl rollout status deploy/frontend  -n ${{ env.KUBE_NAMESPACE }}
