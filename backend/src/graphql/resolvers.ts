@@ -1,7 +1,9 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import { ApolloContext } from '../types/apolloContext'
 import { Resolvers, ContactStatus } from '../types/generated/graphql'
 import { CONTACT_STATUSES } from '../constants/contactstatus'
+import { Contact, Activity } from '../types/generated/graphql'
+
 
 const prisma = new PrismaClient()
 
@@ -13,9 +15,9 @@ export const resolvers: Resolvers<ApolloContext> = {
         orderBy: { createdAt: 'desc' },
       })
 
-      return contacts.map((c) => ({
+      return contacts.map((c: Contact) => ({
         ...c,
-        createdAt: c.createdAt.toISOString(),
+        createdAt: c.createdAt.toString(),
         status: c.status as ContactStatus | undefined,
       }))
     },
@@ -40,31 +42,37 @@ export const resolvers: Resolvers<ApolloContext> = {
         orderBy: { createdAt: 'desc' },
       })
 
-      return activities.map((a) => ({
+      return activities.map((a: Activity) => ({
         ...a,
-        createdAt: a.createdAt.toISOString(),
+        createdAt: a.createdAt.toString(),
       }))
     },
 
     dashboard: async (_, __, { user }) => {
-      const userId = user.userId
-      const [totalContacts, totalActivities, grouped] = await Promise.all([
-        prisma.contact.count({ where: { userId } }),
-        prisma.activity.count({ where: { userId } }),
-        prisma.contact.groupBy({
-          by: ['status'],
-          where: { userId },
-          _count: true,
-        }),
-      ])
+    const userId = user.userId
 
-      const statusCounts = grouped.map((g) => ({
-        status: g.status ?? 'UNKNOWN',
-        count: g._count,
-      }))
+    // counts
+    const [ totalContacts, totalActivities ] = await Promise.all([
+      prisma.contact.count({ where: { userId } }),
+      prisma.activity.count({ where: { userId } }),
+    ])
 
-      return { totalContacts, totalActivities, statusCounts }
-    },
+    // Prisma Client’s groupBy is fully typed
+    const grouped = await prisma.contact.groupBy({
+      by: ['status'],
+      where: { userId },
+      _count: true,
+    })
+
+    // TS will infer `g`’s type correctly here, so no implicit-any error
+    const statusCounts = grouped.map((g: { status: any; _count: any }) => ({
+      status:   g.status   ?? 'UNKNOWN',
+      count:    g._count,
+    }))
+
+    return { totalContacts, totalActivities, statusCounts }
+  }
+
   },
 
   Mutation: {
