@@ -2,7 +2,12 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client';
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  createHttpLink,
+} from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
 interface UserData {
@@ -21,7 +26,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }): ReactNode => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +36,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }): ReactNode =
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
 
-    if (storedToken) setToken(storedToken);
+    if (storedToken) {
+      setToken(storedToken);
+    }
+
     if (storedUser && storedUser !== 'undefined') {
       try {
         setUser(JSON.parse(storedUser));
@@ -40,10 +48,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }): ReactNode =
       }
     }
 
-    setIsLoading(false);
+    // Vent et tick for å sikre at states er oppdatert
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 0);
   }, []);
 
+
   const login = (newToken: string, userData: UserData) => {
+    if (!newToken || !userData?.email) {
+      console.error('Ugyldig token eller brukerdata ved login', newToken, userData);
+      return;
+    }
+
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(userData));
     setToken(newToken);
@@ -60,7 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }): ReactNode =
   };
 
   const httpLink = createHttpLink({
-    uri: 'http://localhost:5000/api/graphql',
+    uri: `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
   });
 
   const authLink = setContext((_, { headers }) => ({
@@ -77,11 +94,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }): ReactNode =
 
   return (
     <AuthContext.Provider value={{ token, login, logout, isLoading, user, setUser }}>
-      {!isLoading && (
-        <ApolloProvider client={client}>
-          {children}
-        </ApolloProvider>
-      )}
+      {!isLoading && <ApolloProvider client={client}>{children}</ApolloProvider>}
     </AuthContext.Provider>
   );
 };

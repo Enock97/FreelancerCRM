@@ -21,12 +21,7 @@ export default function Navbar() {
       </div>
       <div className="flex items-center space-x-4">
         <DarkModeToggle />
-        {!token ? (
-          <>
-            <Link href="/login">Logg inn</Link>
-            <Link href="/register">Registrer</Link>
-          </>
-        ) : (
+        {token && (
           <button onClick={logout} className="text-red-500 hover:text-red-600">Logg ut</button>
         )}
       </div>

@@ -18,6 +18,7 @@ export default function ContactsPage() {
   const [showForm, setShowForm] = useState(false);
 
   const { data, loading, error, refetch } = useQuery(GET_CONTACTS, {
+    skip: !token,
     context: { headers: { Authorization: `Bearer ${token}` } },
   });
 

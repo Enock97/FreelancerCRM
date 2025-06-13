@@ -23,7 +23,6 @@ import { Contact } from '../../../types/types';
 import { STATUS_OPTIONS, StatusKey } from '../../../constants/status'
 
 const STATUS_ENUM = STATUS_OPTIONS
-
 type ContactStatus = StatusKey
 
 export default function DashboardPage() {
@@ -32,9 +31,12 @@ export default function DashboardPage() {
 
   const { data, loading, error, refetch } = useQuery(GET_CONTACTS, {
     skip: !token,
+    context: { headers: { Authorization: `Bearer ${token}` } },
   });
 
-  const [updateContact] = useMutation(UPDATE_CONTACT);
+  const [updateContact] = useMutation(UPDATE_CONTACT, {
+    context: { headers: { Authorization: `Bearer ${token}` } },
+  });
 
   const contacts: Contact[] = data?.contacts ?? [];
 

@@ -6,6 +6,7 @@ import { User } from '../../types/types';
 
 export default function LoginPage() {
   const { login } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -23,9 +24,11 @@ export default function LoginPage() {
 
       const data: { token: string; user: User; error?: string } = await res.json();
 
-      if (!res.ok) throw new Error(data.error || 'Login failed');
-
+      if (!res.ok || !data.token || !data.user) throw new Error(data.error || 'Login failed');
       login(data.token, data.user);
+
+
+      login(data.token, data.user); // login funksjonen tar seg av redirect til /dashboard
     } catch (err) {
       if (err instanceof Error) setError(err.message);
       else setError('Ukjent feil ved innlogging');

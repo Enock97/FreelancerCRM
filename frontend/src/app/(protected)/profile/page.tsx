@@ -19,8 +19,11 @@ export default function ProfilePage() {
     location: '',
   })
 
+  const [realPassword, setRealPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [updateUser] = useMutation(UPDATE_USER)
+  const [updateUser] = useMutation(UPDATE_USER, {
+    context: { headers: { Authorization: `Bearer ${token}` } },
+  })
 
   useEffect(() => {
     if (!isLoading && !token) router.push('/login')
@@ -30,10 +33,11 @@ export default function ProfilePage() {
       if (stored && stored !== 'undefined') {
         try {
           const parsed = JSON.parse(stored)
+          setRealPassword(parsed.password || '')
           setForm({
             ...parsed,
-            email: user?.email || '',
-            password: '*'.repeat(parsed.password?.length || 8),
+            email: user?.email || parsed.email || '',
+            password: '*'.repeat((parsed.password || '').length),
           })
         } catch {
           setForm((prev) => ({
@@ -55,20 +59,25 @@ export default function ProfilePage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
+    if (name === 'password') setRealPassword(value)
   }
 
   const handleSave = async () => {
     const input = {
       email: form.email,
-      password: form.password.includes('*') ? undefined : form.password,
+      password: realPassword !== '' && !realPassword.includes('*') ? realPassword : undefined,
     }
 
     try {
       await updateUser({ variables: { data: input } })
       if (input.password) {
-        form.password = '*'.repeat(input.password.length)
+        setForm((prev) => ({
+          ...prev,
+          password: input.password ? '*'.repeat(input.password.length) : prev.password,
+        }));
+        setRealPassword(input.password)
       }
-      localStorage.setItem('profile_data', JSON.stringify(form))
+      localStorage.setItem('profile_data', JSON.stringify({ ...form, password: realPassword }))
     } catch (err) {
       console.error('Feil ved lagring:', err)
     }
@@ -101,7 +110,7 @@ export default function ProfilePage() {
                 id="password"
                 name="password"
                 type={showPassword ? 'text' : 'password'}
-                value={form.password}
+                value={showPassword ? realPassword : form.password}
                 onChange={handleChange}
                 className="w-full border p-2 pr-10 rounded-lg bg-white dark:bg-gray-900 dark:text-white"
               />
