@@ -1,16 +1,15 @@
-# ======= backend/Dockerfile =======
-
 # ---------- Builder -------------------------------------------------
 FROM node:18 AS builder
 WORKDIR /app
 
-# Install all deps (including devDeps, so tsc is available)
+# 1) Only copy package files, install deps (incl. devDeps so tsc is here)
 COPY package*.json ./
 RUN npm ci
 
+# 2) Copy source (won't overwrite node_modules thanks to .dockerignore)
 COPY . .
 
-# Build TypeScript and generate Prisma client
+# 3) Build & generate
 RUN npm run build
 RUN npx prisma generate
 
@@ -23,14 +22,13 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends openssl libssl-dev \
  && rm -rf /var/lib/apt/lists/*
 
-# Switch to production mode for the runtime
 ENV NODE_ENV=production
 
-# Install only production dependencies
+# Only production deps
 COPY --from=builder /app/package*.json ./
 RUN npm ci --omit=dev
 
-# Copy built code and Prisma artifacts
+# Copy build outputs
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
