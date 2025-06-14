@@ -90,7 +90,7 @@ jobs:
           POSTGRES_DB:       ${{ secrets.POSTGRES_DB }}
           KUBE_NAMESPACE:    ${{ env.KUBE_NAMESPACE }}
         run: |
-          # ensure namespace
+          # ensure namespace exists
           kubectl create namespace "$KUBE_NAMESPACE" --dry-run=client -o yaml \
             | kubectl apply -f -
           # Postgres creds
@@ -106,10 +106,24 @@ jobs:
             --docker-password="${{ secrets.REGISTRY_TOKEN }}" \
             --namespace="$KUBE_NAMESPACE"
 
-      - name: Deploy manifests
-        run: kubectl apply -f k8s/
+      - name: Deploy & debug
+        run: |
+          # 1) Apply all manifests
+          kubectl apply -f k8s/
 
-      - name: Wait for Postgres to be Ready
+          # 2) Dump pod state
+          echo "=== PODS ==="
+          kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
+
+          # 3) Describe backend pod
+          echo "=== DESCRIBE BACKEND POD ==="
+          kubectl describe pod -l app=backend -n ${{ env.KUBE_NAMESPACE }}
+
+          # 4) Show backend logs
+          echo "=== BACKEND LOGS ==="
+          kubectl logs -l app=backend -n ${{ env.KUBE_NAMESPACE }}
+
+      - name: Wait for Postgres rollout
         run: |
           kubectl rollout status statefulset/postgres \
             -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
