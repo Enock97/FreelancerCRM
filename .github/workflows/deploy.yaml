@@ -82,6 +82,11 @@ jobs:
           kubectl patch storageclass local-path \
             -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
+      - name: Wait for local-path provisioner to be ready
+        run: |
+          kubectl rollout status daemonset/local-path-provisioner \
+            -n local-path-storage --timeout=120s
+
       - name: Pull & load images into KinD
         run: |
           docker pull ${{ env.IMAGE_BACKEND_LATEST }}
@@ -110,17 +115,28 @@ jobs:
 
       - name: Deploy & debug
         run: |
-          # 1) Apply all your manifests
+          # 1) Apply your manifests
           kubectl apply -f k8s/
 
-          # 2) Show overall Pod & Event state
+          # 2) Show StorageClasses
+          echo "=== STORAGECLASSES ==="
+          kubectl get sc
+
+          # 3) Show PVC status
+          echo "=== PVCs ==="
+          kubectl get pvc -n ${{ env.KUBE_NAMESPACE }}
+
+          echo "=== DESCRIBE PVC pg-data-postgres-0 ==="
+          kubectl describe pvc pg-data-postgres-0 -n ${{ env.KUBE_NAMESPACE }}
+
+          # 4) Show Pod & Events
           echo "=== PODS ==="
           kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
 
           echo "=== RECENT EVENTS ==="
           kubectl get events -n ${{ env.KUBE_NAMESPACE }} --sort-by='.lastTimestamp'
 
-          # 3) Inspect Postgres
+          # 5) Describe Postgres
           echo "=== DESCRIBE POSTGRES STATEFULSET ==="
           kubectl describe statefulset postgres -n ${{ env.KUBE_NAMESPACE }}
 
@@ -129,26 +145,6 @@ jobs:
 
           echo "=== POSTGRES LOGS ==="
           kubectl logs -l app=postgres -n ${{ env.KUBE_NAMESPACE }} || true
-
-          # 4) Inspect Backend
-          echo "=== DESCRIBE BACKEND POD ==="
-          kubectl describe pod -l app=backend -n ${{ env.KUBE_NAMESPACE }}
-
-          echo "=== BACKEND EVENTS ==="
-          kubectl get events \
-            -n ${{ env.KUBE_NAMESPACE }} \
-            --field-selector involvedObject.kind=Pod,involvedObject.name=$(kubectl get pod -l app=backend -n ${{ env.KUBE_NAMESPACE }} -o jsonpath='{.items[0].metadata.name}') \
-            --sort-by='.lastTimestamp'
-
-          echo "=== BACKEND LOGS ==="
-          kubectl logs -l app=backend -n ${{ env.KUBE_NAMESPACE }} --all-containers || true
-
-          # 5) Inspect Frontend
-          echo "=== DESCRIBE FRONTEND POD ==="
-          kubectl describe pod -l app=frontend -n ${{ env.KUBE_NAMESPACE }}
-
-          echo "=== FRONTEND LOGS ==="
-          kubectl logs -l app=frontend -n ${{ env.KUBE_NAMESPACE }} --all-containers || true
 
       - name: Wait for Postgres Pod to be Ready
         run: |
