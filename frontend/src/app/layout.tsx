@@ -1,22 +1,20 @@
-'use client';
+"use client";
+import React from "react";
+import "../styles/globals.css";
+import { AuthProvider } from "../context/AuthContext";
+import { DarkModeProvider } from "../context/DarkModeContext";
+import Navbar from "../components/Navbar";
 
-import '../styles/globals.css';
-import { ReactNode } from 'react';
-import { AuthProvider } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { DndProvider } from 'react-dnd';
-
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white">
-      <body className="flex flex-col min-h-screen transition-colors duration-300">
-        <DndProvider backend={HTML5Backend}>
-          <AuthProvider>
+    <html lang="no" suppressHydrationWarning>
+      <body className="bg-gray-100 dark:bg-gray-950 min-h-screen">
+        <AuthProvider>
+          <DarkModeProvider>
             <Navbar />
-            {children}
-          </AuthProvider>
-        </DndProvider>
+            <main className="max-w-6xl mx-auto w-full py-8 px-2">{children}</main>
+          </DarkModeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

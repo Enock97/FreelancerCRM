@@ -1,23 +1,28 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const CREATE_CONTACT = gql`
-  mutation CreateContact($data: ContactInput!) {
-    createContact(data: $data) {
+  mutation CreateContact($input: ContactInput!) {
+    createContact(input: $input) {
       id
       name
       email
       phone
       company
-      note
       status
+      note
       createdAt
+      activities {
+        id
+        description
+        createdAt
+      }
     }
   }
 `;
 
 export const UPDATE_CONTACT = gql`
-  mutation UpdateContact($data: UpdateContactInput!) {
-    updateContact(data: $data) {
+  mutation UpdateContact($id: ID!, $input: ContactInput!) {
+    updateContact(id: $id, input: $input) {
       id
       name
       email
@@ -26,38 +31,58 @@ export const UPDATE_CONTACT = gql`
       status
       note
       createdAt
+      activities {
+        id
+        description
+        createdAt
+      }
     }
   }
 `;
 
 export const DELETE_CONTACT = gql`
-  mutation DeleteContact($id: Int!) {
+  mutation DeleteContact($id: ID!) {
     deleteContact(id: $id)
   }
 `;
 
 export const CREATE_ACTIVITY = gql`
-  mutation CreateActivity($data: ActivityInput!) {
-    createActivity(data: $data) {
+  mutation CreateActivity($contactId: ID!, $description: String!) {
+    createActivity(contactId: $contactId, description: $description) {
       id
-      title
-      note
+      description
       createdAt
-      contactId
     }
   }
 `;
 
-export const UPDATE_USER = gql`
-  mutation UpdateUser($data: UpdateUserInput!) {
-    updateUser(data: $data) {
+export const DELETE_ACTIVITY = gql`
+  mutation DeleteActivity($id: ID!) {
+    deleteActivity(id: $id)
+  }
+`;
+
+export const LOGIN = gql`
+  mutation Login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      token
+    }
+  }
+`;
+
+export const REGISTER = gql`
+  mutation Register($email: String!, $password: String!) {
+    register(email: $email, password: $password) {
+      token
+    }
+  }
+`;
+
+export const UPDATE_PROFILE = gql`
+  mutation UpdateProfile($input: UpdateUserInput!) {
+    updateProfile(input: $input) {
       id
       email
-      name
-      phone
-      company
-      location
     }
   }
 `;
-

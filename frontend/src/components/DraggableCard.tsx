@@ -1,49 +1,63 @@
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { motion } from 'framer-motion';
-import ContactCard from './ContactCard';
-import { Contact } from '../types/types';
+"use client";
+import React, { useRef } from "react";
+import { Contact } from "../types/types";
 
-interface Props {
+interface DraggableCardProps {
   contact: Contact;
-  onDelete: (id: number) => void;
-  onUpdate: (updated: Contact) => void;
-  token: string;
+  statusOptions: { value: string; label: string }[];
+  onDragEnd: (contactId: string, newStatus: string) => void;
+  refetch: () => void;
 }
 
-export default function DraggableCard({ contact, onDelete, onUpdate, token }: Props) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: contact.id });
+const DraggableCard: React.FC<DraggableCardProps> = ({
+  contact,
+  statusOptions,
+  onDragEnd,
+  refetch,
+}) => {
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 50 : 0,
-    opacity: isDragging ? 0.5 : 1,
+  // For enkel drag/drop uten ekstern dnd-pakke (HTML5)
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData("id", contact.id);
+  };
+
+  const handleDrop = (e: React.DragEvent, newStatus: string) => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData("id");
+    if (id && id === contact.id && contact.status !== newStatus) {
+      onDragEnd(contact.id, newStatus);
+      refetch();
+    }
   };
 
   return (
-    <motion.div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      layout
-      initial={{ scale: 1 }}
-      animate={{ scale: isDragging ? 1.03 : 1 }}
+    <div
+      ref={cardRef}
+      className="bg-white dark:bg-gray-900 shadow rounded p-3 mb-2 cursor-move"
+      draggable
+      onDragStart={handleDragStart}
+      onDragOver={(e) => e.preventDefault()}
     >
-      <ContactCard
-        contact={contact}
-        onDelete={onDelete}
-        onUpdate={onUpdate}
-        token={token}
-      />
-    </motion.div>
+      <div className="font-bold dark:text-white">{contact.name}</div>
+      <div className="text-gray-500 dark:text-gray-400 text-sm">{contact.company}</div>
+      <div className="flex space-x-1 mt-2">
+        {statusOptions
+          .filter((opt) => opt.value !== contact.status)
+          .map((opt) => (
+            <button
+              key={opt.value}
+              className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 dark:text-white mr-1"
+              onClick={() => onDragEnd(contact.id, opt.value)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => handleDrop(e, opt.value)}
+            >
+              Flytt til {opt.label}
+            </button>
+          ))}
+      </div>
+    </div>
   );
-}
+};
+
+export default DraggableCard;

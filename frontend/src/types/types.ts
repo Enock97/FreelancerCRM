@@ -1,28 +1,17 @@
-// src/types/types.ts  (eller hvor Contact er definert)
-import { StatusKey } from '@/constants/status'
+export interface Activity {
+  id: string;
+  description: string;
+  createdAt: string;
+}
 
 export interface Contact {
-  id: number
-  name: string
-  email: string
-  phone?: string
-  company?: string
-  note?: string
-  status: StatusKey            
-  createdAt: string
-}
-
-export interface User {
-  id: number;
+  id: string;
+  name: string;
   email: string;
+  phone?: string;
+  company?: string;
+  status: string;
+  note?: string;
+  createdAt: string;
+  activities?: Activity[];
 }
-
-export interface Activity {
-  id: number
-  title: string
-  note: string | null
-  createdAt: string
-  contactId: number
-}
-
-

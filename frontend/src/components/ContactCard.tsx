@@ -1,134 +1,107 @@
-'use client'
+"use client";
+import React, { useState } from "react";
+import { Contact, Activity } from "../types/types";
+import { useMutation } from "@apollo/client";
+import { DELETE_CONTACT, CREATE_ACTIVITY, DELETE_ACTIVITY } from "../app/graphql/mutations";
+import { GET_CONTACTS } from "../app/graphql/queries";
+import ContactForm from "../app/(protected)/contacts/ContactForm";
 
-import { useState } from 'react'
-import { Contact } from '@/types/types'
-import { ContactInputType } from '@/types/contactInput'
-import ContactForm from '@/app/(protected)/contacts/ContactForm'
-import { useMutation } from '@apollo/client'
-import { UPDATE_CONTACT, DELETE_CONTACT, CREATE_ACTIVITY } from '@/app/graphql/mutations'
-import { GET_CONTACTS } from '@/app/graphql/queries'
-import { StatusKey } from '@/constants/status'
-
-type Props = {
-  contact: Contact
-  token: string
-  onUpdate?: (c: Contact) => void
-  onDelete?: (id: number) => void
+interface ContactCardProps {
+  contact: Contact;
+  onUpdate?: () => void;
 }
 
-/** Konverter backend-kontakt til skjemainput uten null-felter */
-const toInput = (c: Contact): ContactInputType => ({
-  name: c.name,
-  email: c.email,
-  phone: c.phone ?? '',
-  company: c.company ?? '',
-  note: c.note ?? '',
-  status: c.status as StatusKey,
-})
+const ContactCard: React.FC<ContactCardProps> = ({ contact, onUpdate }) => {
+  const [editMode, setEditMode] = useState(false);
+  const [activityText, setActivityText] = useState("");
+  const [createActivity] = useMutation(CREATE_ACTIVITY, {
+    refetchQueries: [{ query: GET_CONTACTS }],
+  });
+  const [deleteActivity] = useMutation(DELETE_ACTIVITY, {
+    refetchQueries: [{ query: GET_CONTACTS }],
+  });
+  const [deleteContact] = useMutation(DELETE_CONTACT, {
+    refetchQueries: [{ query: GET_CONTACTS }],
+  });
 
-export default function ContactCard({ contact, token, onUpdate, onDelete }: Props) {
-  const [editing, setEditing] = useState(false)
-  const [showActivity, setShowActivity] = useState(false)
-  const [activityTitle, setActivityTitle] = useState('')
+  const handleEdit = () => setEditMode(true);
 
-  const context = { headers: { Authorization: `Bearer ${token}` } }
-
-  const [updateContact] = useMutation(UPDATE_CONTACT, { context, refetchQueries: [{ query: GET_CONTACTS }] })
-  const [deleteContact] = useMutation(DELETE_CONTACT, { context, refetchQueries: [{ query: GET_CONTACTS }] })
-  const [createActivity] = useMutation(CREATE_ACTIVITY, { context, refetchQueries: [{ query: GET_CONTACTS }] })
-
-  /* -------- handlers -------- */
-
-  const handleSave = async (changes: ContactInputType) => {
-    const payload = { id: contact.id, ...changes }
-    await updateContact({ variables: { data: payload } })
-    onUpdate?.({ ...contact, ...changes })
-    setEditing(false)
-  }
-
-  const handleRemove = async () => {
-    await deleteContact({ variables: { id: contact.id } })
-    onDelete?.(contact.id)
-  }
-
-  const handleAddActivity = async () => {
-    if (!activityTitle.trim()) return
+  const handleActivityAdd = async () => {
+    if (!activityText.trim()) return;
     await createActivity({
-      variables: { data: { title: activityTitle, contactId: contact.id } },
-    })
-    setActivityTitle('')
-    setShowActivity(false)
-  }
+      variables: {
+        contactId: contact.id,
+        description: activityText.trim(),
+      },
+    });
+    setActivityText("");
+  };
 
-  /* -------- render -------- */
+  const handleActivityDelete = async (activityId: string) => {
+    await deleteActivity({ variables: { id: activityId } });
+  };
 
-  if (editing) {
+  const handleDelete = async () => {
+    await deleteContact({ variables: { id: contact.id } });
+    onUpdate?.();
+  };
+
+  if (editMode) {
     return (
-      <ContactForm
-        initialData={toInput(contact)}
-        onSubmit={handleSave}
-        onCancel={() => setEditing(false)}
-      />
-    )
+      <div className="bg-white dark:bg-gray-800 rounded shadow p-4 mb-4">
+        <ContactForm
+          initialData={contact}
+          onCancel={() => setEditMode(false)}
+          onSubmit={() => {
+            setEditMode(false);
+            onUpdate?.();
+          }}
+        />
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-2 bg-white dark:bg-gray-800 text-black dark:text-white p-4 rounded shadow transition-colors">
-      <h3 className="text-xl font-semibold">{contact.name}</h3>
-      <p><span className="font-medium">E-post:</span> {contact.email}</p>
-      {contact.phone && <p><span className="font-medium">Telefon:</span> {contact.phone}</p>}
-      {contact.company && <p><span className="font-medium">Firma:</span> {contact.company}</p>}
-      <p><span className="font-medium">Status:</span> {contact.status.replace(/_/g, ' ')}</p>
-      {contact.note && <p><span className="font-medium">Notat:</span> {contact.note}</p>}
-
-      {/* Aktivitet */}
-      {showActivity ? (
-        <div className="space-y-2">
-          <input
-            className="w-full p-2 border rounded bg-white dark:bg-gray-900 dark:text-white"
-            placeholder="Ny aktivitet..."
-            value={activityTitle}
-            onChange={(e) => setActivityTitle(e.target.value)}
-          />
-          <div className="flex gap-2">
-            <button
-              onClick={handleAddActivity}
-              className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-            >
-              Lagre
-            </button>
-            <button
-              onClick={() => setShowActivity(false)}
-              className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
-            >
-              Avbryt
-            </button>
-          </div>
+    <div className="bg-white dark:bg-gray-800 rounded shadow p-4 mb-4">
+      <div className="flex justify-between">
+        <div>
+          <div className="font-bold dark:text-white">{contact.name}</div>
+          <div className="text-gray-500 dark:text-gray-400 text-sm">{contact.email}</div>
+          <div className="text-gray-500 dark:text-gray-400 text-sm">{contact.phone}</div>
+          <div className="text-gray-500 dark:text-gray-400 text-sm">{contact.company}</div>
+          <div className="text-gray-500 dark:text-gray-400 text-sm">{contact.status}</div>
         </div>
-      ) : (
-        <button
-          onClick={() => setShowActivity(true)}
-          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          + Aktivitet
-        </button>
-      )}
-
-      {/* Kontroller */}
-      <div className="flex gap-2 pt-2">
-        <button
-          onClick={() => setEditing(true)}
-          className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-        >
-          Rediger
-        </button>
-        <button
-          onClick={handleRemove}
-          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-        >
-          Slett
-        </button>
+        <div className="flex flex-col space-y-2">
+          <button onClick={handleEdit} className="text-blue-600 dark:text-blue-400 hover:underline">Rediger</button>
+          <button onClick={handleDelete} className="text-red-600 dark:text-red-400 hover:underline">Slett</button>
+        </div>
+      </div>
+      <div className="mt-4">
+        <div className="font-semibold dark:text-white mb-2">Aktiviteter:</div>
+        {contact.activities?.map((activity: Activity) => (
+          <div key={activity.id} className="flex items-center justify-between bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded mb-1">
+            <span className="text-gray-800 dark:text-gray-200">{activity.description}</span>
+            <button onClick={() => handleActivityDelete(activity.id)} className="text-red-500 hover:underline ml-2">Slett</button>
+          </div>
+        ))}
+        <div className="flex mt-2">
+          <input
+            type="text"
+            className="flex-1 rounded-l px-2 py-1 border dark:bg-gray-900 dark:text-white"
+            value={activityText}
+            onChange={(e) => setActivityText(e.target.value)}
+            placeholder="Ny aktivitet..."
+          />
+          <button
+            onClick={handleActivityAdd}
+            className="rounded-r px-4 py-1 bg-blue-500 text-white hover:bg-blue-600"
+          >
+            Legg til
+          </button>
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default ContactCard;

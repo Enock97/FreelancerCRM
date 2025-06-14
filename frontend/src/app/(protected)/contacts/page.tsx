@@ -1,77 +1,47 @@
-'use client'
+"use client";
+import React, { useState } from "react";
+import { useQuery } from "@apollo/client";
+import { GET_CONTACTS } from "../../graphql/queries";
+import ContactCard from "../../../components/ContactCard";
+import ContactForm from "./ContactForm";
+import { Contact } from "../../../types/types";
 
-import { useEffect, useState } from 'react'
-import { useAuth } from '@/context/AuthContext'
-import ContactForm from './ContactForm'
-import ContactCard from '@/components/ContactCard'
-import { useQuery, useMutation } from '@apollo/client'
-import { GET_CONTACTS } from '@/app/graphql/queries'
-import { CREATE_CONTACT, UPDATE_CONTACT, DELETE_CONTACT } from '@/app/graphql/mutations'
-import { Contact } from '@/types/types'
-import { ContactInputType } from '@/types/contactInput'
+const ContactsPage = () => {
+  const { data, loading, error, refetch } = useQuery(GET_CONTACTS);
+  const [addMode, setAddMode] = useState(false);
 
-export default function ContactsPage() {
-  const { token, isLoading } = useAuth()
-  const [showForm, setShowForm] = useState(false)
-
-  const context = { headers: { Authorization: `Bearer ${token}` } }
-
-  const { data, loading, error, refetch } = useQuery(GET_CONTACTS, {
-    skip: !token,
-    context,
-  })
-
-  const [createContact] = useMutation(CREATE_CONTACT, { context, onCompleted: () => refetch() })
-  const [updateContact] = useMutation(UPDATE_CONTACT, { context, onCompleted: () => refetch() })
-  const [deleteContact] = useMutation(DELETE_CONTACT, { context, onCompleted: () => refetch() })
-
-  /* redirect hvis ikke innlogget */
-  useEffect(() => {
-    if (!isLoading && !token) window.location.href = '/login'
-  }, [isLoading, token])
-
-  if (isLoading || loading) return <p>Laster kontakter…</p>
-  if (error) return <p className="text-red-600">Feil: {error.message}</p>
-
-  const handleCreate = async (input: ContactInputType) => {
-    await createContact({ variables: { data: input } })
-    setShowForm(false)
-  }
-
-  const handleUpdate = async (changes: ContactInputType & { id: number }) => {
-    await updateContact({ variables: { data: changes } })
-  }
-
-  const handleDelete = async (id: number) => {
-    await deleteContact({ variables: { id } })
-  }
+  if (loading) return <div>Laster...</div>;
+  if (error) return <div>Feil ved lasting av kontakter</div>;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6 text-black dark:text-white">
-      <h2 className="text-3xl font-bold mb-4">Kontakter</h2>
-
-      {showForm ? (
-        <ContactForm onSubmit={handleCreate} onCancel={() => setShowForm(false)} />
-      ) : (
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold dark:text-white">Kontakter</h2>
         <button
-          onClick={() => setShowForm(true)}
-          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow"
+          onClick={() => setAddMode(true)}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
         >
-          Legg til kontakt
+          Ny kontakt
         </button>
-      )}
-
-      <div className="space-y-6">
-        {data.contacts.map((c: Contact) => (
-          <ContactCard
-            key={c.id}
-            contact={c}
-            token={token!}
-            onUpdate={handleUpdate}
-            onDelete={handleDelete}
+      </div>
+      {addMode && (
+        <div className="mb-4">
+          <ContactForm
+            onCancel={() => setAddMode(false)}
+            onSubmit={() => {
+              setAddMode(false);
+              refetch();
+            }}
           />
+        </div>
+      )}
+      <div>
+        {data.contacts.map((contact: Contact) => (
+          <ContactCard key={contact.id} contact={contact} onUpdate={refetch} />
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default ContactsPage;

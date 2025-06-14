@@ -1,151 +1,92 @@
-'use client'
+"use client";
+import React, { useState } from "react";
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_PROFILE } from "../../graphql/queries";
+import { UPDATE_PROFILE } from "../../graphql/mutations";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '../../../context/AuthContext'
-import { useMutation } from '@apollo/client'
-import { UPDATE_USER } from '../../graphql/mutations'
+const ProfilePage = () => {
+  const { data, loading, error, refetch } = useQuery(GET_PROFILE);
+  const [updateProfile] = useMutation(UPDATE_PROFILE, { onCompleted: () => refetch() });
+  const [editing, setEditing] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-export default function ProfilePage() {
-  const { token, isLoading, user } = useAuth()
-  const router = useRouter()
-
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-    name: '',
-    phone: '',
-    company: '',
-    location: '',
-  })
-
-  const [realPassword, setRealPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [updateUser] = useMutation(UPDATE_USER, {
-    context: { headers: { Authorization: `Bearer ${token}` } },
-  })
-
-  useEffect(() => {
-    if (!isLoading && !token) router.push('/login')
-
-    if (token) {
-      const stored = localStorage.getItem('profile_data')
-      if (stored && stored !== 'undefined') {
-        try {
-          const parsed = JSON.parse(stored)
-          setRealPassword(parsed.password || '')
-          setForm({
-            ...parsed,
-            email: user?.email || parsed.email || '',
-            password: '*'.repeat((parsed.password || '').length),
-          })
-        } catch {
-          setForm((prev) => ({
-            ...prev,
-            email: user?.email || '',
-            password: '********',
-          }))
-        }
-      } else {
-        setForm((prev) => ({
-          ...prev,
-          email: user?.email || '',
-          password: '********',
-        }))
-      }
+  React.useEffect(() => {
+    if (data?.me) {
+      setEmail(data.me.email || "");
+      setPassword(""); // Ikke vis passord fra backend
     }
-  }, [token, isLoading, user, router])
+  }, [data]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
-    if (name === 'password') setRealPassword(value)
-  }
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await updateProfile({
+      variables: {
+        input: {
+          email,
+          password: password || undefined,
+        },
+      },
+    });
+    setEditing(false);
+    setPassword("");
+  };
 
-  const handleSave = async () => {
-    const input: Record<string, string> = {}
-    if (form.email) input.email = form.email
-    if (form.password && !form.password.includes('*')) input.password = form.password
-    if (form.name)     input.name     = form.name
-    if (form.phone)    input.phone    = form.phone
-    if (form.company)  input.company  = form.company
-    if (form.location) input.location = form.location
-
-    try {
-      await updateUser({ variables: { data: input } })
-      if (input.password) form.password = '*'.repeat(input.password.length)
-      localStorage.setItem('profile_data', JSON.stringify(form))
-    } catch (e) {
-      console.error('updateUser-error', e)
-    }
-  }
-
-
-
-  if (isLoading || !token) return null
+  if (loading) return <div>Laster...</div>;
+  if (error) return <div>Kunne ikke hente brukerinfo</div>;
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-4 text-black dark:text-white transition-colors">
-      <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 relative">
-        <h1 className="text-3xl font-bold mb-6 text-center">Min Profil</h1>
-
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block font-medium mb-1">E-post</label>
+    <div className="max-w-lg mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
+      <h2 className="text-2xl font-bold mb-4 dark:text-white">Profil</h2>
+      <form onSubmit={handleSave} className="space-y-4">
+        <div>
+          <label className="block mb-1 dark:text-gray-200">E-post</label>
+          <input
+            type="email"
+            value={email}
+            disabled={!editing}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-2 py-1 border rounded dark:bg-gray-900 dark:text-white"
+          />
+        </div>
+        <div>
+          <label className="block mb-1 dark:text-gray-200">Passord</label>
+          <div className="flex">
             <input
-              id="email"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full border p-2 rounded-lg bg-white dark:bg-gray-900 dark:text-white"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              disabled={!editing}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-2 py-1 border rounded dark:bg-gray-900 dark:text-white"
+              autoComplete="new-password"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="ml-2 px-2 py-1 rounded bg-gray-300 dark:bg-gray-700"
+            >
+              {showPassword ? "Skjul" : "Vis"}
+            </button>
           </div>
-
-          <div>
-            <label htmlFor="password" className="block font-medium mb-1">Passord</label>
-            <div className="relative">
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                value={showPassword ? realPassword : form.password}
-                onChange={handleChange}
-                className="w-full border p-2 pr-10 rounded-lg bg-white dark:bg-gray-900 dark:text-white"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-600 dark:text-gray-300"
-              >
-                {showPassword ? 'Skjul' : 'Vis'}
-              </button>
-            </div>
-          </div>
-
-          {['name', 'phone', 'company', 'location'].map((field) => (
-            <div key={field}>
-              <label htmlFor={field} className="block font-medium mb-1 capitalize">{field}</label>
-              <input
-                id={field}
-                name={field}
-                value={form[field as keyof typeof form]}
-                onChange={handleChange}
-                className="w-full border p-2 rounded-lg bg-white dark:bg-gray-900 dark:text-white"
-              />
-            </div>
-          ))}
         </div>
-
-        <div className="pt-6 flex justify-end">
-          <button
-            onClick={handleSave}
-            className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700"
-          >
-            Lagre
+        {editing ? (
+          <div className="flex space-x-2">
+            <button type="submit" className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+              Lagre
+            </button>
+            <button type="button" className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400" onClick={() => setEditing(false)}>
+              Avbryt
+            </button>
+          </div>
+        ) : (
+          <button type="button" className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600" onClick={() => setEditing(true)}>
+            Rediger
           </button>
-        </div>
-      </div>
-    </main>
-  )
-}
+        )}
+      </form>
+    </div>
+  );
+};
+
+export default ProfilePage;

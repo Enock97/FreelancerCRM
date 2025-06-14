@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const GET_CONTACTS = gql`
   query GetContacts {
@@ -11,17 +11,20 @@ export const GET_CONTACTS = gql`
       status
       note
       createdAt
+      activities {
+        id
+        description
+        createdAt
+      }
     }
   }
 `;
 
-export const GET_ACTIVITIES = gql`
-  query GetActivities($contactId: Int!) {
-    activities(contactId: $contactId) {
+export const GET_PROFILE = gql`
+  query GetProfile {
+    me {
       id
-      title
-      note
-      createdAt
+      email
     }
   }
 `;

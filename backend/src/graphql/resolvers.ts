@@ -1,174 +1,144 @@
-import { PrismaClient, Prisma } from '@prisma/client'
-import { ApolloContext } from '../types/apolloContext'
-import { Resolvers, ContactStatus } from '../types/generated/graphql'
-import { CONTACT_STATUSES } from '../constants/contactstatus'
-import { Contact, Activity } from '../types/generated/graphql'
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
+const prisma = new PrismaClient();
+const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 
-const prisma = new PrismaClient()
-
-export const resolvers: Resolvers<ApolloContext> = {
-  Query: {
-    contacts: async (_, __, { user }) => {
-      const contacts = await prisma.contact.findMany({
-        where: { userId: user.userId },
-        orderBy: { createdAt: 'desc' },
-      })
-
-      return contacts.map((c: Contact) => ({
-        ...c,
-        createdAt: c.createdAt.toString(),
-        status: c.status as ContactStatus | undefined,
-      }))
-    },
-
-    contact: async (_, { id }, { user }) => {
-      const contact = await prisma.contact.findFirst({
-        where: { id, userId: user.userId },
-      })
-
-      return contact
-        ? {
-            ...contact,
-            createdAt: contact.createdAt.toISOString(),
-            status: contact.status as ContactStatus | undefined,
-          }
-        : null
-    },
-
-    activities: async (_, { contactId }, { user }) => {
-      const activities = await prisma.activity.findMany({
-        where: { contactId, userId: user.userId },
-        orderBy: { createdAt: 'desc' },
-      })
-
-      return activities.map((a: Activity) => ({
-        ...a,
-        createdAt: a.createdAt.toString(),
-      }))
-    },
-
-    dashboard: async (_, __, { user }) => {
-    const userId = user.userId
-
-    // counts
-    const [ totalContacts, totalActivities ] = await Promise.all([
-      prisma.contact.count({ where: { userId } }),
-      prisma.activity.count({ where: { userId } }),
-    ])
-
-    // Prisma Client’s groupBy is fully typed
-    const grouped = await prisma.contact.groupBy({
-      by: ['status'],
-      where: { userId },
-      _count: true,
-    })
-
-    // TS will infer `g`’s type correctly here, so no implicit-any error
-    const statusCounts = grouped.map((g: { status: any; _count: any }) => ({
-      status:   g.status   ?? 'UNKNOWN',
-      count:    g._count,
-    }))
-
-    return { totalContacts, totalActivities, statusCounts }
+function getUserIdFromContext(context: any): string | null {
+  const auth = context.req?.headers?.authorization || "";
+  if (auth.startsWith("Bearer ")) {
+    try {
+      const token = auth.slice(7);
+      const payload = jwt.verify(token, JWT_SECRET) as any;
+      return payload.userId as string;
+    } catch {
+      return null;
+    }
   }
+  return null;
+}
 
+export const resolvers = {
+  Query: {
+    contacts: async (_parent: any, _args: any, context: any) => {
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Ikke autentisert");
+      return await prisma.contact.findMany({
+        where: { userId: Number(userId) },
+        include: { activities: true },
+        orderBy: { createdAt: "desc" },
+      });
+    },
+    me: async (_parent: any, _args: any, context: any) => {
+      const userId = getUserIdFromContext(context);
+      if (!userId) return null;
+      return await prisma.user.findUnique({
+        where: { id: Number(userId) },
+        include: { contacts: true, activities: true },
+      });
+    },
   },
 
   Mutation: {
-    createContact: async (_, { data }, { user }) => {
-      if (data.status && !CONTACT_STATUSES.includes(data.status)) {
-        throw new Error(`Invalid status: ${data.status}`)
-      }
-
-      console.log("Received data:", data)
-
-      const contact = await prisma.contact.create({
-        data: { ...data, userId: user.userId },
-      })
-
-      return {
-        ...contact,
-        createdAt: contact.createdAt.toISOString(),
-        status: contact.status as ContactStatus | undefined,
-      }
+    createContact: async (_parent: any, { input }: any, context: any) => {
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Ikke autentisert");
+      return await prisma.contact.create({
+        data: {
+          ...input,
+          userId,
+        },
+        include: { activities: true },
+      });
     },
-
-    updateContact: async (_, { data }, { user }) => {
-      if (data.status && !CONTACT_STATUSES.includes(data.status)) {
-        throw new Error(`Invalid status: ${data.status}`)
-      }
-
-      const { id, ...rest } = data
-      
-      const prismaData: Record<string, any> = {}
-      for (const key in rest) {
-        const value = rest[key as keyof typeof rest]
-        if (value !== null && value !== undefined) {
-          prismaData[key] = value
-        }
-      }
-
-      const updated = await prisma.contact.updateMany({
-        where: { id, userId: user.userId },
-        data: prismaData,
-      })
-
-      if (updated.count === 0) throw new Error('Contact not found')
-
-      const updatedContact = await prisma.contact.findUnique({ where: { id } })
-      if (!updatedContact) throw new Error('Contact not found')
-
-      return {
-        ...updatedContact,
-        createdAt: updatedContact.createdAt.toISOString(),
-        status: updatedContact.status as ContactStatus | undefined,
-      }
+    updateContact: async (_parent: any, { id, input }: any, context: any) => {
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Ikke autentisert");
+      const contact = await prisma.contact.findUnique({ where: { id } });
+      if (!contact || contact.userId !== Number(userId)) throw new Error("Ingen tilgang");
+      return await prisma.contact.update({
+        where: { id },
+        data: {
+          ...input,
+        },
+        include: { activities: true },
+      });
     },
-
-    deleteContact: async (_, { id }, { user }) => {
-      await prisma.activity.deleteMany({ where: { contactId: id, userId: user.userId } })
-      const deleted = await prisma.contact.deleteMany({ where: { id, userId: user.userId } })
-      return deleted.count > 0
+    deleteContact: async (_parent: any, { id }: any, context: any) => {
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Ikke autentisert");
+      const contact = await prisma.contact.findUnique({ where: { id } });
+      if (!contact || contact.userId !== Number(userId)) throw new Error("Ingen tilgang");
+      await prisma.activity.deleteMany({ where: { contactId: id } });
+      await prisma.contact.delete({ where: { id } });
+      return true;
     },
-
-
-    createActivity: async (_, { data }, { user }) => {
-      const contact = await prisma.contact.findFirst({
-        where: { id: data.contactId, userId: user.userId },
-      })
-
-      if (!contact) throw new Error('Contact not found')
-
-      const activity = await prisma.activity.create({
-        data: { ...data, userId: user.userId },
-      })
-
-      return {
-        ...activity,
-        createdAt: activity.createdAt.toISOString(),
-      }
+    createActivity: async (_parent: any, { contactId, description }: any, context: any) => {
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Ikke autentisert");
+      const contact = await prisma.contact.findUnique({ where: { id: contactId } });
+      if (!contact || contact.userId !== Number(userId)) throw new Error("Ingen tilgang");
+      return await prisma.activity.create({
+        data: { description, contactId },
+      });
     },
-
-    updateUser: async (_, { data }, { user }) => {
-    const cleanedData: Record<string, any> = {};
-    for (const key in data) {
-      const value = data[key as keyof typeof data];
-      if (value !== null && value !== undefined) {
-        cleanedData[key] = value;
-      }
-    }
-
-    const updated = await prisma.user.update({
-      where: { id: user.userId },
-      data: cleanedData,
-    });
-
-    return updated;
+    deleteActivity: async (_parent: any, { id }: any, context: any) => {
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Ikke autentisert");
+      const activity = await prisma.activity.findUnique({ where: { id } });
+      if (!activity) throw new Error("Ikke funnet");
+      const contact = await prisma.contact.findUnique({ where: { id: activity.contactId } });
+      if (!contact || contact.userId !== Number(userId)) throw new Error("Ingen tilgang");
+      await prisma.activity.delete({ where: { id } });
+      return true;
+    },
+    register: async (_parent: any, { email, password }: any) => {
+      const existing = await prisma.user.findUnique({ where: { email } });
+      if (existing) throw new Error("Bruker finnes allerede");
+      const hash = await bcrypt.hash(password, 10);
+      const user = await prisma.user.create({
+        data: { email, password: hash },
+      });
+      const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+      return { token };
+    },
+    login: async (_parent: any, { email, password }: any) => {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) throw new Error("Feil e-post eller passord");
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid) throw new Error("Feil e-post eller passord");
+      const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+      return { token };
+    },
+    updateProfile: async (_parent: any, { input }: any, context: any) => {
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Ikke autentisert");
+      const data: any = {};
+      if (input.email) data.email = input.email;
+      if (input.password) data.password = await bcrypt.hash(input.password, 10);
+      return await prisma.user.update({
+        where: { id: Number(userId) },
+        data,
+      });
+    },
   },
 
-
-
-
+  Contact: {
+    activities: (parent: any) =>
+      prisma.activity.findMany({
+        where: { contactId: parent.id },
+        orderBy: { createdAt: "desc" },
+      }),
   },
-}
+  User: {
+    contacts: (parent: any) =>
+      prisma.contact.findMany({ where: { userId: parent.id } }),
+    activities: (parent: any) =>
+      prisma.activity.findMany({ where: { contact: { userId: parent.id } } }),
+  },
+  Activity: {
+    contact: (parent: any) =>
+      prisma.contact.findUnique({ where: { id: parent.contactId } }),
+  },
+};

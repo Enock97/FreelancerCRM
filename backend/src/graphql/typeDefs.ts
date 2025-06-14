@@ -1,22 +1,30 @@
-import gql from 'graphql-tag';
+import { gql } from "graphql-tag";
 
-const typeDefs = gql`
-  enum ContactStatus {
-    VENTER_PA_SVAR
-    I_SAMTALE
-    TENKER_PA_DET
-    AVKLART
+export const typeDefs = gql`
+  enum Status {
+    NY
+    OPPFØLGING
+    KUNDE
+    ARKIVERT
   }
 
   type Contact {
-    id: Int!
+    id: ID!
     name: String!
     email: String!
     phone: String
     company: String
-    status: ContactStatus
+    status: Status!
     note: String
     createdAt: String!
+    activities: [Activity!]!
+  }
+
+  type Activity {
+    id: ID!
+    description: String!
+    createdAt: String!
+    contact: Contact!
   }
 
   input ContactInput {
@@ -24,78 +32,41 @@ const typeDefs = gql`
     email: String!
     phone: String
     company: String
-    status: ContactStatus
+    status: Status
     note: String
-  }
-
-  input ContactUpdateInput {
-    id: Int!
-    name: String
-    email: String
-    phone: String
-    company: String
-    status: ContactStatus
-    note: String
-  }
-
-  type User {
-    id: Int!
-    email: String!
-    name: String
-    phone: String
-    company: String
-    location: String
-    password: String
   }
 
   input UpdateUserInput {
     email: String
     password: String
-    name: String
-    phone: String
-    company: String
-    location: String
   }
 
-  type Activity {
-    id: Int!
-    title: String!
-    note: String
-    createdAt: String!
-    contactId: Int!
+  type User {
+    id: ID!
+    email: String!
+    contacts: [Contact!]!
+    activities: [Activity!]!
   }
 
-  input ActivityInput {
-    title: String!
-    note: String
-    contactId: Int!
-  }
-
-  type StatusCount {
-    status: String!
-    count: Int!
-  }
-
-  type DashboardData {
-    totalContacts: Int!
-    totalActivities: Int!
-    statusCounts: [StatusCount!]!
+  type AuthPayload {
+    token: String!
   }
 
   type Query {
     contacts: [Contact!]!
-    contact(id: Int!): Contact
-    activities(contactId: Int!): [Activity!]!
-    dashboard: DashboardData!
+    me: User
   }
 
   type Mutation {
-    createContact(data: ContactInput!): Contact!
-    updateContact(data: ContactUpdateInput!): Contact!
-    deleteContact(id: Int!): Boolean!
-    createActivity(data: ActivityInput!): Activity!
-    updateUser(data: UpdateUserInput!): User
+    createContact(input: ContactInput!): Contact!
+    updateContact(id: ID!, input: ContactInput!): Contact!
+    deleteContact(id: ID!): Boolean!
+
+    createActivity(contactId: ID!, description: String!): Activity!
+    deleteActivity(id: ID!): Boolean!
+
+    login(email: String!, password: String!): AuthPayload!
+    register(email: String!, password: String!): AuthPayload!
+    updateProfile(input: UpdateUserInput!): User!
   }
 `;
-
-export default typeDefs;

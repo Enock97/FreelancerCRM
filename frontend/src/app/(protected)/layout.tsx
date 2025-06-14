@@ -1,20 +1,10 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../../context/AuthContext';
+"use client";
+import React from "react";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const { token, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && !token) {
-      router.push('/login');
-    }
-  }, [isLoading, token, router]);
-
-  if (isLoading || !token) return null;
-
-  return <>{children}</>;
+  return (
+    <div>
+      {children}
+    </div>
+  );
 }
