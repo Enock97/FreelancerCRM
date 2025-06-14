@@ -50,15 +50,12 @@ jobs:
             ${{ env.IMAGE_FRONTEND_LATEST }}
             ghcr.io/enock97/freelancercrm-frontend:${{ steps.vars.outputs.sha }}
 
-  deploy:
+    deploy:
     needs: build-push
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # log in so we can pull private images
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -76,19 +73,29 @@ jobs:
         with:
           version: v0.24.0
 
-      # Pull the images you just pushed
-      - name: Pull backend image
-        run: docker pull ${{ env.IMAGE_BACKEND_LATEST }}
-      - name: Pull frontend image
-        run: docker pull ${{ env.IMAGE_FRONTEND_LATEST }}
-
-      # Now load them into the KinD cluster
-      - name: Load images into KinD
+      - name: Pull & load images into KinD
         run: |
+          docker pull ${{ env.IMAGE_BACKEND_LATEST }}
+          docker pull ${{ env.IMAGE_FRONTEND_LATEST }}
           kind load docker-image ${{ env.IMAGE_BACKEND_LATEST }}
           kind load docker-image ${{ env.IMAGE_FRONTEND_LATEST }}
 
-      - name: Deploy to KinD
+      - name: Create pg-secret & ghcr-secret
+        run: |
+          kubectl create namespace ${KUBE_NAMESPACE} --dry-run=client -o yaml \
+            | kubectl apply -f -
+          kubectl create secret generic pg-secret \
+            --from-literal=POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+            --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+            --from-literal=POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+            -n ${{ env.KUBE_NAMESPACE }}
+          kubectl create secret docker-registry ghcr-secret \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.REGISTRY_TOKEN }} \
+            -n ${{ env.KUBE_NAMESPACE }}
+
+      - name: Deploy & wait
         run: |
           kubectl apply -f k8s/
           kubectl rollout status deploy/backend   -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
