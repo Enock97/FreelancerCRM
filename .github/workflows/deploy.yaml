@@ -97,8 +97,8 @@ jobs:
           POSTGRES_USER:     ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB:       ${{ secrets.POSTGRES_DB }}
-          DB_HOST:           db       
-          DB_PORT:           5432     
+          DB_HOST:           db
+          DB_PORT:           5432
           KUBE_NAMESPACE:    ${{ env.KUBE_NAMESPACE }}
         run: |
           kubectl create namespace "$KUBE_NAMESPACE" --dry-run=client -o yaml \
@@ -115,16 +115,8 @@ jobs:
             --docker-password="${{ secrets.REGISTRY_TOKEN }}" \
             --namespace="$KUBE_NAMESPACE"
 
-      - name: Patch Postgres SC onto StatefulSet
-        run: |
-          kubectl patch statefulset postgres \
-            -n ${{ env.KUBE_NAMESPACE }} \
-            --type='json' \
-            -p='[{"op":"replace","path":"/spec/volumeClaimTemplates/0/spec/storageClassName","value":"local-path"}]'
-
       - name: Deploy & initial debug
         run: |
-        
           echo "=== APPLYING MANIFESTS ==="
           kubectl apply -f k8s/
 
