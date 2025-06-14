@@ -27,7 +27,6 @@ spec:
     spec:
       imagePullSecrets:
         - name: ghcr-secret
-
       containers:
         - name: backend
           image: ghcr.io/enock97/freelancercrm-backend:latest
@@ -62,8 +61,10 @@ spec:
                   name: backend-config
                   key: DB_PORT
             - name: DATABASE_URL
-              value: >
-                postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(POSTGRES_DB)
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: DATABASE_URL
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
