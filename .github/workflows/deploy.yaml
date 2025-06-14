@@ -51,122 +51,122 @@ jobs:
             ${{ env.IMAGE_FRONTEND_LATEST }}
             ghcr.io/enock97/freelancercrm-frontend:${{ steps.vars.outputs.sha }}
 
-deploy:
-  needs: build-push
-  runs-on: ubuntu-latest
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
 
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Login to GHCR
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.REGISTRY_TOKEN }}
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
 
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'latest'
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
 
-    - name: Create KinD cluster
-      uses: engineerd/setup-kind@v0.6.2
-      with:
-        version: v0.24.0
+      - name: Create KinD cluster
+        uses: engineerd/setup-kind@v0.6.2
+        with:
+          version: v0.24.0
 
-    - name: Install local-path provisioner
-      run: |
-        kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+      - name: Install local-path provisioner
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
 
-    - name: Wait for provisioner to be ready
-      run: |
-        kubectl rollout status deployment/local-path-provisioner \
-          -n local-path-storage --timeout=120s
+      - name: Wait for provisioner to be ready
+        run: |
+          kubectl rollout status deployment/local-path-provisioner \
+            -n local-path-storage --timeout=120s
 
-    - name: Create Immediate‐binding StorageClass inline
-      run: |
-        cat <<EOF | kubectl apply -f -
-        apiVersion: storage.k8s.io/v1
-        kind: StorageClass
-        metadata:
-          name: local-path-immediate
-          annotations:
-            storageclass.kubernetes.io/is-default-class: "true"
-        provisioner: rancher.io/local-path
-        reclaimPolicy: Delete
-        volumeBindingMode: Immediate
-        EOF
+      - name: Create Immediate‐binding StorageClass inline
+        run: |
+          cat <<EOF | kubectl apply -f -
+          apiVersion: storage.k8s.io/v1
+          kind: StorageClass
+          metadata:
+            name: local-path-immediate
+            annotations:
+              storageclass.kubernetes.io/is-default-class: "true"
+          provisioner: rancher.io/local-path
+          reclaimPolicy: Delete
+          volumeBindingMode: Immediate
+          EOF
 
-    - name: Load images into KinD
-      run: |
-        docker pull ${{ env.IMAGE_BACKEND_LATEST }}
-        docker pull ${{ env.IMAGE_FRONTEND_LATEST }}
-        kind load docker-image ${{ env.IMAGE_BACKEND_LATEST }}
-        kind load docker-image ${{ env.IMAGE_FRONTEND_LATEST }}
+      - name: Load images into KinD
+        run: |
+          docker pull ${{ env.IMAGE_BACKEND_LATEST }}
+          docker pull ${{ env.IMAGE_FRONTEND_LATEST }}
+          kind load docker-image ${{ env.IMAGE_BACKEND_LATEST }}
+          kind load docker-image ${{ env.IMAGE_FRONTEND_LATEST }}
 
-    - name: Create Kubernetes Secrets
-      env:
-        POSTGRES_USER:     ${{ secrets.POSTGRES_USER }}
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        POSTGRES_DB:       ${{ secrets.POSTGRES_DB }}
-        KUBE_NAMESPACE:    ${{ env.KUBE_NAMESPACE }}
-      run: |
-        kubectl create namespace "$KUBE_NAMESPACE" --dry-run=client -o yaml \
-          | kubectl apply -f -
-        kubectl create secret generic pg-secret \
-          --from-literal=POSTGRES_USER="$POSTGRES_USER" \
-          --from-literal=POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
-          --from-literal=POSTGRES_DB="$POSTGRES_DB" \
-          --namespace="$KUBE_NAMESPACE"
-        kubectl create secret docker-registry ghcr-secret \
-          --docker-server=ghcr.io \
-          --docker-username="${{ github.actor }}" \
-          --docker-password="${{ secrets.REGISTRY_TOKEN }}" \
-          --namespace="$KUBE_NAMESPACE"
+      - name: Create Kubernetes Secrets
+        env:
+          POSTGRES_USER:     ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB:       ${{ secrets.POSTGRES_DB }}
+          KUBE_NAMESPACE:    ${{ env.KUBE_NAMESPACE }}
+        run: |
+          kubectl create namespace "$KUBE_NAMESPACE" --dry-run=client -o yaml \
+            | kubectl apply -f -
+          kubectl create secret generic pg-secret \
+            --from-literal=POSTGRES_USER="$POSTGRES_USER" \
+            --from-literal=POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
+            --from-literal=POSTGRES_DB="$POSTGRES_DB" \
+            --namespace="$KUBE_NAMESPACE"
+          kubectl create secret docker-registry ghcr-secret \
+            --docker-server=ghcr.io \
+            --docker-username="${{ github.actor }}" \
+            --docker-password="${{ secrets.REGISTRY_TOKEN }}" \
+            --namespace="$KUBE_NAMESPACE"
 
-    - name: Deploy & initial debug
-      run: |
-        # point your Postgres StatefulSet at the new SC
-        sed -i 's/storageClassName: local-path/storageClassName: local-path-immediate/' k8s/postgres-statefulset.yaml
+      - name: Deploy & initial debug
+        run: |
+          # point your Postgres StatefulSet at the new SC
+          sed -i 's/storageClassName: local-path/storageClassName: local-path-immediate/' k8s/postgres-statefulset.yaml
 
-        kubectl apply -f k8s/
+          kubectl apply -f k8s/
 
-        echo "=== STORAGECLASSES ==="
-        kubectl get sc
+          echo "=== STORAGECLASSES ==="
+          kubectl get sc
 
-        echo "=== PVCs ==="
-        kubectl get pvc -n ${{ env.KUBE_NAMESPACE }}
+          echo "=== PVCs ==="
+          kubectl get pvc -n ${{ env.KUBE_NAMESPACE }}
 
-        echo "=== Describe pg PVC ==="
-        kubectl describe pvc pg-data-postgres-0 -n ${{ env.KUBE_NAMESPACE }}
+          echo "=== Describe pg PVC ==="
+          kubectl describe pvc pg-data-postgres-0 -n ${{ env.KUBE_NAMESPACE }}
 
-        echo "=== PODS ==="
-        kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
+          echo "=== PODS ==="
+          kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
 
-        echo "=== EVENTS ==="
-        kubectl get events -n ${{ env.KUBE_NAMESPACE }} --sort-by='.lastTimestamp'
+          echo "=== EVENTS ==="
+          kubectl get events -n ${{ env.KUBE_NAMESPACE }} --sort-by='.lastTimestamp'
 
-        echo "=== REPLICA SETS ==="
-        kubectl get rs
+          echo "=== REPLICA SETS ==="
+          kubectl get rs
 
-    - name: Wait for Postgres PVC to bind
-      run: |
-        kubectl wait --for=condition=Bound pvc/pg-data-postgres-0 \
-          -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+      - name: Wait for Postgres PVC to bind
+        run: |
+          kubectl wait --for=condition=Bound pvc/pg-data-postgres-0 \
+            -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
 
-    - name: Wait for Postgres Pod to be Ready
-      run: |
-        kubectl wait --for=condition=Ready pod -l app=postgres \
-          -n ${{ env.KUBE_NAMESPACE }} --timeout=180s
+      - name: Wait for Postgres Pod to be Ready
+        run: |
+          kubectl wait --for=condition=Ready pod -l app=postgres \
+            -n ${{ env.KUBE_NAMESPACE }} --timeout=180s
 
-    - name: Wait for Backend rollout
-      run: |
-        kubectl rollout status deployment/backend \
-          -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+      - name: Wait for Backend rollout
+        run: |
+          kubectl rollout status deployment/backend \
+            -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
 
-    - name: Wait for Frontend rollout
-      run: |
-        kubectl rollout status deployment/frontend \
-          -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+      - name: Wait for Frontend rollout
+        run: |
+          kubectl rollout status deployment/frontend \
+            -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
