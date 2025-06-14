@@ -86,7 +86,11 @@ jobs:
         run: |
            kubectl rollout status deployment/local-path-provisioner \
              -n local-path-storage --timeout=120s
-             
+      - name: Patch local-path SC for Immediate binding
+        run: |
+          kubectl patch storageclass local-path \
+          -p '{"volumeBindingMode":"Immediate"}'
+          
       - name: Pull & load images into KinD
         run: |
           docker pull ${{ env.IMAGE_BACKEND_LATEST }}
