@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { RequestHandler, Router } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes';
@@ -14,7 +14,9 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10)
 
 const bootstrap = async () => {
-  const graphqlMiddleware = await createGraphQLMiddleware();
+    // 1) Grab your array of middleware functions and assert them as RequestHandler[]
+  const rawGQL = await createGraphQLMiddleware();
+  const graphqlMiddleware = rawGQL as unknown as RequestHandler[];
 
   app.use(cors({
     origin: 'http://localhost:3000',
@@ -26,9 +28,16 @@ const bootstrap = async () => {
   app.use('/api/auth', authRoutes);
   app.use('/api/activities', activityRoutes);
   app.use('/api/users', userRoutes);
-  app.use('/api/graphql', ...graphqlMiddleware);
+ // 4) Mount GraphQL—wrap in a Router to make TS happy
+  const gqlRouter = Router();
+  gqlRouter.use(...graphqlMiddleware);
+  app.use('/api/graphql', gqlRouter);
 
-  app.get('/api/health', (_req, res) => res.sendStatus(200));
+  // 5) Health‐check as a void‐returning handler
+  const healthHandler: RequestHandler = (_req, res) => {
+    res.sendStatus(200);
+  };
+  app.get('/api/health', healthHandler);
 
   app.listen(PORT,'0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);

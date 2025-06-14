@@ -68,5 +68,7 @@ k8s/pg-secret.yaml        # ALDRI i Git
 **/node_modules
 **/npm-debug.log*
 **/.env*
+kind.exe
+*.tar
 
 docker-compose.yaml

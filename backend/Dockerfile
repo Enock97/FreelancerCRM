@@ -4,7 +4,7 @@ WORKDIR /app
 
 # 1) Only copy package files, install deps (incl. devDeps so tsc is here)
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # 2) Copy source (won't overwrite node_modules thanks to .dockerignore)
 COPY . .
