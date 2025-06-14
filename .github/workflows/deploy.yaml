@@ -107,11 +107,6 @@ jobs:
             --from-literal=POSTGRES_USER="$POSTGRES_USER" \
             --from-literal=POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
             --from-literal=POSTGRES_DB="$POSTGRES_DB" \
-            --namespace="$KUBE_NAMESPACE"
-          kubectl create secret generic pg-secret \
-            --from-literal=POSTGRES_USER="$POSTGRES_USER" \
-            --from-literal=POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
-            --from-literal=POSTGRES_DB="$POSTGRES_DB" \
             --from-literal=DATABASE_URL="postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$DB_HOST:$DB_PORT/$POSTGRES_DB" \
             --namespace="$KUBE_NAMESPACE"
           kubectl create secret docker-registry ghcr-secret \

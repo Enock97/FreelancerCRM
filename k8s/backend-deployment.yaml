@@ -14,7 +14,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 0
+      maxUnavailable: 1
 
   selector:
     matchLabels:
@@ -75,17 +75,3 @@ spec:
             postStart:
               exec:
                 command: ["sh", "-c", "npx prisma migrate deploy || true"]
-
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 5000
-            initialDelaySeconds: 30
-            periodSeconds: 10
-
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 5000
-            initialDelaySeconds: 10
-            periodSeconds: 5
