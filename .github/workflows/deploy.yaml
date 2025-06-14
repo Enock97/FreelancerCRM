@@ -90,30 +90,36 @@ jobs:
           POSTGRES_DB:       ${{ secrets.POSTGRES_DB }}
           KUBE_NAMESPACE:    ${{ env.KUBE_NAMESPACE }}
         run: |
-          # 1) ensure namespace exists
+          # ensure namespace
           kubectl create namespace "$KUBE_NAMESPACE" --dry-run=client -o yaml \
             | kubectl apply -f -
-
-          # 2) create Postgres creds
+          # Postgres creds
           kubectl create secret generic pg-secret \
             --from-literal=POSTGRES_USER="$POSTGRES_USER" \
             --from-literal=POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
             --from-literal=POSTGRES_DB="$POSTGRES_DB" \
             --namespace="$KUBE_NAMESPACE"
-
-          # 3) create GHCR pull-secret
+          # GHCR pull-secret
           kubectl create secret docker-registry ghcr-secret \
             --docker-server=ghcr.io \
             --docker-username="${{ github.actor }}" \
             --docker-password="${{ secrets.REGISTRY_TOKEN }}" \
             --namespace="$KUBE_NAMESPACE"
 
-      - name: Wait for Postgres
+      - name: Deploy manifests
+        run: kubectl apply -f k8s/
+
+      - name: Wait for Postgres to be Ready
         run: |
-          kubectl wait --for=condition=ready pod -l app=postgres -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
-      
-      - name: Deploy & wait
+          kubectl rollout status statefulset/postgres \
+            -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+
+      - name: Wait for Backend rollout
         run: |
-          kubectl apply -f k8s/
-          kubectl rollout status deploy/backend  -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
-          kubectl rollout status deploy/frontend -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+          kubectl rollout status deployment/backend \
+            -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+
+      - name: Wait for Frontend rollout
+        run: |
+          kubectl rollout status deployment/frontend \
+            -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
