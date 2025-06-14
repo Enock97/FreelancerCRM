@@ -82,6 +82,11 @@ jobs:
           kubectl patch storageclass local-path \
             -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
+      - name: Wait for local-path provisioner to be ready
+        run: |
+           kubectl rollout status deployment/local-path-provisioner \
+             -n local-path-storage --timeout=120s
+             
       - name: Pull & load images into KinD
         run: |
           docker pull ${{ env.IMAGE_BACKEND_LATEST }}
