@@ -1,89 +1,43 @@
 # FreelancerCRM
-```md
-FreelancerCRM er en fullstack CRM-applikasjon rettet mot freelancere og konsulenter som trenger enkel og effektiv kundehåndtering. Applikasjonen lar deg registrere kontakter, endre pipeline-status, sette opp aktiviteter og holde oversikt over leads, tilbud og salg.
-```
+
+**FreelancerCRM** er en moderne CRM-webapplikasjon laget for frilansere og små team som ønsker enkel oversikt over kunderelasjoner, aktiviteter og kommunikasjon – alt i et brukervennlig, responsivt dashboard med Kanban-visning.
 
 ---
 
-## Stack
-- **Frontend**: React, TypeScript, Next.js, Tailwind CSS
-- **Backend**: Express.js (Node.js), TypeScript, Prisma ORM
-- **Database**: PostgreSQL (via Docker)
-- **Autentisering**: JWT
-- **DevOps**: Docker Compose
+## 🌐 Prøv appen
+
+Du kan teste applikasjonen live her:  
+**[Demo på Vercel/Netlify (lenke kommer)](https://din-app-url.vercel.app)**
 
 ---
 
-## Komme i gang
+## 💡 Om applikasjonen
 
-### 1. Klon prosjektet
-```bash
+- Administrer kontakter med felter for navn, e-post, firma, status, notat og telefonnummer.
+- Organiser kundeprosesser med et visuelt Kanban-board (dra-og-slipp mellom kolonner).
+- Registrer og følg opp aktiviteter knyttet til hver kontakt.
+- Brukerautentisering (registrering, innlogging, beskyttede sider).
+- Profilside med mulighet for oppdatering av e-post og passord.
+- Støtte for mørk/lys modus.
+- Mobilvennlig og responsivt design.
+
+---
+
+## 🛠️ Teknologier
+
+- **Frontend:** Next.js, React, Apollo Client, Tailwind CSS
+- **Backend:** Node.js, Express, Apollo Server (GraphQL), Prisma ORM
+- **Database:** PostgreSQL
+- **Autentisering:** JWT
+- **DevOps:** Docker, Kubernetes, Vercel/Netlify, ngrok
+
+---
+
+## 📦 Se/kjør kildekoden
+
+```sh
 git clone https://github.com/Enock97/FreelancerCRM.git
-cd FreelancerCRM
 ```
-
----
-
-### 2. Kjør med Docker (backend + database)
-Krever at du har [Docker Desktop](https://www.docker.com/products/docker-desktop) installert.
-
-```bash
-cp .env.example .env
-docker-compose up --build
-```
-
-- REST-API: `http://localhost:5000/api/health`
-- GraphQL API: `http://localhost:5000/api/graphql`
-- PostgreSQL kjører på `localhost:5432`
-
----
-
-### 3. Start frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-- Webapp: `http://localhost:5173`
-
----
-
-### 4. Backend for utvikling uten Docker (valgfritt)
-```bash
-cd backend
-npm install
-npx prisma generate
-npx prisma migrate dev --name init
-npm run dev
-```
-
----
-
-## .env-format
-
-Opprett `.env` i `backend/` med følgende verdier:
-
-```env
-DATABASE_URL="postgresql://myuser:mysecretpassword@localhost:5432/mydb"
-JWT_SECRET="your-secret-string"
-PORT=5000
-```
-
----
-
-## Scripts
-
-```bash
-# Frontend
-npm run dev         # Starter React/Vite
-
-# Backend
-npm run dev         # Starter Express + ts-node-dev
-npx prisma migrate dev --name init
-npx prisma generate
-```
-
 ---
 
 ## Utvikler
