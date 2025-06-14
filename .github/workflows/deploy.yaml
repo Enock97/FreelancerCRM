@@ -85,20 +85,6 @@ jobs:
           kubectl rollout status deployment/local-path-provisioner \
             -n local-path-storage --timeout=120s
 
-      - name: Create Immediate‐binding StorageClass inline
-        run: |
-          cat <<EOF | kubectl apply -f -
-          apiVersion: storage.k8s.io/v1
-          kind: StorageClass
-          metadata:
-            name: local-path-immediate
-            annotations:
-              storageclass.kubernetes.io/is-default-class: "true"
-          provisioner: rancher.io/local-path
-          reclaimPolicy: Delete
-          volumeBindingMode: Immediate
-          EOF
-
       - name: Load images into KinD
         run: |
           docker pull ${{ env.IMAGE_BACKEND_LATEST }}
@@ -128,9 +114,6 @@ jobs:
 
       - name: Deploy & initial debug
         run: |
-          # point your Postgres StatefulSet at the new SC
-          sed -i 's/^ *storageClassName: local-path$/storageClassName: local-path-immediate/' k8s/postgres-statefulset.yaml
-
           echo "=== APPLYING MANIFESTS ==="
           kubectl apply -f k8s/
 
@@ -140,22 +123,11 @@ jobs:
           echo "=== PVCs ==="
           kubectl get pvc -n ${{ env.KUBE_NAMESPACE }}
 
-          echo "=== Describe pg PVC ==="
-          kubectl describe pvc pg-data-postgres-0 -n ${{ env.KUBE_NAMESPACE }}
-
           echo "=== PODS ==="
           kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
 
           echo "=== EVENTS ==="
           kubectl get events -n ${{ env.KUBE_NAMESPACE }} --sort-by='.lastTimestamp'
-
-          echo "=== REPLICA SETS ==="
-          kubectl get rs
-
-      - name: Wait for Postgres PVC to bind
-        run: |
-          kubectl wait --for=condition=Bound pvc/pg-data-postgres-0 \
-            -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
 
       - name: Wait for Postgres Pod to be Ready
         run: |
