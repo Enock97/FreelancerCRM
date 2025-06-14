@@ -4,4 +4,4 @@ metadata:
   name: frontend-config
   namespace: freelancercrm
 data:
-  apiUrl: "https://api.freelancercrm.local/api"
+  apiUrl: "http://backend:5000"
