@@ -129,8 +129,9 @@ jobs:
       - name: Deploy & initial debug
         run: |
           # point your Postgres StatefulSet at the new SC
-          sed -i 's/storageClassName: local-path/storageClassName: local-path-immediate/' k8s/postgres-statefulset.yaml
+          sed -i 's/^ *storageClassName: local-path$/storageClassName: local-path-immediate/' k8s/postgres-statefulset.yaml
 
+          echo "=== APPLYING MANIFESTS ==="
           kubectl apply -f k8s/
 
           echo "=== STORAGECLASSES ==="
