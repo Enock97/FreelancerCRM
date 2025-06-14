@@ -108,6 +108,10 @@ jobs:
             --docker-password="${{ secrets.REGISTRY_TOKEN }}" \
             --namespace="$KUBE_NAMESPACE"
 
+      - name: Wait for Postgres
+        run: |
+          kubectl wait --for=condition=ready pod -l app=postgres -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+      
       - name: Deploy & wait
         run: |
           kubectl apply -f k8s/
