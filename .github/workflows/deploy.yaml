@@ -51,7 +51,7 @@ jobs:
             ${{ env.IMAGE_FRONTEND_LATEST }}
             ghcr.io/enock97/freelancercrm-frontend:${{ steps.vars.outputs.sha }}
 
-  deploy:
+deploy:
   needs: build-push
   runs-on: ubuntu-latest
 
@@ -150,7 +150,7 @@ jobs:
 
         echo "=== REPLICA SETS ==="
         kubectl get rs
-        
+
     - name: Wait for Postgres PVC to bind
       run: |
         kubectl wait --for=condition=Bound pvc/pg-data-postgres-0 \
