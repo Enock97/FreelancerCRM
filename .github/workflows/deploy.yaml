@@ -75,7 +75,7 @@ jobs:
         uses: engineerd/setup-kind@v0.6.2
         with:
           version: v0.24.0
-      
+
       - name: Install local-path storage (for PVCs)
         run: |
           kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
@@ -108,47 +108,28 @@ jobs:
             --docker-password="${{ secrets.REGISTRY_TOKEN }}" \
             --namespace="$KUBE_NAMESPACE"
 
-      - name: Wait for Postgres to be ready
+      - name: Deploy all manifests
+        run: |
+          kubectl apply -f k8s/
+
+      - name: Debug pod state
+        run: |
+          echo "=== PODS ==="
+          kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
+          echo "=== EVENTS ==="
+          kubectl get events -n ${{ env.KUBE_NAMESPACE }}
+
+      - name: Wait for Postgres StatefulSet
         run: |
           kubectl rollout status statefulset/postgres \
             -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
 
-      - name: Deploy & debug
-        run: |
-          kubectl apply -f k8s/
-
-          set +e
-          echo "=== EVENTS ==="
-          kubectl get events -n ${{ env.KUBE_NAMESPACE }}
-
-          echo "=== PODS ==="
-          kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
-
-          echo "=== DESCRIBE POSTGRES POD ==="
-          kubectl describe pod -l app=postgres -n ${{ env.KUBE_NAMESPACE }}
-
-          echo "=== POSTGRES LOGS ==="
-          kubectl logs -l app=postgres -n ${{ env.KUBE_NAMESPACE }} || true
-
-          echo "=== DESCRIBE BACKEND POD ==="
-          kubectl describe pod -l app=backend -n ${{ env.KUBE_NAMESPACE }}
-
-          echo "=== BACKEND LOGS ==="
-          kubectl logs -l app=backend -n ${{ env.KUBE_NAMESPACE }} || true
-
-          echo "=== DESCRIBE FRONTEND POD ==="
-          kubectl describe pod -l app=frontend -n ${{ env.KUBE_NAMESPACE }}
-
-          echo "=== FRONTEND LOGS ==="
-          kubectl logs -l app=frontend -n ${{ env.KUBE_NAMESPACE }} || true
-          set -e
-
-      - name: Wait for Backend deployment
+      - name: Wait for Backend rollout
         run: |
           kubectl rollout status deployment/backend \
             -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
 
-      - name: Wait for Frontend deployment
+      - name: Wait for Frontend rollout
         run: |
           kubectl rollout status deployment/frontend \
             -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
