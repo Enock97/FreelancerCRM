@@ -79,18 +79,16 @@ jobs:
       - name: Install local-path storage (for PVCs)
         run: |
           kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-          kubectl patch storageclass local-path \
-            -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
       - name: Wait for local-path provisioner to be ready
         run: |
-           kubectl rollout status deployment/local-path-provisioner \
+          kubectl rollout status deployment/local-path-provisioner \
              -n local-path-storage --timeout=120s
-      - name: Patch local-path SC for Immediate binding
+
+      - name: Create Immediate-binding StorageClass
         run: |
-          kubectl patch storageclass local-path \
-          -p '{"volumeBindingMode":"Immediate"}'
-          
+          kubectl apply -f k8s/local-path-immediate-sc.yaml
+
       - name: Pull & load images into KinD
         run: |
           docker pull ${{ env.IMAGE_BACKEND_LATEST }}

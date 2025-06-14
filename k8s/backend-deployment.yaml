@@ -5,9 +5,21 @@ metadata:
   namespace: freelancercrm
 spec:
   replicas: 1
+
+  # Keep last 5 revisions for rollback, fail fast if rollout stalls
+  revisionHistoryLimit: 5
+  progressDeadlineSeconds: 120
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
   selector:
     matchLabels:
       app: backend
+
   template:
     metadata:
       labels:
@@ -15,33 +27,64 @@ spec:
     spec:
       imagePullSecrets:
         - name: ghcr-secret
+
       containers:
         - name: backend
           image: ghcr.io/enock97/freelancercrm-backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
+
           env:
             - name: POSTGRES_USER
-              valueFrom: { secretKeyRef: { name: pg-secret, key: POSTGRES_USER } }
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
-              valueFrom: { secretKeyRef: { name: pg-secret, key: POSTGRES_PASSWORD } }
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_PASSWORD
             - name: POSTGRES_DB
-              valueFrom: { secretKeyRef: { name: pg-secret, key: POSTGRES_DB } }
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_DB
             - name: DB_HOST
-              valueFrom: { configMapKeyRef: { name: backend-config, key: DB_HOST } }
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DB_HOST
             - name: DB_PORT
-              valueFrom: { configMapKeyRef: { name: backend-config, key: DB_PORT } }
-            # Prisma trenger DATABASE_URL => bygg den on-the-fly
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DB_PORT
             - name: DATABASE_URL
-              value: >-
+              value: >
                 postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(POSTGRES_DB)
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: pg-secret      # evt. egen secret
-                  key: POSTGRES_PASSWORD  
+                  name: pg-secret
+                  key: POSTGRES_PASSWORD
+
           lifecycle:
             postStart:
               exec:
                 command: ["sh", "-c", "npx prisma migrate deploy || true"]
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 5
