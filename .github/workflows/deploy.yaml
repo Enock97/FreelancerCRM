@@ -50,7 +50,7 @@ jobs:
             ${{ env.IMAGE_FRONTEND_LATEST }}
             ghcr.io/enock97/freelancercrm-frontend:${{ steps.vars.outputs.sha }}
 
-    deploy:
+  deploy:
     needs: build-push
     runs-on: ubuntu-latest
     steps:
