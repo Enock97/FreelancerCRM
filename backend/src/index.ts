@@ -28,9 +28,7 @@ const bootstrap = async () => {
   app.use('/api/users', userRoutes);
   app.use('/api/graphql', ...graphqlMiddleware);
 
-  app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok' });
-  });
+  app.get('/api/health', (_req, res) => res.sendStatus(200));
 
   app.listen(PORT,'0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);

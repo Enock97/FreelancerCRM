@@ -115,9 +115,16 @@ jobs:
             --docker-password="${{ secrets.REGISTRY_TOKEN }}" \
             --namespace="$KUBE_NAMESPACE"
 
+      - name: Patch Postgres SC onto StatefulSet
+        run: |
+          kubectl patch statefulset postgres \
+            -n ${{ env.KUBE_NAMESPACE }} \
+            --type='json' \
+            -p='[{"op":"replace","path":"/spec/volumeClaimTemplates/0/spec/storageClassName","value":"local-path"}]'
 
       - name: Deploy & initial debug
         run: |
+        
           echo "=== APPLYING MANIFESTS ==="
           kubectl apply -f k8s/
 
