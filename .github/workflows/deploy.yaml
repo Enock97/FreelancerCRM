@@ -75,6 +75,12 @@ jobs:
         uses: engineerd/setup-kind@v0.6.2
         with:
           version: v0.24.0
+      
+      - name: Install local-path storage (for PVCs)
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+          kubectl patch storageclass local-path \
+            -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
       - name: Pull & load images into KinD
         run: |
@@ -90,16 +96,12 @@ jobs:
           POSTGRES_DB:       ${{ secrets.POSTGRES_DB }}
           KUBE_NAMESPACE:    ${{ env.KUBE_NAMESPACE }}
         run: |
-          # ensure namespace exists
-          kubectl create namespace "$KUBE_NAMESPACE" --dry-run=client -o yaml \
-            | kubectl apply -f -
-          # Postgres creds
+          kubectl create namespace "$KUBE_NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
           kubectl create secret generic pg-secret \
             --from-literal=POSTGRES_USER="$POSTGRES_USER" \
             --from-literal=POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
             --from-literal=POSTGRES_DB="$POSTGRES_DB" \
             --namespace="$KUBE_NAMESPACE"
-          # GHCR pull-secret
           kubectl create secret docker-registry ghcr-secret \
             --docker-server=ghcr.io \
             --docker-username="${{ github.actor }}" \
@@ -108,20 +110,25 @@ jobs:
 
       - name: Deploy & debug
         run: |
-          # 1) Apply all manifests
           kubectl apply -f k8s/
 
-          # 2) Dump pod state
           echo "=== PODS ==="
           kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
 
-          # 3) Describe backend pod
+          echo "=== EVENTS ==="
+          kubectl get events -n ${{ env.KUBE_NAMESPACE }}
+
           echo "=== DESCRIBE BACKEND POD ==="
           kubectl describe pod -l app=backend -n ${{ env.KUBE_NAMESPACE }}
 
-          # 4) Show backend logs
           echo "=== BACKEND LOGS ==="
           kubectl logs -l app=backend -n ${{ env.KUBE_NAMESPACE }}
+
+          echo "=== DESCRIBE FRONTEND POD ==="
+          kubectl describe pod -l app=frontend -n ${{ env.KUBE_NAMESPACE }}
+
+          echo "=== FRONTEND LOGS ==="
+          kubectl logs -l app=frontend -n ${{ env.KUBE_NAMESPACE }}
 
       - name: Wait for Postgres rollout
         run: |
