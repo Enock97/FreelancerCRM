@@ -130,10 +130,12 @@ jobs:
           echo "=== FRONTEND LOGS ==="
           kubectl logs -l app=frontend -n ${{ env.KUBE_NAMESPACE }}
 
-      - name: Wait for Postgres rollout
+      - name: Wait for Postgres Pod to be Ready
         run: |
-          kubectl rollout status statefulset/postgres \
-            -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+          kubectl wait --for=condition=Ready pod \
+            -l app=postgres \
+            -n ${{ env.KUBE_NAMESPACE }} \
+            --timeout=180s
 
       - name: Wait for Backend rollout
         run: |
