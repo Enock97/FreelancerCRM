@@ -82,11 +82,6 @@ jobs:
           kubectl patch storageclass local-path \
             -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
-      - name: Wait for local-path provisioner to be ready
-        run: |
-          kubectl rollout status daemonset/local-path-provisioner \
-            -n local-path-storage --timeout=120s
-
       - name: Pull & load images into KinD
         run: |
           docker pull ${{ env.IMAGE_BACKEND_LATEST }}
@@ -118,9 +113,13 @@ jobs:
           # 1) Apply your manifests
           kubectl apply -f k8s/
 
-          # 2) Show StorageClasses
+          # 2) Debug storage classes and PVC
           echo "=== STORAGECLASSES ==="
           kubectl get sc
+          echo "=== PVCs ==="
+          kubectl get pvc -n ${{ env.KUBE_NAMESPACE }}
+          echo "=== DESCRIBE pg-data-postgres-0 PVC ==="
+          kubectl describe pvc pg-data-postgres-0 -n ${{ env.KUBE_NAMESPACE }}
 
           # 3) Show PVC status
           echo "=== PVCs ==="
@@ -146,12 +145,18 @@ jobs:
           echo "=== POSTGRES LOGS ==="
           kubectl logs -l app=postgres -n ${{ env.KUBE_NAMESPACE }} || true
 
-      - name: Wait for Postgres Pod to be Ready
+          #6) Get ReplicaSets
+          kubectl get rs
+
+      - name: Wait for Postgres PVC to bind
         run: |
-          kubectl wait --for=condition=Ready pod \
-            -l app=postgres \
-            -n ${{ env.KUBE_NAMESPACE }} \
-            --timeout=180s
+          kubectl wait --for=condition=Bound pvc/pg-data-postgres-0 \
+            -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+
+      - name: Wait for Postgres Pod to become Ready
+        run: |
+          kubectl wait --for=condition=Ready pod -l app=postgres \
+            -n ${{ env.KUBE_NAMESPACE }} --timeout=180s
 
       - name: Wait for Backend rollout
         run: |
