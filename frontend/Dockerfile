@@ -1,4 +1,3 @@
-# ---------- Build stage -------------------------------------------------
 FROM node:18-alpine AS builder
 WORKDIR /app
 
@@ -6,23 +5,17 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build
 
-# ---------- Runtime stage -----------------------------------------------
-FROM node:18-alpine AS runtime
+FROM node:18-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV HOST=0.0.0.0
 ENV PORT=3000
 
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static     ./.next/static
-COPY --from=builder /app/public           ./public
-COPY --from=builder /app/node_modules     ./node_modules
+COPY --from=builder /app ./
 
 EXPOSE 3000
-CMD ["node","server.js"]
+CMD ["npm", "start"]
