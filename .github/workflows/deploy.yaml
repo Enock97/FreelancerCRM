@@ -65,9 +65,9 @@ jobs:
           version: 'latest'
 
       - name: Create KinD cluster
-        uses: engineerd/setup-kind@v0.6.0
+        uses: engineerd/setup-kind@v0.6.2
         with:
-          version: v0.17.0
+          version: v0.24.0
 
       - name: Load images into KinD
         run: |
@@ -77,5 +77,5 @@ jobs:
       - name: Deploy to KinD
         run: |
           kubectl apply -f k8s/
-          kubectl rollout status deploy/backend  -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
-          kubectl rollout status deploy/frontend -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+          kubectl rollout status deploy/backend   -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
+          kubectl rollout status deploy/frontend  -n ${{ env.KUBE_NAMESPACE }} --timeout=120s
