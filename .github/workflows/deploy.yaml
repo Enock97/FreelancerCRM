@@ -83,25 +83,14 @@ jobs:
           kind load docker-image ${{ env.IMAGE_BACKEND_LATEST }}
           kind load docker-image ${{ env.IMAGE_FRONTEND_LATEST }}
 
-      - name: Create pg-secret & ghcr-secret
+      - name: Create Kubernetes Secrets
         run: |
           # ensure namespace exists
-          kubectl create namespace ${KUBE_NAMESPACE} --dry-run=client -o yaml \
-            | kubectl apply -f -
-
+          kubectl create namespace ${{ env.KUBE_NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
           # create Postgres creds
-          kubectl create secret generic pg-secret \
-            --from-literal=POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
-            --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-            --from-literal=POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
-            -n ${{ env.KUBE_NAMESPACE }}
-
-          # create GHCR image pull secret
-          kubectl create secret docker-registry ghcr-secret \
-            --docker-server=ghcr.io \
-            --docker-username=${{ github.actor }} \
-            --docker-password=${{ secrets.REGISTRY_TOKEN }} \
-            -n ${{ env.KUBE_NAMESPACE }}
+          kubectl create secret generic pg-secret --from-literal=POSTGRES_USER=${{ secrets.POSTGRES_USER }} --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} --from-literal=POSTGRES_DB=${{ secrets.POSTGRES_DB }} -n ${{ env.KUBE_NAMESPACE }}
+          # create GHCR image-pull secret
+          kubectl create secret docker-registry ghcr-secret --docker-server=ghcr.io --docker-username=${{ github.actor }} --docker-password=${{ secrets.REGISTRY_TOKEN }} -n ${{ env.KUBE_NAMESPACE }}
 
       - name: Deploy & wait
         run: |
