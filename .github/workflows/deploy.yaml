@@ -75,7 +75,7 @@ jobs:
         uses: engineerd/setup-kind@v0.6.2
         with:
           version: v0.24.0
-      
+
       - name: Install local-path storage (for PVCs)
         run: |
           kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
@@ -110,25 +110,45 @@ jobs:
 
       - name: Deploy & debug
         run: |
+          # 1) Apply all your manifests
           kubectl apply -f k8s/
 
+          # 2) Show overall Pod & Event state
           echo "=== PODS ==="
           kubectl get pods -n ${{ env.KUBE_NAMESPACE }}
 
-          echo "=== EVENTS ==="
-          kubectl get events -n ${{ env.KUBE_NAMESPACE }}
+          echo "=== RECENT EVENTS ==="
+          kubectl get events -n ${{ env.KUBE_NAMESPACE }} --sort-by='.lastTimestamp'
 
+          # 3) Inspect Postgres
+          echo "=== DESCRIBE POSTGRES STATEFULSET ==="
+          kubectl describe statefulset postgres -n ${{ env.KUBE_NAMESPACE }}
+
+          echo "=== POSTGRES POD ==="
+          kubectl get pod -l app=postgres -n ${{ env.KUBE_NAMESPACE }}
+
+          echo "=== POSTGRES LOGS ==="
+          kubectl logs -l app=postgres -n ${{ env.KUBE_NAMESPACE }} || true
+
+          # 4) Inspect Backend
           echo "=== DESCRIBE BACKEND POD ==="
           kubectl describe pod -l app=backend -n ${{ env.KUBE_NAMESPACE }}
 
-          echo "=== BACKEND LOGS ==="
-          kubectl logs -l app=backend -n ${{ env.KUBE_NAMESPACE }}
+          echo "=== BACKEND EVENTS ==="
+          kubectl get events \
+            -n ${{ env.KUBE_NAMESPACE }} \
+            --field-selector involvedObject.kind=Pod,involvedObject.name=$(kubectl get pod -l app=backend -n ${{ env.KUBE_NAMESPACE }} -o jsonpath='{.items[0].metadata.name}') \
+            --sort-by='.lastTimestamp'
 
+          echo "=== BACKEND LOGS ==="
+          kubectl logs -l app=backend -n ${{ env.KUBE_NAMESPACE }} --all-containers || true
+
+          # 5) Inspect Frontend
           echo "=== DESCRIBE FRONTEND POD ==="
           kubectl describe pod -l app=frontend -n ${{ env.KUBE_NAMESPACE }}
 
           echo "=== FRONTEND LOGS ==="
-          kubectl logs -l app=frontend -n ${{ env.KUBE_NAMESPACE }}
+          kubectl logs -l app=frontend -n ${{ env.KUBE_NAMESPACE }} --all-containers || true
 
       - name: Wait for Postgres Pod to be Ready
         run: |
