@@ -97,6 +97,8 @@ jobs:
           POSTGRES_USER:     ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB:       ${{ secrets.POSTGRES_DB }}
+          DB_HOST:           db       
+          DB_PORT:           5432     
           KUBE_NAMESPACE:    ${{ env.KUBE_NAMESPACE }}
         run: |
           kubectl create namespace "$KUBE_NAMESPACE" --dry-run=client -o yaml \
@@ -106,11 +108,18 @@ jobs:
             --from-literal=POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
             --from-literal=POSTGRES_DB="$POSTGRES_DB" \
             --namespace="$KUBE_NAMESPACE"
+          kubectl create secret generic pg-secret \
+            --from-literal=POSTGRES_USER="$POSTGRES_USER" \
+            --from-literal=POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
+            --from-literal=POSTGRES_DB="$POSTGRES_DB" \
+            --from-literal=DATABASE_URL="postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$DB_HOST:$DB_PORT/$POSTGRES_DB" \
+            -n $KUBE_NAMESPACE
           kubectl create secret docker-registry ghcr-secret \
             --docker-server=ghcr.io \
             --docker-username="${{ github.actor }}" \
             --docker-password="${{ secrets.REGISTRY_TOKEN }}" \
             --namespace="$KUBE_NAMESPACE"
+
 
       - name: Deploy & initial debug
         run: |
