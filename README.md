@@ -46,6 +46,6 @@ git clone https://github.com/Enock97/FreelancerCRM.git
 ---
 ## 👨‍💻 Developer
 
-**Enock Ladu – Full-Stack Developer**: [LinkedIn Profil](https://www.linkedin.com/in/enock-ladu-b56b0724b/) / Oslo, Norway
+**Enock Ladu – Full-Stack Developer**: [LinkedIn Profile](https://www.linkedin.com/in/enock-ladu-b56b0724b/) / Oslo, Norway
 
 ---
