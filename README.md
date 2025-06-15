@@ -1,6 +1,6 @@
 # FreelancerCRM
 
-**FreelancerCRM** er en Minimum Viable Product (MVP)versjon av en moderne CRM-webapplikasjon laget for frilansere og små team som ønsker enkel oversikt over kunderelasjoner, aktiviteter og kommunikasjon – alt i et brukervennlig, responsivt dashboard med dra-og-slipp Kanban-visning.
+**FreelancerCRM** er en Minimum Viable Product (MVP) versjon av en moderne CRM-webapplikasjon laget for frilansere og små team som ønsker enkel oversikt over kunderelasjoner, aktiviteter og kommunikasjon – alt i et brukervennlig, responsivt dashboard med dra-og-slipp Kanban-visning.
 
 ---
 
