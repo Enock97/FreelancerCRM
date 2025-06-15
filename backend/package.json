@@ -8,8 +8,7 @@
     "build": "npm exec tsc",
     "start": "node dist/index.js",
     "type-check": "tsc --noEmit",
-    "seed": "ts-node prisma/seed.ts"
-
+    "seed": "ts-node ./prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,12 +17,16 @@
   "dependencies": {
     "@apollo/server": "^4.12.2",
     "@prisma/client": "^6.9.0",
+    "@tailwindcss/cli": "^4.1.10",
+    "@tailwindcss/postcss": "^4.1.10",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "graphql-tag": "^2.12.6",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^4.1.10"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.7",
@@ -34,7 +37,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.9",
-    "@types/node": "^22.15.30",
+    "@types/node": "^22.15.31",
     "graphql": "^16.11.0",
     "prisma": "^6.9.0",
     "ts-node-dev": "^2.0.0",

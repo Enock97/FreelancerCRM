@@ -35,7 +35,7 @@ export const resolvers = {
       if (!userId) return null;
       return await prisma.user.findUnique({
         where: { id: Number(userId) },
-        include: { contacts: true, activities: true },
+        include: { contacts: true },
       });
     },
   },

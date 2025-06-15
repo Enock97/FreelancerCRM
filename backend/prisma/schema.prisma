@@ -35,8 +35,6 @@ model Activity {
   createdAt   DateTime @default(now())
   contact     Contact  @relation(fields: [contactId], references: [id])
   contactId   Int
-  user        User?    @relation(fields: [userId], references: [id])
-  userId      Int?
 }
 
 model User {
@@ -44,5 +42,4 @@ model User {
   email      String    @unique
   password   String
   contacts   Contact[]
-  activities Activity[]
 }

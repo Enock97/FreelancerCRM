@@ -13,7 +13,7 @@ const LoginPage = () => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
   const LOGIN_URL = `${API_URL}/api/auth/login`;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     try {

@@ -1,15 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Sletter alt for en "clean slate"
-  await prisma.activity.deleteMany();
-  await prisma.contact.deleteMany();
-  await prisma.user.deleteMany();
-
-  // Lag bruker
+  // Bruker med id 2 må eksistere fra før
+    // Lag bruker
   const user = await prisma.user.create({
     data: {
       email: 'demo@bruker.no',
@@ -17,62 +13,83 @@ async function main() {
     },
   });
 
-  // Lag kontakter
-  const contacts = await prisma.contact.createMany({
-    data: [
-      {
-        name: "Ola Nordmann",
-        email: "ola@nordmann.no",
-        phone: "90012345",
-        company: "Nordic AS",
-        status: "NY",
-        note: "Første kontakt",
-        userId: user.id,
-      },
-      {
-        name: "Kari Nordmann",
-        email: "kari@nordmann.no",
-        phone: "91122334",
-        company: "Kari Tekstil",
-        status: "OPPFOLGING",
-        note: "Interessert i demo",
-        userId: user.id,
-      },
-      {
-        name: "Ali Ahmed",
-        email: "ali@ahmed.no",
-        phone: "98811223",
-        company: "Ahmed Transport",
-        status: "KUNDE",
-        note: "God kunde",
-        userId: user.id,
-      },
-      {
-        name: "Sara Olsen",
-        email: "sara@olsen.no",
-        phone: "97998877",
-        company: "Olsen IT",
-        status: "ARKIVERT",
-        note: "Ingen respons",
-        userId: user.id,
-      },
-    ],
+  // Kontakt 1
+  const kontakt1 = await prisma.contact.create({
+    data: {
+      name: 'Ola Nordmann',
+      email: 'ola@nordmann.no',
+      phone: '12345678',
+      company: 'Ola IT',
+      status: 'NY',
+      note: 'Fersk lead fra nettside',
+      userId: 1,
+      activities: {
+        create: [
+          { description: 'Sendte introduksjonsmail' },
+          { description: 'Fulgte opp på telefon' }
+        ]
+      }
+    }
   });
 
-  // Hent kontakter for å få id'ene
-  const kontaktListe = await prisma.contact.findMany({ where: { userId: user.id } });
+  // Kontakt 2
+  const kontakt2 = await prisma.contact.create({
+    data: {
+      name: 'Kari Nordmann',
+      email: 'kari@nordmann.no',
+      phone: '87654321',
+      company: 'Kari Tekstil',
+      status: 'OPPFOLGING',
+      note: 'Vil ha demo',
+      userId: 1,
+      activities: {
+        create: [
+          { description: 'Sendte demo-invitasjon' },
+          { description: 'Demo booket' }
+        ]
+      }
+    }
+  });
 
-  // Lag activities for hver kontakt (to aktiviteter per kontakt)
-  for (const contact of kontaktListe) {
-    await prisma.activity.createMany({
-      data: [
-        { description: "Første aktivitet for " + contact.name, contactId: contact.id },
-        { description: "Andre aktivitet for " + contact.name, contactId: contact.id },
-      ],
-    });
-  }
+  // Kontakt 3
+  const kontakt3 = await prisma.contact.create({
+    data: {
+      name: 'Per Hansen',
+      email: 'per@hansen.no',
+      phone: '11223344',
+      company: 'Hansen AS',
+      status: 'KUNDE',
+      note: 'Signert kontrakt',
+      userId: 1,
+      activities: {
+        create: [
+          { description: 'Opprettet bruker'},
+          { description: 'Fakturert første måned'}
+        ]
+      }
+    }
+  });
 
-  console.log("Dummydata ferdig satt inn!");
+  // Kontakt 4
+  const kontakt4 = await prisma.contact.create({
+    data: {
+      name: 'Anne Larsen',
+      email: 'anne@larsen.no',
+      phone: '44332211',
+      company: 'Larsen Design',
+      status: 'ARKIVERT',
+      note: 'Valgte konkurrent',
+      userId: 1,
+      activities: {
+        create: [
+          { description: 'Avsluttet dialog' },
+          { description: 'Flyttet til arkiv' }
+        ]
+      }
+    }
+  });
+
+  console.log('Seed complete!');
 }
 
 main()
@@ -80,6 +97,6 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
+  .finally(() => {
+    prisma.$disconnect();
   });

@@ -13,7 +13,7 @@ const RegisterPage = () => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
   const REGISTER_URL = `${API_URL}/api/auth/register`;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     try {
