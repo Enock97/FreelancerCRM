@@ -15,6 +15,10 @@ const statusOptions = [
 const KanbanBoard = () => {
   const { data, loading, error } = useQuery(GET_CONTACTS);
 
+  console.log("Dashboard:", JSON.stringify(data, null, 2));
+
+
+
   if (loading) return <div className="text-center text-gray-500 dark:text-gray-300">Laster Kanban...</div>;
   if (error) return <div className="text-center text-red-500">Kunne ikke hente data</div>;
 

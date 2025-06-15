@@ -7,6 +7,8 @@ import { GET_CONTACTS } from "../../graphql/queries";
 const ContactsPage = () => {
   const { data, loading, error } = useQuery(GET_CONTACTS);
 
+  console.log("Contacts Page:", JSON.stringify(data, null, 2));
+
   if (loading) {
     return <div>Laster...</div>;
   }

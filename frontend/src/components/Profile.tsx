@@ -6,6 +6,9 @@ import { GET_PROFILE } from "../app/graphql/queries";
 const Profile = () => {
   const { data, loading, error } = useQuery(GET_PROFILE);
 
+  console.log("Profile page:", JSON.stringify(data, null, 2));
+
+
   if (loading) return <div className="text-center text-gray-500 dark:text-gray-300">Laster profil...</div>;
   if (error) return <div className="text-center text-red-500">Kunne ikke hente profilinfo</div>;
 
