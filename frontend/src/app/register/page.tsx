@@ -14,59 +14,59 @@ const RegisterPage = () => {
   const REGISTER_URL = `${API_URL}/api/auth/register`;
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
-  try {
-    const res = await fetch(`${REGISTER_URL}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    e.preventDefault();
+    setError(null);
+    try {
+      const res = await fetch(REGISTER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!res.ok) {
-      throw new Error("Kunne ikke registrere din bruker. Prøv igjen.");
-    }
+      if (!res.ok) throw new Error("Kunne ikke registrere din bruker. Prøv igjen.");
 
-    const data = await res.json();
-    const token = data.token;
-    if (token) {
-      setToken(token);
-      router.push("/dashboard");
-    }
-      } catch (err) {
-        console.error("Registrerings error:", err);
-        setError("Kunne ikke registrere din bruker. Prøv igjen.");
+      const data = await res.json();
+      const token = data.token;
+      if (token) {
+        setToken(token);
+        router.push("/dashboard");
       }
-    };
-
+    } catch (err) {
+        console.error("Registrering error:", err);
+      setError("Kunne ikke registrere din bruker. Prøv igjen.");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh]">
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded shadow space-y-3 min-w-[280px]">
-        <h2 className="text-2xl font-bold mb-2 dark:text-white">Registrer deg</h2>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg space-y-4 min-w-[300px] border border-gray-100 dark:border-gray-700 transition-colors"
+      >
+        <h2 className="text-2xl font-extrabold mb-3 text-gray-900 dark:text-white text-center">Registrer deg</h2>
         <input
           type="email"
-          className="w-full px-2 py-1 border rounded dark:bg-gray-900 dark:text-white"
+          className="w-full px-3 py-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700 outline-none focus:ring-2 focus:ring-green-400"
           placeholder="E-post"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
-          className="w-full px-2 py-1 border rounded dark:bg-gray-900 dark:text-white"
+          className="w-full px-3 py-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700 outline-none focus:ring-2 focus:ring-green-400"
           placeholder="Passord"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           required
         />
         <button
           type="submit"
-          className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          className="w-full py-2 bg-green-600 text-white rounded hover:bg-green-700 font-semibold"
         >
           Registrer
         </button>
-        {error && <div className="text-red-500 text-sm mt-2">Noe gikk galt – prøv igjen</div>}
+        {error && <div className="text-red-500 text-sm mt-2 text-center">{error}</div>}
       </form>
     </div>
   );

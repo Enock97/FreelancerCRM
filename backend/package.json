@@ -7,7 +7,9 @@
     "dev": "ts-node-dev src/index.ts",
     "build": "npm exec tsc",
     "start": "node dist/index.js",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "seed": "ts-node prisma/seed.ts"
+
   },
   "keywords": [],
   "author": "",

@@ -13,60 +13,60 @@ const LoginPage = () => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
   const LOGIN_URL = `${API_URL}/api/auth/login`;
 
-
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
-  try {
-    const res = await fetch(`${LOGIN_URL}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    e.preventDefault();
+    setError(null);
+    try {
+      const res = await fetch(LOGIN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!res.ok) {
-      throw new Error("Feil e-post eller passord");
-    }
+      if (!res.ok) throw new Error("Feil e-post eller passord");
 
-    const data = await res.json();
-    const token = data.token;
-    if (token) {
-      setToken(token);
-      router.push("/dashboard");
-    }
-      } catch (err) {
-        console.error("Login error:", err);
-        setError("Kunne ikke logge inn. Feil e-post eller passord. Prøv igjen.");
+      const data = await res.json();
+      const token = data.token;
+      if (token) {
+        setToken(token);
+        router.push("/dashboard");
       }
-    };
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Kunne ikke logge inn. Feil e-post eller passord. Prøv igjen.");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh]">
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded shadow space-y-3 min-w-[280px]">
-        <h2 className="text-2xl font-bold mb-2 dark:text-white">Logg inn</h2>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg space-y-4 min-w-[300px] border border-gray-100 dark:border-gray-700 transition-colors"
+      >
+        <h2 className="text-2xl font-extrabold mb-3 text-gray-900 dark:text-white text-center">Logg inn</h2>
         <input
           type="email"
-          className="w-full px-2 py-1 border rounded dark:bg-gray-900 dark:text-white"
+          className="w-full px-3 py-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="E-post"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
-          className="w-full px-2 py-1 border rounded dark:bg-gray-900 dark:text-white"
+          className="w-full px-3 py-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="Passord"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           required
         />
         <button
           type="submit"
-          className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
         >
           Logg inn
         </button>
-        {error && <div className="text-red-500 text-sm mt-2">Feil e-post eller passord</div>}
+        {error && <div className="text-red-500 text-sm mt-2 text-center">{error}</div>}
       </form>
     </div>
   );

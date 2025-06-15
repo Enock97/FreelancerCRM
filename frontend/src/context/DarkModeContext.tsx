@@ -9,35 +9,30 @@ interface DarkModeContextType {
 const DarkModeContext = createContext<DarkModeContextType | undefined>(undefined);
 
 export const DarkModeProvider = ({ children }: { children: ReactNode }) => {
-    const [darkMode, setDarkMode] = useState(false);
-    const [mounted, setMounted] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
-    useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem("darkMode");
+  // Init once: check localStorage, else system preference
+  useEffect(() => {
+    const saved = typeof window !== "undefined" ? localStorage.getItem("darkMode") : null;
     if (saved !== null) {
       setDarkMode(saved === "true");
-      console.log("Console Log: console.log(' saved !== null: ' + darkMode): Output: " + darkMode)
-    } else {
-      const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setDarkMode(systemDark);
-      console.log("Console Log: console.log(' saved === null: ' + darkMode): Output: " + darkMode)
+    } else if (typeof window !== "undefined") {
+      setDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches);
     }
   }, []);
 
+  // Toggle html class & save preference
   useEffect(() => {
-    if (!mounted) return;
+    if (typeof window === "undefined") return;
     if (darkMode) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
     localStorage.setItem("darkMode", String(darkMode));
-  }, [darkMode, mounted]);
+  }, [darkMode]);
 
   const toggleDarkMode = () => setDarkMode((v) => !v);
-
-  if (!mounted) return null;
 
   return (
     <DarkModeContext.Provider value={{ darkMode, toggleDarkMode }}>
