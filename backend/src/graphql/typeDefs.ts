@@ -45,7 +45,6 @@ const typeDefs = gql`
     id: ID!
     email: String!
     contacts: [Contact!]!
-    activities: [Activity!]!
   }
 
   type AuthPayload {

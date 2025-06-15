@@ -134,8 +134,6 @@ export const resolvers = {
   User: {
     contacts: (parent: any) =>
       prisma.contact.findMany({ where: { userId: parent.id } }),
-    activities: (parent: any) =>
-      prisma.activity.findMany({ where: { contact: { userId: parent.id } } }),
   },
   Activity: {
     contact: (parent: any) =>
