@@ -48,8 +48,8 @@ const ContactsPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-4">
+    <div className="max-w-4xl mx-auto ">
+      <div className="flex justify-between items-center mb-4 ">
         <h1 className="text-2xl font-bold dark:text-white">Kontakter</h1>
         <button onClick={handleNew} className="bg-blue-600 text-white px-4 py-2 rounded">
           Ny kontakt
@@ -62,14 +62,14 @@ const ContactsPage: React.FC = () => {
           initialData={editingContact || undefined}
         />
       )}
-      <div className="mt-4 grid grid-cols-1 gap-4 dark:text-white">
+      <div className="mt-4 grid grid-cols-1 gap-4  dark:text-white">
         {data?.contacts.map((contact) => (
           <div
             key={contact.id}
-            className="bg-white dark:bg-gray-900 p-4 rounded shadow flex flex-col gap-2"
+            className="bg-gray-200 dark:bg-gray-900 p-4 rounded shadow flex flex-col gap-2"
           >
             <div className="dark:text-white">
-              <span className="font-semibold text-2xl">{contact.name}</span> &ndash; {contact.email}
+              <span className="font-semibold text-2xl text-blue-400">{contact.name}</span> &ndash; {contact.email}
               <div className="text-xl text-gray-500">Status: {contact.status}</div>
               {contact.phone && <div className="text-xl">{contact.phone}</div>}
               {contact.company && <div className="text-xl">{contact.company}</div>}
