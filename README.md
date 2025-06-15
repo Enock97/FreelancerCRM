@@ -1,6 +1,6 @@
 # FreelancerCRM
 
-**FreelancerCRM** er en moderne CRM-webapplikasjon laget for frilansere og små team som ønsker enkel oversikt over kunderelasjoner, aktiviteter og kommunikasjon – alt i et brukervennlig, responsivt dashboard med Kanban-visning.
+**FreelancerCRM** er en moderne CRM-webapplikasjon MVP (Minimum Viable Product) laget for frilansere og små team som ønsker enkel oversikt over kunderelasjoner, aktiviteter og kommunikasjon – alt i et brukervennlig, responsivt dashboard med Kanban-visning.
 
 ---
 
