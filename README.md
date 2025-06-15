@@ -8,18 +8,24 @@
 
 Du kan teste applikasjonen live her:  
 **[Demo på Vercel (lenke kommer)](https://din-app-url.vercel.app)**
+<br>
+Demo tilgjengelighet (AV/PÅ): **AV**
 
 ---
 
 ## 💡 Om applikasjonen
 
 - Administrer kontakter med felter for navn, e-post, firma, status, notat og telefonnummer.
-- Organiser kundeprosesser med et visuelt Kanban-board (dra-og-slipp mellom kolonner) - **funksjonalitet for dra-og-slipp kommer!**.
+- Organiser kundeprosesser med et visuelt Kanban-board (dra-og-slipp mellom kolonner).
 - Registrer og følg opp aktiviteter knyttet til hver kontakt.
 - Brukerautentisering (registrering, innlogging, beskyttede sider).
 - Profilside med mulighet for oppdatering av e-post og passord.
 - Støtte for mørk/lys modus.
 - Mobilvennlig og responsivt design.
+
+🙏 **Tilleggsfunksjonalitet som kommer:**
+- Dra-og-slipp funksjonalitet i kanban-visningen.
+- Oppdatering av e-post og passord.
 
 ---
 
