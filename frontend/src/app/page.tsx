@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import '../styles/globals.css';
 
 export default function HomePage() {
   return (

@@ -1,9 +1,9 @@
 import { gql } from "graphql-tag";
 
-export const typeDefs = gql`
+const typeDefs = gql`
   enum Status {
     NY
-    OPPFØLGING
+    OPPFOLGING
     KUNDE
     ARKIVERT
   }
@@ -70,3 +70,5 @@ export const typeDefs = gql`
     updateProfile(input: UpdateUserInput!): User!
   }
 `;
+
+export default typeDefs;

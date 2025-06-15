@@ -10,7 +10,7 @@ datasource db {
 
 enum Status {
   NY
-  OPPFØLGING
+  OPPFOLGING
   KUNDE
   ARKIVERT
 }

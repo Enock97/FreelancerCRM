@@ -2,7 +2,6 @@ import express, { RequestHandler, Router } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes';
-import activityRoutes from './routes/activity.routes';
 import userRoutes from './routes/user.routes';
 import createGraphQLMiddleware from './graphql';
 
@@ -26,7 +25,6 @@ const bootstrap = async () => {
   app.use(express.json());
 
   app.use('/api/auth', authRoutes);
-  app.use('/api/activities', activityRoutes);
   app.use('/api/users', userRoutes);
  // 4) Mount GraphQL—wrap in a Router to make TS happy
   const gqlRouter = Router();
