@@ -1,104 +1,99 @@
 "use client";
 import React, { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { CREATE_CONTACT, UPDATE_CONTACT } from "../../graphql/mutations";
-import { GET_CONTACTS } from "../../graphql/queries";
 import { Contact } from "../../../types/types";
 
-interface ContactFormProps {
-  initialData?: Contact;
+export interface ContactFormProps {
+  onSubmit: (formData: Omit<Contact, "id" | "createdAt" | "activities">) => void | Promise<void>;
   onCancel: () => void;
-  onSubmit: () => void;
+  initialData?: Partial<Contact>;
 }
 
-const statusOptions = [
-  "NY", "OPPFØLGING", "KUNDE", "ARKIVERT"
-];
+const statusOptions = ["NY", "OPPFOLGING", "KUNDE", "ARKIVERT"];
 
-const ContactForm: React.FC<ContactFormProps> = ({
-  initialData,
-  onCancel,
-  onSubmit,
-}) => {
-  const [name, setName] = useState(initialData?.name || "");
-  const [email, setEmail] = useState(initialData?.email || "");
-  const [phone, setPhone] = useState(initialData?.phone || "");
-  const [company, setCompany] = useState(initialData?.company || "");
-  const [status, setStatus] = useState(initialData?.status || "NY");
-  const [note, setNote] = useState(initialData?.note || "");
-
-  const [createContact] = useMutation(CREATE_CONTACT, {
-    refetchQueries: [{ query: GET_CONTACTS }],
-  });
-  const [updateContact] = useMutation(UPDATE_CONTACT, {
-    refetchQueries: [{ query: GET_CONTACTS }],
+const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialData }) => {
+  const [formData, setFormData] = useState<Omit<Contact, "id" | "createdAt" | "activities">>({
+    name: initialData?.name || "",
+    email: initialData?.email || "",
+    phone: initialData?.phone || "",
+    company: initialData?.company || "",
+    status: initialData?.status || "NY",
+    note: initialData?.note || "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  }
+
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (initialData) {
-      await updateContact({
-        variables: {
-          id: initialData.id,
-          input: { name, email, phone, company, status, note },
-        },
-      });
-    } else {
-      await createContact({
-        variables: { input: { name, email, phone, company, status, note } },
-      });
-    }
-    onSubmit();
-  };
+    onSubmit(formData);
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white dark:bg-gray-900 dark:text-white p-4 rounded-lg shadow-md flex flex-col gap-2"
+    >
       <input
-        className="w-full rounded px-2 py-1 border dark:bg-gray-900 dark:text-white"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        type="text"
+        name="name"
         placeholder="Navn"
+        value={formData.name}
+        onChange={handleChange}
+        className="input rounded px-2 py-1 border dark:bg-gray-900"
         required
       />
       <input
-        className="w-full rounded px-2 py-1 border dark:bg-gray-900 dark:text-white"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="E-post"
         type="email"
+        name="email"
+        placeholder="E-post"
+        value={formData.email}
+        onChange={handleChange}
+        className="input rounded px-2 py-1 border dark:bg-gray-900"
         required
       />
       <input
-        className="w-full rounded px-2 py-1 border dark:bg-gray-900 dark:text-white"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
+        type="text"
+        name="phone"
         placeholder="Telefon"
+        value={formData.phone}
+        onChange={handleChange}
+        className="input rounded px-2 py-1 border dark:bg-gray-900"
       />
       <input
-        className="w-full rounded px-2 py-1 border dark:bg-gray-900 dark:text-white"
-        value={company}
-        onChange={(e) => setCompany(e.target.value)}
+        type="text"
+        name="company"
         placeholder="Firma"
+        value={formData.company}
+        onChange={handleChange}
+        className="input rounded px-2 py-1 border dark:bg-gray-900"
       />
       <select
-        className="w-full rounded px-2 py-1 border dark:bg-gray-900 dark:text-white"
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
+        name="status"
+        value={formData.status}
+        onChange={handleChange}
+        className="input rounded px-2 py-1 border dark:bg-gray-900"
       >
-        {statusOptions.map((s) => (
-          <option key={s} value={s}>{s}</option>
+        {statusOptions.map((option) => (
+          <option key={option} value={option}>{option}</option>
         ))}
       </select>
       <textarea
-        className="w-full rounded px-2 py-1 border dark:bg-gray-900 dark:text-white"
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
+        name="note"
         placeholder="Notat"
-        rows={2}
+        value={formData.note}
+        onChange={handleChange}
+        className="input rounded px-2 py-1 border dark:bg-gray-900"
       />
-      <div className="flex space-x-2">
-        <button type="submit" className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Lagre</button>
-        <button type="button" className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400" onClick={onCancel}>Avbryt</button>
+      <div className="flex gap-2 mt-2">
+        <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
+          Lagre
+        </button>
+        <button type="button" onClick={onCancel} className="bg-gray-300 px-4 py-2 rounded">
+          Avbryt
+        </button>
       </div>
     </form>
   );

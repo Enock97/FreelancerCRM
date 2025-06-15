@@ -17,9 +17,13 @@ const createGraphQLMiddleware = async () => {
   // Return Express middleware ready to be mounted
   return [
     json(), // For parsing JSON bodies
-    requireAuth, // Inject user
     expressMiddleware(server, {
-      context: async ({ req }) => ({ user: (req as any).user }),
+      context: async ({ req }) => {
+        return {
+          user: (req as any).user,
+          req
+        };
+      }
     }),
   ];
 };

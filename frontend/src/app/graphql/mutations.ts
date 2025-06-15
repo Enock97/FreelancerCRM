@@ -40,6 +40,26 @@ export const UPDATE_CONTACT = gql`
   }
 `;
 
+export const GET_CONTACTS = gql`
+  query GetContacts {
+    contacts {
+      id
+      name
+      email
+      phone
+      company
+      status
+      note
+      createdAt
+      activities {
+        id
+        description
+        createdAt
+      }
+    }
+  }
+`;
+
 export const DELETE_CONTACT = gql`
   mutation DeleteContact($id: ID!) {
     deleteContact(id: $id)

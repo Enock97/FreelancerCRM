@@ -22,9 +22,15 @@ export const GET_CONTACTS = gql`
 
 export const GET_PROFILE = gql`
   query GetProfile {
-    me {
+  me {
+    id
+    email
+    contacts {
       id
-      email
+      activities {
+        id
+      }
     }
+  }
   }
 `;

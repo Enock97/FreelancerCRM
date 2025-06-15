@@ -2,23 +2,26 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
 import { GET_PROFILE } from "../app/graphql/queries";
+import { Contact } from "../types/types";
 
-const Profile = () => {
+const ProfilePage = () => {
   const { data, loading, error } = useQuery(GET_PROFILE);
 
-  console.log("Profile page:", JSON.stringify(data, null, 2));
-
-
-  if (loading) return <div className="text-center text-gray-500 dark:text-gray-300">Laster profil...</div>;
-  if (error) return <div className="text-center text-red-500">Kunne ikke hente profilinfo</div>;
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div className="text-red-500">Feil: {error.message}</div>;
 
   const user = data?.me;
-  if (!user) {
-    return <div className="text-center text-gray-500 dark:text-gray-400">Ingen brukerdata funnet.</div>;
-  }
+  if (!user) return <div>Ingen brukerdata funnet.</div>;
+
+  // Antall aktiviteter: summer over alle kontakter
+  const totalActivities = user.contacts.reduce(
+    (acc: number, contact: Contact) => acc + (contact.activities?.length ?? 0),
+    0
+  );
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
+    <div className="max-w-xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-md p-8 space-y-6 mt-8 border border-gray-100 dark:border-gray-800">
+      <h1 className="text-2xl font-bold text-center mb-4 text-gray-900 dark:text-white">Min Profil</h1>
       <div>
         <span className="block text-gray-700 dark:text-gray-300">E-post:</span>
         <span className="font-medium text-gray-900 dark:text-white">{user.email}</span>
@@ -29,10 +32,10 @@ const Profile = () => {
       </div>
       <div>
         <span className="block text-gray-700 dark:text-gray-300">Aktiviteter totalt:</span>
-        <span className="font-medium text-gray-900 dark:text-white">{user.activities.length}</span>
+        <span className="font-medium text-gray-900 dark:text-white">{totalActivities}</span>
       </div>
     </div>
   );
 };
 
-export default Profile;
+export default ProfilePage;

@@ -1,4 +1,4 @@
-"use client";
+"use client"; /*
 import React, { useRef } from "react";
 import { Contact } from "../types/types";
 
@@ -25,7 +25,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
   const handleDrop = (e: React.DragEvent, newStatus: string) => {
     e.preventDefault();
     const id = e.dataTransfer.getData("id");
-    if (id && id === contact.id && contact.status !== newStatus) {
+    if (id && id == contact.id && contact.status !== newStatus) {
       onDragEnd(contact.id, newStatus);
       refetch();
     }
@@ -60,4 +60,4 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
   );
 };
 
-export default DraggableCard;
+export default DraggableCard; */

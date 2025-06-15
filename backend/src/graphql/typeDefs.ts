@@ -32,7 +32,7 @@ const typeDefs = gql`
     email: String!
     phone: String
     company: String
-    status: Status
+    status: Status!
     note: String
   }
 

@@ -13,31 +13,36 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:5000/api/graphql";
 
-const httpLink = new HttpLink({ uri: GRAPHQL_ENDPOINT });
-
-const authLink = setContext((_, { headers }) => {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  return {
+function makeApolloClient(token: string | null) {
+  const httpLink = new HttpLink({ uri: GRAPHQL_ENDPOINT });
+  const authLink = setContext((_, { headers }) => ({
     headers: {
       ...headers,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-  };
-});
-
-const apolloClient = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
-  connectToDevTools: process.env.NODE_ENV === "development",
-});
+  }));
+  return new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache(),
+    connectToDevTools: process.env.NODE_ENV === "development",
+  });
+}
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setTokenState] = useState<string | null>(null);
+  const [client, setClient] = useState(() => makeApolloClient(null));
 
+  // Kjør på mount for å hente evt. token fra localStorage
   useEffect(() => {
-    const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    setTokenState(storedToken);
+    const stored = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    setTokenState(stored);
+    setClient(makeApolloClient(stored));
   }, []);
+
+  // (Re)init ApolloClient når token endres
+  useEffect(() => {
+    setClient(makeApolloClient(token));
+  }, [token]);
 
   const setToken = (newToken: string | null) => {
     setTokenState(newToken);
@@ -45,15 +50,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (newToken) localStorage.setItem("token", newToken);
       else localStorage.removeItem("token");
     }
+    // NB: ApolloClient blir reinitialisert automatisk i useEffect
   };
 
-  const logout = () => {
-    setToken(null);
-  };
+  const logout = () => setToken(null);
 
   return (
     <AuthContext.Provider value={{ token, setToken, logout }}>
-      <ApolloProvider client={apolloClient}>
+      <ApolloProvider client={client}>
         {children}
       </ApolloProvider>
     </AuthContext.Provider>

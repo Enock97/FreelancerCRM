@@ -1,11 +1,11 @@
 export interface Activity {
-  id: string;
+  id: number;
   description: string;
   createdAt: string;
 }
 
 export interface Contact {
-  id: string;
+  id: number;
   name: string;
   email: string;
   phone?: string;

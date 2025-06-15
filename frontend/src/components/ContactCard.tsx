@@ -1,27 +1,43 @@
+// src/components/ContactCard.tsx
 "use client";
 import React from "react";
 import { Contact } from "../types/types";
 
-const ContactCard = ({ contact }: { contact: Contact }) => {
+interface ContactCardProps {
+  contact: Contact;
+  onEdit?: (contact: Contact) => void;
+  onDelete?: (id: number) => void;
+  onUpdate?: () => void; // Juster type hvis du bruker denne
+}
+
+const ContactCard: React.FC<ContactCardProps> = ({ contact, onEdit, onDelete }) => {
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-5 flex flex-col gap-2 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-center">
-        <div>
-          <div className="font-semibold text-lg dark:text-white">{contact.name}</div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">{contact.email}</div>
-          {contact.phone && <div className="text-sm text-gray-500 dark:text-gray-400">{contact.phone}</div>}
-          {contact.company && <div className="text-sm text-gray-500 dark:text-gray-400">{contact.company}</div>}
-        </div>
-        <div className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 dark:text-gray-200 text-gray-600">
-          {contact.status}
-        </div>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col gap-2">
+      <div className="font-semibold">{contact.name}</div>
+      <div className="text-xs text-gray-500">{contact.email}</div>
+      <div className="text-xs text-gray-500">{contact.phone}</div>
+      <div className="text-xs text-gray-500">{contact.company}</div>
+      <div className="text-xs text-gray-500">
+        Status: <span className="font-bold">{contact.status}</span>
       </div>
-      {contact.note && (
-        <div className="mt-2 text-gray-700 dark:text-gray-300 text-sm">Note: {contact.note}</div>
-      )}
-      <div className="flex gap-2 text-xs text-gray-400 mt-2">
-        <span>Opprettet: {new Date(contact.createdAt).toLocaleDateString("no-NO")}</span>
-        <span>| {contact.activities?.length || 0} aktiviteter</span>
+      <div className="text-xs text-gray-500">{contact.note}</div>
+      <div className="flex gap-2 mt-2">
+        {onEdit && (
+          <button
+            onClick={() => onEdit(contact)}
+            className="px-3 py-1 bg-blue-600 text-white rounded"
+          >
+            Rediger
+          </button>
+        )}
+        {onDelete && (
+          <button
+            onClick={() => onDelete(contact.id)}
+            className="px-3 py-1 bg-red-600 text-white rounded"
+          >
+            Slett
+          </button>
+        )}
       </div>
     </div>
   );
