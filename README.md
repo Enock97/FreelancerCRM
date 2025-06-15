@@ -6,8 +6,7 @@
 
 ## 🌐 Prøv appen
 
-Du kan teste applikasjonen live her:  
-**[Demo på Vercel (lenke kommer)](https://din-app-url.vercel.app)**
+Du kan teste applikasjonen live her: **[Demo på Vercel (lenke kommer)](https://din-app-url.vercel.app)**
 <br>
 Demo tilgjengelighet (AV/PÅ): **AV**
 
