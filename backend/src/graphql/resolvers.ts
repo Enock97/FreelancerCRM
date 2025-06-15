@@ -28,7 +28,6 @@ export const resolvers = {
     contacts: async (_parent: any, _args: any, context: any) => {
       const userId = getUserIdFromContext(context);
       if (!userId) throw new Error("Ikke autentisert");
-      console.log('Authorization-header:', context.req?.headers?.authorization)
       return await prisma.contact.findMany({
         where: { userId: Number(userId) },
         include: { activities: true },
@@ -37,7 +36,6 @@ export const resolvers = {
     },
     me: async (_parent: any, _args: any, context: any) => {
       const userId = getUserIdFromContext(context);
-      console.log('Authorization-header:', context.req?.headers?.authorization)
       if (!userId) return null;
       return await prisma.user.findUnique({
         where: { id: Number(userId) },
