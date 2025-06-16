@@ -7,12 +7,12 @@
 ## 🌐 Try the App
 
 You can test the live application here: 
-- **[Demo on Vercel](https://freelancercrm-deployment.vercel.app/)**
-- **[Backend API Health](https://freelancercrm.onrender.com/api/health)**
+- **[Frontend Demo on Vercel](https://freelancercrm-deployment.vercel.app/)**
+- **[Backend API Health on Heroku](https://freelancecrm-backend-40133daf1fbc.herokuapp.com/api/health)**
 
 <br>
 
-Demo availability (ON/OFF): **OFF**
+Current full web application demo availability (YES/NO): **NO**
 
 ---
 
