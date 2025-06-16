@@ -19,4 +19,4 @@ npm-debug.log*
 .DS_Store
 
 
-*.tar
+*.tarnode_modules/
