@@ -50,7 +50,6 @@ const bootstrap = async () => {
     console.log(`API Health is active and running on /api/health`);
   });
 
-  console.log("CWD:", process.cwd());
 };
 
 bootstrap();
