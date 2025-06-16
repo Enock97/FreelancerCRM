@@ -34,7 +34,7 @@ Demo availability (ON/OFF): **OFF**
 - **Backend:** Node.js, Express.js (TypeScript), REST, GraphQL (Apollo Server), Prisma ORM
 - **Database:** PostgreSQL
 - **Authentication:** JWT
-- **DevOps:** Docker, Kubernetes, Vercel, ngrok
+- **DevOps:** Docker, Kubernetes, Vercel, Render
 
 ---
 
