@@ -38,8 +38,9 @@ const bootstrap = async () => {
   app.get('/api/health', healthHandler);
 
   app.listen(PORT,'0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`GraphQL running at ${PORT}/graphql`);
+    console.log(`REST Server is active and running on /api/auth/`);
+    console.log(`GraphQL Server is active and running on /api/graphql`);
+    console.log(`App health is active and can be viewed on /api/health`);
   });
 };
 
