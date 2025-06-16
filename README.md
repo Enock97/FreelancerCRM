@@ -6,8 +6,12 @@
 
 ## 🌐 Try the App
 
-You can test the live application here: **[Demo on Vercel (link coming soon)](https://your-app-url.vercel.app)**  
+You can test the live application here: 
+- **[Demo on Vercel](https://freelancercrm-deployment.vercel.app/)**
+- **[Backend API Health](https://freelancercrm.onrender.com/api/health)**
+
 <br>
+
 Demo availability (ON/OFF): **OFF**
 
 ---
@@ -43,7 +47,9 @@ Demo availability (ON/OFF): **OFF**
 ```sh
 git clone https://github.com/Enock97/FreelancerCRM.git
 ```
+
 ---
+
 ## 👨‍💻 Developer
 
 **Enock Ladu – Full-Stack Developer**: [LinkedIn Profile](https://www.linkedin.com/in/enock-ladu-b56b0724b/) / Oslo, Norway
