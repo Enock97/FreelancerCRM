@@ -42,6 +42,8 @@ const bootstrap = async () => {
     console.log(`GraphQL Server is active and running on /api/graphql`);
     console.log(`API Health is active and running on /api/health`);
   });
+
+  console.log("CWD:", process.cwd());
 };
 
 bootstrap();
