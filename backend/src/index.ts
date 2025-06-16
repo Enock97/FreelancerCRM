@@ -18,7 +18,7 @@ const bootstrap = async () => {
   const graphqlMiddleware = rawGQL as unknown as RequestHandler[];
 
   app.use(cors({
-    origin: 'https://freelancercrm-deployment.vercel.app/',
+    origin: 'https://freelancercrm-deployment.vercel.app',
     credentials: true,
   }));
 
