@@ -1,53 +1,51 @@
-# FreelancerCRM
+# ⭐ FreelancerCRM
 
-**FreelancerCRM** er en Minimum Viable Product (MVP) versjon av en moderne CRM-webapplikasjon laget for frilansere og små team som ønsker enkel oversikt over kunderelasjoner, aktiviteter og kommunikasjon – alt i et brukervennlig, responsivt dashboard med dra-og-slipp Kanban-visning.
+**FreelancerCRM** is a Minimum Viable Product (MVP) version of a modern CRM web application built for freelancers and small teams who need a simple overview of client relationships, activities, and communication — all presented in a user-friendly, responsive dashboard with a drag-and-drop Kanban interface.
 
 ---
 
-## 🌐 Prøv appen
+## 🌐 Try the App
 
-Du kan teste applikasjonen live her: **[Demo på Vercel (lenke kommer)](https://din-app-url.vercel.app)**
+You can test the live application here: **[Demo on Vercel (link coming soon)](https://your-app-url.vercel.app)**  
 <br>
-Demo tilgjengelighet (AV/PÅ): **AV**
+Demo availability (ON/OFF): **OFF**
 
 ---
 
-## 💡 Om applikasjonen
+## 💡 About the Application
 
-- Administrer kontakter med felter for navn, e-post, firma, status, notat og telefonnummer.
-- Organiser kundeprosesser med et visuelt Kanban-board (dra-og-slipp mellom kolonner).
-- Registrer og følg opp aktiviteter knyttet til hver kontakt.
-- Brukerautentisering (registrering, innlogging, beskyttede sider).
-- Profilside med mulighet for oppdatering av e-post og passord.
-- Støtte for mørk/lys modus.
-- Mobilvennlig og responsivt design.
+- Manage contacts with fields for name, email, company, status, note, and phone number.
+- Organize client workflows using a visual Kanban board (drag-and-drop between columns).
+- Log and track activities linked to each contact.
+- User authentication (registration, login, protected routes).
+- Profile page with email and password update options.
+- Supports dark/light mode.
+- Mobile-friendly and responsive design.
 
-🙏 **Tilleggsfunksjonalitet som kommer:**
-- Dra-og-slipp funksjonalitet i kanban-visningen.
-- Oppdatering av e-post og passord.
+🙏 **Upcoming Features:**
+- Drag-and-drop functionality in the Kanban view.
+- Email and password update functionality.
 
 ---
 
-## 🛠️ Teknologier
+## 🛠️ Technologies
 
 - **Frontend:** Next.js (TypeScript), React, Apollo Client, Tailwind CSS
 - **Backend:** Node.js, Express.js (TypeScript), REST, GraphQL (Apollo Server), Prisma ORM
 - **Database:** PostgreSQL
-- **Autentisering:** JWT
-- **DevOps:** Docker, Kubernetes, Vercel, ngrok
+- **Authentication:** JWT
+- **DevOps:** Docker, Kubernetes, Vercel, Render
 
 ---
 
-## 📦 Se/kjør kildekoden
+## 📦 View/Run the Source Code
 
 ```sh
 git clone https://github.com/Enock97/FreelancerCRM.git
 ```
 ---
+## 👨‍💻 Developer
 
-## Utvikler
-
-Enock Ladu – Fullstack Utvikler  
-[LinkedIn Profil](https://www.linkedin.com/in/enock-ladu-b56b0724b/) / Oslo, Norge
+**Enock Ladu – Full-Stack Developer**: [LinkedIn Profile](https://www.linkedin.com/in/enock-ladu-b56b0724b/) / Oslo, Norway
 
 ---
