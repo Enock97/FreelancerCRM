@@ -17,10 +17,17 @@ const bootstrap = async () => {
   const rawGQL = await createGraphQLMiddleware();
   const graphqlMiddleware = rawGQL as unknown as RequestHandler[];
 
-  app.use(cors({
-    origin: 'https://freelancercrm-deployment.vercel.app',
-    credentials: true,
-  }));
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "https://freelancercrm-deployment.vercel.app"
+  ];
+
+  app.use(
+    cors({
+      origin: allowedOrigins,
+      credentials: true,
+    })
+  );
 
   app.use(express.json());
 
