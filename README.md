@@ -25,6 +25,7 @@ Current full web application demo availability (YES/NO): **YES**
 - Profile page with email and password update options.
 - Supports dark/light mode.
 - Mobile-friendly and responsive design.
+- Front-end deployed on Vercel and back-end on Heroku
 
 🙏 **Upcoming Features:**
 - Drag-and-drop functionality in the Kanban view.
@@ -38,7 +39,7 @@ Current full web application demo availability (YES/NO): **YES**
 - **Backend:** Node.js, Express.js (TypeScript), REST, GraphQL (Apollo Server), Prisma ORM
 - **Database:** PostgreSQL
 - **Authentication:** JWT
-- **DevOps:** Docker, Kubernetes, Vercel, Render
+- **DevOps:** Docker, Kubernetes, Vercel, Heroku
 
 ---
 
