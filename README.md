@@ -30,7 +30,8 @@ Current full web application demo availability (YES/NO): **YES**
 🙏 **Upcoming Features:**
 - Drag-and-drop functionality in the Kanban view.
 - Email and password update functionality.
-
+- New color palette
+- Translating the web app from Norwegian to English for international comprehension and use
 ---
 
 ## 🛠️ Technologies
