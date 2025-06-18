@@ -19,19 +19,19 @@ Current full web application demo availability (YES/NO): **YES**
 ## 💡 About the Application
 
 - Manage contacts with fields for name, email, company, status, note, and phone number.
-- Organize client workflows using a visual Kanban board (drag-and-drop between columns).
+- Organize client workflows using a visual Kanban board.
 - Log and track activities linked to each contact.
 - User authentication (registration, login, protected routes).
-- Profile page with email and password update options.
+- Profile page with total contacts and activities.
 - Supports dark/light mode.
 - Mobile-friendly and responsive design.
-- Front-end deployed on Vercel, and back-end and database deployed on Heroku
+- Front-end deployed on Vercel, and back-end and database deployed on Heroku.
 
-🙏 **Upcoming Features:**
+🙏 ***Upcoming Features:**
 - Drag-and-drop functionality in the Kanban view.
-- Email and password update functionality.
-- New color palette
-- Translating the web app from Norwegian to English for international comprehension and use
+- Profile page email and password update functionality.
+- Possibly a new color palette/scheme for light mode.
+
 ---
 
 ## 🛠️ Technologies
@@ -40,7 +40,7 @@ Current full web application demo availability (YES/NO): **YES**
 - **Backend:** Express.js (Node.js/TypeScript), REST, GraphQL (Apollo Server), Prisma ORM
 - **Database:** PostgreSQL
 - **Authentication:** JWT
-- **DevOps:** Docker, Kubernetes, Vercel, Heroku
+- **DevOps:** Docker, Kubernetes, GitHub Actions, Vercel, Heroku
 
 ---
 

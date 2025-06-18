@@ -20,4 +20,4 @@ npm-debug.log*
 
 
 *.tarnode_modules/
-seed.ts
+prisma/seed.ts
