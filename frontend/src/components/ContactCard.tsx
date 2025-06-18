@@ -27,7 +27,7 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onEdit, onDelete }) 
             onClick={() => onEdit(contact)}
             className="px-3 py-1 bg-blue-600 text-white rounded"
           >
-            Rediger
+            Edit
           </button>
         )}
         {onDelete && (
@@ -35,7 +35,7 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onEdit, onDelete }) 
             onClick={() => onDelete(contact.id)}
             className="px-3 py-1 bg-red-600 text-white rounded"
           >
-            Slett
+            Delete
           </button>
         )}
       </div>

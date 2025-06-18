@@ -14,10 +14,10 @@ export interface KanbanColumnProps {
 }
 
 const statusOptions = [
-  { value: "NY", label: "Ny" },
-  { value: "OPPFOLGING", label: "Oppfølging" },
-  { value: "KUNDE", label: "Kunde" },
-  { value: "ARKIVERT", label: "Arkivert" },
+  { value: "NEW", label: "New" },
+  { value: "FOLLOW_UP", label: "Follow Up" },
+  { value: "CUSTOMER", label: "Customer" },
+  { value: "ARCHIVED", label: "Archived" },
 ];
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
@@ -77,7 +77,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
       <h3 className="font-bold mb-4 text-3xl text-blue-600 text-center">{label}</h3>
       <div className="flex-1 flex flex-col gap-4">
         {contacts.length === 0 && (
-          <div className="text-center text-gray-400 dark:text-gray-600">Ingen kontakter</div>
+          <div className="text-center text-gray-400 dark:text-gray-600">No contacts</div>
         )}
         {contacts.map((contact) => (
           <div
@@ -97,7 +97,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                   className="rounded px-2 py-1 border dark:bg-gray-900"
                   value={editFields.name ?? ""}
                   onChange={e => handleEditField("name", e.target.value)}
-                  placeholder="Navn"
+                  placeholder="Name"
                   required
                 />
                 <input
@@ -105,7 +105,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                   className="rounded px-2 py-1 border dark:bg-gray-900"
                   value={editFields.email ?? ""}
                   onChange={e => handleEditField("email", e.target.value)}
-                  placeholder="E-post"
+                  placeholder="Email"
                   required
                 />
                 <input
@@ -113,14 +113,14 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                   className="rounded px-2 py-1 border dark:bg-gray-900"
                   value={editFields.phone ?? ""}
                   onChange={e => handleEditField("phone", e.target.value)}
-                  placeholder="Telefon"
+                  placeholder="Phone"
                 />
                 <input
                   type="text"
                   className="rounded px-2 py-1 border dark:bg-gray-900"
                   value={editFields.company ?? ""}
                   onChange={e => handleEditField("company", e.target.value)}
-                  placeholder="Firma"
+                  placeholder="Company"
                 />
                 {/* Status - dropdown, alltid vertikal */}
                 <select
@@ -146,14 +146,14 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                     type="submit"
                     className="px-3 py-1 bg-green-600 text-white rounded"
                   >
-                    Lagre
+                    Save
                   </button>
                   <button
                     type="button"
                     onClick={handleCancel}
                     className="px-3 py-1 bg-gray-400 text-white rounded"
                   >
-                    Avbryt
+                    Cancel
                   </button>
                 </div>
               </form>

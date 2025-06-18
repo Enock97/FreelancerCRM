@@ -31,12 +31,12 @@ const DashboardPage = () => {
       refetch();
     } catch (e) {
       console.log(e)
-      alert("Kunne ikke oppdatere kontakt.");
+      alert("Could not update contact.");
     }
   };
 
-  if (loading) return <div className="text-center mt-10">Laster kontakter…</div>;
-  if (error) return <div className="text-red-500 text-center mt-10">Feil ved henting av kontakter</div>;
+  if (loading) return <div className="text-center mt-10">Loading contacts…</div>;
+  if (error) return <div className="text-red-500 text-center mt-10">Error loading contacts</div>;
 
   return (
     <div className="w-full max-w-[2000px] mx-auto px-1 py-6">

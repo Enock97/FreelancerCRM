@@ -19,7 +19,7 @@ const ContactsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
 
   if (loading) return <div>Laster...</div>;
-  if (error) return <div>Feil ved lasting av kontakter: {error.message}</div>;
+  if (error) return <div>Error loading contacts: {error.message}</div>;
 
   const handleEdit = (contact: Contact) => {
     setEditingContact(contact);
@@ -52,7 +52,7 @@ const ContactsPage: React.FC = () => {
       <div className="flex justify-between items-center mb-4 ">
         <h1 className="text-2xl font-bold dark:text-white">Kontakter</h1>
         <button onClick={handleNew} className="bg-blue-600 text-white px-4 py-2 rounded">
-          Ny kontakt
+          New contact
         </button>
       </div>
       {showForm && (
@@ -91,12 +91,12 @@ const ContactsPage: React.FC = () => {
                         }}
                         type="button"
                       >
-                        Slett
+                        Delete
                       </button>
                     </li>
                   ))
                 ) : (
-                  <li className="text-xs text-gray-400">Ingen aktiviteter</li>
+                  <li className="text-xs text-gray-400">No activities</li>
                 )}
               </ul>
               {/* Add new activity input */}
@@ -134,7 +134,7 @@ const ContactsPage: React.FC = () => {
                     await refetch();
                   }}
                 >
-                  Legg til
+                  Add
                 </button>
               </div>
             </div>
@@ -144,13 +144,13 @@ const ContactsPage: React.FC = () => {
                 onClick={() => handleEdit(contact)}
                 className="bg-yellow-500 text-white px-3 py-1 rounded"
               >
-                Rediger
+                Edit
               </button>
               <button
                 onClick={() => handleDelete(contact.id)}
                 className="bg-red-600 text-white px-3 py-1 rounded"
               >
-                Slett
+                Delete
               </button>
             </div>
           </div>

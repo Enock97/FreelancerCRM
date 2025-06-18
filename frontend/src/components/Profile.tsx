@@ -11,7 +11,7 @@ const ProfilePage = () => {
   if (error) return <div className="text-red-500">Feil: {error.message}</div>;
 
   const user = data?.me;
-  if (!user) return <div>Ingen brukerdata funnet.</div>;
+  if (!user) return <div>No user data found.</div>;
 
   // Antall aktiviteter: summer over alle kontakter
   const totalActivities = user.contacts.reduce(
@@ -21,17 +21,17 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-md p-8 space-y-6 mt-8 border border-gray-100 dark:border-gray-800">
-      <h1 className="text-2xl font-bold text-center mb-4 text-gray-900 dark:text-white">Min Profil</h1>
+      <h1 className="text-2xl font-bold text-center mb-4 text-gray-900 dark:text-white">My Profile</h1>
       <div>
-        <span className="block text-gray-700 dark:text-gray-300">E-post:</span>
+        <span className="block text-gray-700 dark:text-gray-300">Email:</span>
         <span className="font-medium text-gray-900 dark:text-white">{user.email}</span>
       </div>
       <div>
-        <span className="block text-gray-700 dark:text-gray-300">Antall kontakter:</span>
+        <span className="block text-gray-700 dark:text-gray-300">Total contacts:</span>
         <span className="font-medium text-gray-900 dark:text-white">{user.contacts.length}</span>
       </div>
       <div>
-        <span className="block text-gray-700 dark:text-gray-300">Aktiviteter totalt:</span>
+        <span className="block text-gray-700 dark:text-gray-300">Total activities:</span>
         <span className="font-medium text-gray-900 dark:text-white">{totalActivities}</span>
       </div>
     </div>

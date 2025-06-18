@@ -8,7 +8,7 @@ export interface ContactFormProps {
   initialData?: Partial<Contact>;
 }
 
-const statusOptions = ["NY", "OPPFOLGING", "KUNDE", "ARKIVERT"];
+const statusOptions = ["NEW", "FOLLOW_UP", "CUSTOMER", "ARCHIVED"];
 
 const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialData }) => {
   const [formData, setFormData] = useState<Omit<Contact, "id" | "createdAt" | "activities">>({
@@ -16,7 +16,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
     email: initialData?.email || "",
     phone: initialData?.phone || "",
     company: initialData?.company || "",
-    status: initialData?.status || "NY",
+    status: initialData?.status || "NEW",
     note: initialData?.note || "",
   });
 
@@ -89,10 +89,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       />
       <div className="flex gap-2 mt-2">
         <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
-          Lagre
+          Save
         </button>
         <button type="button" onClick={onCancel} className="bg-gray-300 px-4 py-2 rounded">
-          Avbryt
+          Cancel
         </button>
       </div>
     </form>

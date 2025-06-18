@@ -42,12 +42,12 @@ const Navbar = () => {
             onClick={handleLogout}
             className="text-sm px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 transition-colors"
           >
-            Logg ut
+            Sign out
           </button>
         ) : (
           <>
-            <Link href="/login" className="text-sm px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors">Logg inn</Link>
-            <Link href="/register" className="text-sm px-3 py-1 rounded bg-green-500 text-white hover:bg-green-600 transition-colors">Registrer</Link>
+            <Link href="/login" className="text-sm px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors">Sign in</Link>
+            <Link href="/register" className="text-sm px-3 py-1 rounded bg-green-500 text-white hover:bg-green-600 transition-colors">Register</Link>
           </>
         )}
       </div>

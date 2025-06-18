@@ -11,7 +11,7 @@ const ProfilePage = () => {
   if (error) return <div className="text-red-500">Feil: {error.message}</div>;
 
   const user = data?.me;
-  if (!user) return <div>Ingen brukerdata funnet.</div>;
+  if (!user) return <div>No user data found.</div>;
 
   // Antall aktiviteter: summer over alle kontakter
   const totalActivities = user.contacts.reduce(

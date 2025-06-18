@@ -3,87 +3,82 @@ import bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient();
 
-async function main() {
-  // Bruker med id 2 må eksistere fra før
-    // Lag bruker
+async function main() { // For admin user
+
   const user = await prisma.user.create({
     data: {
-      email: 'demo@bruker.no',
+      email: 'demo@user.com',
       password: await bcrypt.hash('test1234', 10),
     },
   });
-
-  // Kontakt 1
-  const kontakt1 = await prisma.contact.create({
+ 
+  const contact1 = await prisma.contact.create({
     data: {
       name: 'Ola Nordmann',
       email: 'ola@nordmann.no',
       phone: '12345678',
       company: 'Ola IT',
-      status: 'NY',
-      note: 'Fersk lead fra nettside',
+      status: 'NEW',
+      note: 'Fresh lead from website',
       userId: 1,
       activities: {
         create: [
-          { description: 'Sendte introduksjonsmail' },
-          { description: 'Fulgte opp på telefon' }
+          { description: 'Sent introduction mail' },
+          { description: 'Followed up on phone' }
         ]
       }
     }
   });
 
-  // Kontakt 2
-  const kontakt2 = await prisma.contact.create({
+  const contact2 = await prisma.contact.create({
     data: {
       name: 'Kari Nordmann',
       email: 'kari@nordmann.no',
       phone: '87654321',
       company: 'Kari Tekstil',
-      status: 'OPPFOLGING',
-      note: 'Vil ha demo',
+      status: 'FOLLOW_UP',
+      note: 'Wants demo',
       userId: 1,
       activities: {
         create: [
-          { description: 'Sendte demo-invitasjon' },
-          { description: 'Demo booket' }
+          { description: 'Sent demo-invitation' },
+          { description: 'Demo booked' }
         ]
       }
     }
   });
 
-  // Kontakt 3
-  const kontakt3 = await prisma.contact.create({
+  const contact3 = await prisma.contact.create({
     data: {
       name: 'Per Hansen',
       email: 'per@hansen.no',
       phone: '11223344',
       company: 'Hansen AS',
-      status: 'KUNDE',
+      status: 'CUSTOMER',
       note: 'Signert kontrakt',
       userId: 1,
       activities: {
         create: [
-          { description: 'Opprettet bruker'},
-          { description: 'Fakturert første måned'}
+          { description: 'Created user'},
+          { description: 'Invoiced first month'}
         ]
       }
     }
   });
 
-  // Kontakt 4
-  const kontakt4 = await prisma.contact.create({
+  const contact4 = await prisma.contact.create({
     data: {
       name: 'Anne Larsen',
       email: 'anne@larsen.no',
       phone: '44332211',
       company: 'Larsen Design',
-      status: 'ARKIVERT',
-      note: 'Valgte konkurrent',
+      status: 'ARCHIVED',
+      note: 'Chose contestant',
       userId: 1,
       activities: {
         create: [
-          { description: 'Avsluttet dialog' },
-          { description: 'Flyttet til arkiv' }
+          { description: 'Canceled dialog' },
+          { description: 'Moved to archive' }
         ]
       }
     }

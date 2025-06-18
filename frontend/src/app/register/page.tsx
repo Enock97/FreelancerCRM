@@ -23,7 +23,7 @@ const RegisterPage = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) throw new Error("Kunne ikke registrere din bruker. Prøv igjen.");
+      if (!res.ok) throw new Error("Could not register your user. Try again.");
 
       const data = await res.json();
       const token = data.token;
@@ -32,8 +32,8 @@ const RegisterPage = () => {
         router.push("/dashboard");
       }
     } catch (err) {
-        console.error("Registrering error:", err);
-      setError("Kunne ikke registrere din bruker. Prøv igjen.");
+        console.error("Registering error:", err);
+      setError("Could not register your user. Try again.");
     }
   };
 
@@ -64,7 +64,7 @@ const RegisterPage = () => {
           type="submit"
           className="w-full py-2 bg-green-600 text-white rounded hover:bg-green-700 font-semibold"
         >
-          Registrer
+          Register
         </button>
         {error && <div className="text-red-500 text-sm mt-2 text-center">{error}</div>}
       </form>

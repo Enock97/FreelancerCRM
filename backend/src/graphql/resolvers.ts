@@ -27,7 +27,7 @@ export const resolvers = {
   Query: {
     contacts: async (_parent: any, _args: any, context: any) => {
       const userId = getUserIdFromContext(context);
-      if (!userId) throw new Error("Ikke autentisert");
+      if (!userId) throw new Error("Unauthorized");
       return await prisma.contact.findMany({
         where: { userId: Number(userId) },
         include: { activities: true },
@@ -47,7 +47,7 @@ export const resolvers = {
   Mutation: {
     createContact: async (_parent: any, { input }: any, context: any) => {
       const userId = getUserIdFromContext(context);
-      if (!userId) throw new Error("Ikke autentisert");
+      if (!userId) throw new Error("Unauthorized");
       return await prisma.contact.create({
         data: {
           ...input,
@@ -58,9 +58,9 @@ export const resolvers = {
     },
     updateContact: async (_parent: any, { id, input }: any, context: any) => {
       const userId = getUserIdFromContext(context);
-      if (!userId) throw new Error("Ikke autentisert");
+      if (!userId) throw new Error("Unauthorized");
       const contact = await prisma.contact.findUnique({ where: { id: Number(id) } });
-      if (!contact || contact.userId !== Number(userId)) throw new Error("Ingen tilgang");
+      if (!contact || contact.userId !== Number(userId)) throw new Error("No access");
       return await prisma.contact.update({
         where: { id: Number(id) },
         data: {
@@ -71,35 +71,35 @@ export const resolvers = {
     },
     deleteContact: async (_parent: any, { id }: any, context: any) => {
       const userId = getUserIdFromContext(context);
-      if (!userId) throw new Error("Ikke autentisert");
+      if (!userId) throw new Error("Unauthorized");
       const contact = await prisma.contact.findUnique({ where: { id: Number(id) } });
-      if (!contact || contact.userId !== Number(userId)) throw new Error("Ingen tilgang");
+      if (!contact || contact.userId !== Number(userId)) throw new Error("No access");
       await prisma.activity.deleteMany({ where: { contactId: Number(id) } });
       await prisma.contact.delete({ where: { id: Number(id) } });
       return true;
     },
     createActivity: async (_parent: any, { contactId, description }: any, context: any) => {
       const userId = getUserIdFromContext(context);
-      if (!userId) throw new Error("Ikke autentisert");
+      if (!userId) throw new Error("Unauthorized");
       const contact = await prisma.contact.findUnique({ where: { id: Number(contactId) } });
-      if (!contact || contact.userId !== Number(userId)) throw new Error("Ingen tilgang");
+      if (!contact || contact.userId !== Number(userId)) throw new Error("No access");
       return await prisma.activity.create({
         data: { description, contactId: Number(contactId) },
       });
     },
     deleteActivity: async (_parent: any, { id }: any, context: any) => {
       const userId = getUserIdFromContext(context);
-      if (!userId) throw new Error("Ikke autentisert");
+      if (!userId) throw new Error("Unauthorized");
       const activity = await prisma.activity.findUnique({ where: { id: Number(id) } });
-      if (!activity) throw new Error("Ikke funnet");
+      if (!activity) throw new Error("Not found");
       const contact = await prisma.contact.findUnique({ where: { id: Number(activity.contactId) } });
-      if (!contact || contact.userId !== Number(userId)) throw new Error("Ingen tilgang");
+      if (!contact || contact.userId !== Number(userId)) throw new Error("No access");
       await prisma.activity.delete({ where: { id: Number(id) } });
       return true;
     },
     register: async (_parent: any, { email, password }: any) => {
       const existing = await prisma.user.findUnique({ where: { email } });
-      if (existing) throw new Error("Bruker finnes allerede");
+      if (existing) throw new Error("User already exists");
       const hash = await bcrypt.hash(password, 10);
       const user = await prisma.user.create({
         data: { email, password: hash },
@@ -109,15 +109,15 @@ export const resolvers = {
     },
     login: async (_parent: any, { email, password }: any) => {
       const user = await prisma.user.findUnique({ where: { email } });
-      if (!user) throw new Error("Feil e-post eller passord");
+      if (!user) throw new Error("Wrong email or password");
       const valid = await bcrypt.compare(password, user.password);
-      if (!valid) throw new Error("Feil e-post eller passord");
+      if (!valid) throw new Error("Wrong email or password");
       const token = jwt.sign({ userId: user.id }, JWT_SECRET);
       return { token };
     },
     updateProfile: async (_parent: any, { input }: any, context: any) => {
       const userId = getUserIdFromContext(context);
-      if (!userId) throw new Error("Ikke autentisert");
+      if (!userId) throw new Error("Unauthorized");
       const data: any = {};
       if (input.email) data.email = input.email;
       if (input.password) data.password = await bcrypt.hash(input.password, 10);

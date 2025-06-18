@@ -2,10 +2,10 @@ import { gql } from "graphql-tag";
 
 const typeDefs = gql`
   enum Status {
-    NY
-    OPPFOLGING
-    KUNDE
-    ARKIVERT
+    NEW
+    FOLLOW_UP
+    CUSTOMER
+    ARCHIVED
   }
 
   type Contact {
