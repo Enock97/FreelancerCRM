@@ -10,20 +10,18 @@ const DashboardPage = () => {
   const [deleteContact] = useMutation(DELETE_CONTACT);
   const [updateContact] = useMutation(UPDATE_CONTACT);
 
-  // For å trigge refresh etter sletting/oppdatering
   const handleDeleteContact = async (id: number) => {
     try {
       await deleteContact({ variables: { id: Number(id) } });
       refetch();
     } catch (e) {
       console.log(e)
-      alert("Kunne ikke slette kontakt.");
+      alert("Could not delete contact.");
     }
   };
 
   const handleEditContact = async (contact: Contact, input: Partial<Contact>) => {
     try {
-      // Fjern felter som ikke skal være med i input
       const { name, email, phone, company, status, note } = input;
       await updateContact({
         variables: { id: Number(contact.id), input: { name, email, phone, company, status, note } },
@@ -31,12 +29,12 @@ const DashboardPage = () => {
       refetch();
     } catch (e) {
       console.log(e)
-      alert("Kunne ikke oppdatere kontakt.");
+      alert("Could not update contact.");
     }
   };
 
-  if (loading) return <div className="text-center mt-10">Laster kontakter…</div>;
-  if (error) return <div className="text-red-500 text-center mt-10">Feil ved henting av kontakter</div>;
+  if (loading) return <div className="text-center mt-10">Loading contacts…</div>;
+  if (error) return <div className="text-red-500 text-center mt-10">Error loading contacts</div>;
 
   return (
     <div className="w-full max-w-[2000px] mx-auto px-1 py-6">

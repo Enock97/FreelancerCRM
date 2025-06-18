@@ -14,10 +14,10 @@ export interface KanbanColumnProps {
 }
 
 const statusOptions = [
-  { value: "NY", label: "Ny" },
-  { value: "OPPFOLGING", label: "Oppfølging" },
-  { value: "KUNDE", label: "Kunde" },
-  { value: "ARKIVERT", label: "Arkivert" },
+  { value: "NEW", label: "New" },
+  { value: "FOLLOW_UP", label: "Follow Up" },
+  { value: "CUSTOMER", label: "Customer" },
+  { value: "ARCHIVED", label: "Archived" },
 ];
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
@@ -29,7 +29,6 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
 }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFields, setEditFields] = useState<Partial<Contact>>({});
-  // Local state for new activity descriptions per contact
   const [activityInput, setActivityInput] = useState<Record<number, string>>({});
   const [createActivity] = useMutation(CREATE_ACTIVITY);
   const [deleteActivity] = useMutation(DELETE_ACTIVITY);
@@ -58,7 +57,6 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
     setEditFields({});
   };
 
-  // -- ACTIVITY HANDLERS --
   const handleAddActivity = async (contactId: number) => {
     const description = activityInput[contactId]?.trim();
     if (!description) return;
@@ -77,7 +75,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
       <h3 className="font-bold mb-4 text-3xl text-blue-600 text-center">{label}</h3>
       <div className="flex-1 flex flex-col gap-4">
         {contacts.length === 0 && (
-          <div className="text-center text-gray-400 dark:text-gray-600">Ingen kontakter</div>
+          <div className="text-center text-gray-400 dark:text-gray-600">No contacts</div>
         )}
         {contacts.map((contact) => (
           <div
@@ -97,7 +95,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                   className="rounded px-2 py-1 border dark:bg-gray-900"
                   value={editFields.name ?? ""}
                   onChange={e => handleEditField("name", e.target.value)}
-                  placeholder="Navn"
+                  placeholder="Name"
                   required
                 />
                 <input
@@ -105,7 +103,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                   className="rounded px-2 py-1 border dark:bg-gray-900"
                   value={editFields.email ?? ""}
                   onChange={e => handleEditField("email", e.target.value)}
-                  placeholder="E-post"
+                  placeholder="Email"
                   required
                 />
                 <input
@@ -113,14 +111,14 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                   className="rounded px-2 py-1 border dark:bg-gray-900"
                   value={editFields.phone ?? ""}
                   onChange={e => handleEditField("phone", e.target.value)}
-                  placeholder="Telefon"
+                  placeholder="Phone"
                 />
                 <input
                   type="text"
                   className="rounded px-2 py-1 border dark:bg-gray-900"
                   value={editFields.company ?? ""}
                   onChange={e => handleEditField("company", e.target.value)}
-                  placeholder="Firma"
+                  placeholder="Company"
                 />
                 {/* Status - dropdown, alltid vertikal */}
                 <select
@@ -139,21 +137,21 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                   className="rounded px-2 py-1 border dark:bg-gray-900"
                   value={editFields.note ?? ""}
                   onChange={e => handleEditField("note", e.target.value)}
-                  placeholder="Notat"
+                  placeholder="Note"
                 />
                 <div className="flex gap-2 mt-2">
                   <button
                     type="submit"
                     className="px-3 py-1 bg-green-600 text-white rounded"
                   >
-                    Lagre
+                    Save
                   </button>
                   <button
                     type="button"
                     onClick={handleCancel}
                     className="px-3 py-1 bg-gray-400 text-white rounded"
                   >
-                    Avbryt
+                    Cancel
                   </button>
                 </div>
               </form>
@@ -161,8 +159,8 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
               <main className="this-needs-to-be-draggable dark:text-gray-300 space-y-1.5">
                 <div className="text-2xl font-bold text-blue-400">{contact.name}</div>
                 <div className="text-base"><span className="font-semibold">Email: </span>{contact.email}</div>
-                <div className="text-base"><span className="font-semibold">Telefon: </span>{contact.phone}</div>
-                <div className="text-base "><span className="font-semibold">Selskap: </span>{contact.company}</div>
+                <div className="text-base"><span className="font-semibold">Phone: </span>{contact.phone}</div>
+                <div className="text-base "><span className="font-semibold">Company: </span>{contact.company}</div>
                 <div className="text-base  dark:text-gray-500">
                   <span className=" font-semibold">Status: </span> {contact.status}
                 </div>

@@ -13,7 +13,6 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10)
 
 const bootstrap = async () => {
-    // 1) Grab your array of middleware functions and assert them as RequestHandler[]
   const rawGQL = await createGraphQLMiddleware();
   const graphqlMiddleware = rawGQL as unknown as RequestHandler[];
 
@@ -33,12 +32,12 @@ const bootstrap = async () => {
 
   app.use('/api/auth', authRoutes);
   app.use('/api/users', userRoutes);
- // 4) Mount GraphQL—wrap in a Router to make TS happy
+
   const gqlRouter = Router();
   gqlRouter.use(...graphqlMiddleware);
   app.use('/api/graphql', gqlRouter);
 
-  // 5) Health‐check as a void‐returning handler
+
   const healthHandler: RequestHandler = (_req, res) => {
     res.sendStatus(200);
   };

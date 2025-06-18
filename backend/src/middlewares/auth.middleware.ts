@@ -13,17 +13,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'changeme';
 
 export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
-  req.user = null; // Default til ikke-innlogget
+  req.user = null;
   if (authHeader && authHeader.startsWith("Bearer ")) {
     const token = authHeader.split(" ")[1];
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
-      req.user = decoded; // Kan være { userId: 1, iat: ... }
+      req.user = decoded; 
     } catch {
       req.user = null;
     }
   }
-  next(); // ALDRI send res.status her for GraphQL
+  next(); 
 };
 
 

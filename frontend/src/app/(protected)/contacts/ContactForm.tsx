@@ -8,7 +8,7 @@ export interface ContactFormProps {
   initialData?: Partial<Contact>;
 }
 
-const statusOptions = ["NY", "OPPFOLGING", "KUNDE", "ARKIVERT"];
+const statusOptions = ["NEW", "FOLLOW_UP", "CUSTOMER", "ARCHIVED"];
 
 const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialData }) => {
   const [formData, setFormData] = useState<Omit<Contact, "id" | "createdAt" | "activities">>({
@@ -16,7 +16,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
     email: initialData?.email || "",
     phone: initialData?.phone || "",
     company: initialData?.company || "",
-    status: initialData?.status || "NY",
+    status: initialData?.status || "NEW",
     note: initialData?.note || "",
   });
 
@@ -39,7 +39,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       <input
         type="text"
         name="name"
-        placeholder="Navn"
+        placeholder="Name"
         value={formData.name}
         onChange={handleChange}
         className="input rounded px-2 py-1 border dark:bg-gray-900"
@@ -48,7 +48,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       <input
         type="email"
         name="email"
-        placeholder="E-post"
+        placeholder="Email"
         value={formData.email}
         onChange={handleChange}
         className="input rounded px-2 py-1 border dark:bg-gray-900"
@@ -57,7 +57,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       <input
         type="text"
         name="phone"
-        placeholder="Telefon"
+        placeholder="Phone"
         value={formData.phone}
         onChange={handleChange}
         className="input rounded px-2 py-1 border dark:bg-gray-900"
@@ -65,7 +65,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       <input
         type="text"
         name="company"
-        placeholder="Firma"
+        placeholder="Company"
         value={formData.company}
         onChange={handleChange}
         className="input rounded px-2 py-1 border dark:bg-gray-900"
@@ -82,17 +82,17 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       </select>
       <textarea
         name="note"
-        placeholder="Notat"
+        placeholder="Note"
         value={formData.note}
         onChange={handleChange}
         className="input rounded px-2 py-1 border dark:bg-gray-900"
       />
       <div className="flex gap-2 mt-2">
         <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
-          Lagre
+          Save
         </button>
         <button type="button" onClick={onCancel} className="bg-gray-300 px-4 py-2 rounded">
-          Avbryt
+          Cancel
         </button>
       </div>
     </form>

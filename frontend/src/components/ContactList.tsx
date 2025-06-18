@@ -12,7 +12,7 @@ const ContactList: React.FC<ContactListProps> = ({ contacts }) => {
   if (!contacts || contacts.length === 0) {
     return (
       <div className="text-gray-400 dark:text-gray-500 text-sm">
-        Ingen kontakter funnet.
+        No contacts found.
       </div>
     );
   }

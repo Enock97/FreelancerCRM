@@ -11,15 +11,15 @@ export const getUser = async (req: AuthRequest, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user?.userId },
-      select: { id: true, email: true }, // Fjernet createdAt
+      select: { id: true, email: true }, 
     });
 
-    if (!user) res.status(404).json({ error: 'Bruker ikke funnet' });
+    if (!user) res.status(404).json({ error: 'User not found' });
 
     res.json(user);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Noe gikk galt ved henting av bruker' });
+    res.status(500).json({ error: 'Error retrieving user' });
   }
 };
 
@@ -40,9 +40,9 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
       data: updates,
     });
 
-    res.json({ message: 'Profil oppdatert', user: { email: updated.email } });
+    res.json({ message: 'Profile updated', user: { email: updated.email } });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Noe gikk galt under oppdatering' });
+    res.status(500).json({ error: 'Error under update' });
   }
 };

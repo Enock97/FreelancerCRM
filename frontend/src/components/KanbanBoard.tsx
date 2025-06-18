@@ -3,7 +3,7 @@ import React from "react";
 import KanbanColumn from "./KanbanColumn";
 import { Contact } from "../types/types";
 
-const statuses = ["NY", "OPPFOLGING", "KUNDE", "ARKIVERT"];
+const statuses = ["NEW", "FOLLOW_UP", "CUSTOMER", "ARCHIVED"];
 
 const statusLabels: Record<string, string> = {
   NY: "Ny",

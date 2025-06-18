@@ -9,10 +9,10 @@ datasource db {
 }
 
 enum Status {
-  NY
-  OPPFOLGING
-  KUNDE
-  ARKIVERT
+  NEW
+  FOLLOW_UP
+  CUSTOMER
+  ARCHIVED
 }
 
 model Contact {
@@ -21,7 +21,7 @@ model Contact {
   email      String
   phone      String?
   company    String?
-  status     Status   @default(NY)
+  status     Status   @default(NEW)
   note       String?
   createdAt  DateTime @default(now())
   activities Activity[]
