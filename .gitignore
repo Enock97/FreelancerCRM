@@ -29,7 +29,7 @@ k8s/*secret*.yaml
 postgres_data/
 
 # ─── Kubernetes & Helm ───────────────────────────────────────────
-k8s/pg-secrets.yaml   # inneholder passord, holdes kun lokalt
+k8s/pg-secrets.yaml   # inneholder Password, holdes kun lokalt
 *.kubeconfig
 *.tgz                 # helm-pakker
 # ─── Docker ──────────────────────────────────────────────────────

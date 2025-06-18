@@ -32,14 +32,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setTokenState] = useState<string | null>(null);
   const [client, setClient] = useState(() => makeApolloClient(null));
 
-  // Kjør på mount for å hente evt. token fra localStorage
   useEffect(() => {
     const stored = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     setTokenState(stored);
     setClient(makeApolloClient(stored));
   }, []);
 
-  // (Re)init ApolloClient når token endres
   useEffect(() => {
     setClient(makeApolloClient(token));
   }, [token]);
@@ -50,7 +48,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (newToken) localStorage.setItem("token", newToken);
       else localStorage.removeItem("token");
     }
-    // NB: ApolloClient blir reinitialisert automatisk i useEffect
   };
 
   const logout = () => setToken(null);

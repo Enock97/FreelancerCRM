@@ -11,7 +11,6 @@ const DarkModeContext = createContext<DarkModeContextType | undefined>(undefined
 export const DarkModeProvider = ({ children }: { children: ReactNode }) => {
   const [darkMode, setDarkMode] = useState(false);
 
-  // Init once: check localStorage, else system preference
   useEffect(() => {
     const saved = typeof window !== "undefined" ? localStorage.getItem("darkMode") : null;
     if (saved !== null) {
@@ -21,7 +20,6 @@ export const DarkModeProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Toggle html class & save preference
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (darkMode) {

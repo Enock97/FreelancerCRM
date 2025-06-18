@@ -29,7 +29,6 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
 }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFields, setEditFields] = useState<Partial<Contact>>({});
-  // Local state for new activity descriptions per contact
   const [activityInput, setActivityInput] = useState<Record<number, string>>({});
   const [createActivity] = useMutation(CREATE_ACTIVITY);
   const [deleteActivity] = useMutation(DELETE_ACTIVITY);
@@ -58,7 +57,6 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
     setEditFields({});
   };
 
-  // -- ACTIVITY HANDLERS --
   const handleAddActivity = async (contactId: number) => {
     const description = activityInput[contactId]?.trim();
     if (!description) return;
@@ -139,7 +137,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                   className="rounded px-2 py-1 border dark:bg-gray-900"
                   value={editFields.note ?? ""}
                   onChange={e => handleEditField("note", e.target.value)}
-                  placeholder="Notat"
+                  placeholder="Note"
                 />
                 <div className="flex gap-2 mt-2">
                   <button
@@ -161,8 +159,8 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
               <main className="this-needs-to-be-draggable dark:text-gray-300 space-y-1.5">
                 <div className="text-2xl font-bold text-blue-400">{contact.name}</div>
                 <div className="text-base"><span className="font-semibold">Email: </span>{contact.email}</div>
-                <div className="text-base"><span className="font-semibold">Telefon: </span>{contact.phone}</div>
-                <div className="text-base "><span className="font-semibold">Selskap: </span>{contact.company}</div>
+                <div className="text-base"><span className="font-semibold">Phone: </span>{contact.phone}</div>
+                <div className="text-base "><span className="font-semibold">Company: </span>{contact.company}</div>
                 <div className="text-base  dark:text-gray-500">
                   <span className=" font-semibold">Status: </span> {contact.status}
                 </div>

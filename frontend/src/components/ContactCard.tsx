@@ -7,7 +7,7 @@ interface ContactCardProps {
   contact: Contact;
   onEdit?: (contact: Contact) => void;
   onDelete?: (id: number) => void;
-  onUpdate?: () => void; // Juster type hvis du bruker denne
+  onUpdate?: () => void;
 }
 
 const ContactCard: React.FC<ContactCardProps> = ({ contact, onEdit, onDelete }) => {

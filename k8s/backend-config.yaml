@@ -4,5 +4,5 @@ metadata:
   name: backend-config
   namespace: freelancercrm
 data:
-  DB_HOST: db                 # samme navn som postgres-servicen
+  DB_HOST: db                 # samme Name som postgres-servicen
   DB_PORT: "5432"

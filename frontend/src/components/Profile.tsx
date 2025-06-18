@@ -8,12 +8,11 @@ const ProfilePage = () => {
   const { data, loading, error } = useQuery(GET_PROFILE);
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-500">Feil: {error.message}</div>;
+  if (error) return <div className="text-red-500">Error: {error.message}</div>;
 
   const user = data?.me;
   if (!user) return <div>No user data found.</div>;
 
-  // Antall aktiviteter: summer over alle kontakter
   const totalActivities = user.contacts.reduce(
     (acc: number, contact: Contact) => acc + (contact.activities?.length ?? 0),
     0

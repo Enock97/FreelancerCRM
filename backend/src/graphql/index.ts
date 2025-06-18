@@ -14,9 +14,9 @@ const createGraphQLMiddleware = async () => {
 
   await server.start();
 
-  // Return Express middleware ready to be mounted
+
   return [
-    json(), // For parsing JSON bodies
+    json(), 
     expressMiddleware(server, {
       context: async ({ req }) => {
         return {

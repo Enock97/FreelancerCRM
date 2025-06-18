@@ -24,8 +24,8 @@ const Navbar = () => {
         {token && (
           <>
             <Link href="/dashboard" className="font-medium text-gray-800 dark:text-gray-200 hover:underline underline-offset-4">Dashboard</Link>
-            <Link href="/contacts" className="font-medium text-gray-800 dark:text-gray-200 hover:underline underline-offset-4">Kontakter</Link>
-            <Link href="/profile" className="font-medium text-gray-800 dark:text-gray-200 hover:underline underline-offset-4">Profil</Link>
+            <Link href="/contacts" className="font-medium text-gray-800 dark:text-gray-200 hover:underline underline-offset-4">Contacts</Link>
+            <Link href="/profile" className="font-medium text-gray-800 dark:text-gray-200 hover:underline underline-offset-4">Profile</Link>
           </>
         )}
       </div>

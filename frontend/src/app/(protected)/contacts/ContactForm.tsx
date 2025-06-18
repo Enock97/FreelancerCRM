@@ -39,7 +39,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       <input
         type="text"
         name="name"
-        placeholder="Navn"
+        placeholder="Name"
         value={formData.name}
         onChange={handleChange}
         className="input rounded px-2 py-1 border dark:bg-gray-900"
@@ -48,7 +48,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       <input
         type="email"
         name="email"
-        placeholder="E-post"
+        placeholder="Email"
         value={formData.email}
         onChange={handleChange}
         className="input rounded px-2 py-1 border dark:bg-gray-900"
@@ -57,7 +57,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       <input
         type="text"
         name="phone"
-        placeholder="Telefon"
+        placeholder="Phone"
         value={formData.phone}
         onChange={handleChange}
         className="input rounded px-2 py-1 border dark:bg-gray-900"
@@ -65,7 +65,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       <input
         type="text"
         name="company"
-        placeholder="Firma"
+        placeholder="Company"
         value={formData.company}
         onChange={handleChange}
         className="input rounded px-2 py-1 border dark:bg-gray-900"
@@ -82,7 +82,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
       </select>
       <textarea
         name="note"
-        placeholder="Notat"
+        placeholder="Note"
         value={formData.note}
         onChange={handleChange}
         className="input rounded px-2 py-1 border dark:bg-gray-900"

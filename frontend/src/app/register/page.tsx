@@ -47,7 +47,7 @@ const RegisterPage = () => {
         <input
           type="email"
           className="w-full px-3 py-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700 outline-none focus:ring-2 focus:ring-green-400"
-          placeholder="E-post"
+          placeholder="Email"
           value={email}
           onChange={e => setEmail(e.target.value)}
           required
@@ -55,7 +55,7 @@ const RegisterPage = () => {
         <input
           type="password"
           className="w-full px-3 py-2 border rounded bg-gray-50 dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700 outline-none focus:ring-2 focus:ring-green-400"
-          placeholder="Passord"
+          placeholder="Password"
           value={password}
           onChange={e => setPassword(e.target.value)}
           required

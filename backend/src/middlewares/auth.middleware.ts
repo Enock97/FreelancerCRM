@@ -13,7 +13,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'changeme';
 
 export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
-  req.user = null; // Default til ikke-innlogget
+  req.user = null;
   if (authHeader && authHeader.startsWith("Bearer ")) {
     const token = authHeader.split(" ")[1];
     try {

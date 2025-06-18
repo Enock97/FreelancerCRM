@@ -5,7 +5,6 @@ import { AuthProvider } from "../context/AuthContext";
 import { DarkModeProvider } from "../context/DarkModeContext";
 import Navbar from "../components/Navbar";
 
-// App router layout for Next.js 13+ (med html/body på toppnivå)
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="no" suppressHydrationWarning>
