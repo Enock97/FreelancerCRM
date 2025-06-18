@@ -77,7 +77,7 @@ const ContactsPage: React.FC = () => {
             </div>
             {/* --- ACTIVITIES --- */}
             <div className="mt-2 flex flex-col gap-1">
-              <div className="font-semibold text-gray-700 dark:text-gray-200 mb-1">Aktiviteter:</div>
+              <div className="font-semibold text-gray-700 dark:text-gray-200 mb-1">Activities:</div>
               <ul className="flex flex-col gap-1 dark:text-white">
                 {contact.activities && contact.activities.length > 0 ? (
                   contact.activities.map((activity) => (
@@ -104,7 +104,7 @@ const ContactsPage: React.FC = () => {
                 <input
                   type="text"
                   className="flex-1 rounded px-2 py-1 border dark:bg-gray-900 text-sm"
-                  placeholder="Ny aktivitet"
+                  placeholder="New activitity"
                   value={activityInput[contact.id] || ""}
                   onChange={e =>
                     setActivityInput((prev) => ({

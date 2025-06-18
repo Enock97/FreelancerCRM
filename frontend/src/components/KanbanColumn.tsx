@@ -167,7 +167,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                 <div className="text-sm w-full max-w-full break-words"><span className="font-semibold">Note: </span>{contact.note}</div>
                 {/* --- ACTIVITY LIST --- */}
                 <div className="mt-2 flex flex-col gap-1">
-                  <div className="font-semibold text-gray-700 dark:text-gray-200 mb-1">Aktiviteter:</div>
+                  <div className="font-semibold text-gray-700 dark:text-gray-200 mb-1">Activities:</div>
                   <ul className=" flex flex-col gap-1 ">
                     {contact.activities && contact.activities.length > 0 ? (
                       contact.activities.map((activity) => (
@@ -178,12 +178,12 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                             onClick={() => handleDeleteActivity(activity.id)}
                             type="button"
                           >
-                            Slett
+                            Delete
                           </button>
                         </li>
                       ))
                     ) : (
-                      <li className="text-xs text-gray-400">Ingen aktiviteter</li>
+                      <li className="text-xs text-gray-400">No activities</li>
                     )}
                   </ul>
                   {/* Add new activity input */}
@@ -191,7 +191,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                     <input
                       type="text"
                       className="flex-1 min-w-0 rounded px-2 py-1 border dark:bg-gray-900 text-sm"
-                      placeholder="Ny aktivitet"
+                      placeholder="New activitity"
                       value={activityInput[contact.id] || ""}
                       onChange={e =>
                         setActivityInput((prev) => ({
@@ -211,7 +211,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                       className="px-2 py-1 bg-green-600 text-white rounded text-xs"
                       onClick={() => handleAddActivity(contact.id)}
                     >
-                      Legg til
+                      Add
                     </button>
                   </div>
                 </div>
@@ -221,13 +221,13 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                     onClick={() => startEdit(contact)}
                     className="px-3 py-1 bg-blue-600 text-white rounded"
                   >
-                    Rediger
+                    Edit
                   </button>
                   <button
                     onClick={() => onDelete(contact.id)}
                     className="px-3 py-1 bg-red-600 text-white rounded"
                   >
-                    Slett
+                    Delete
                   </button>
                 </div>
               </main>

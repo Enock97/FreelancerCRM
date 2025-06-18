@@ -6,10 +6,10 @@ import { Contact } from "../types/types";
 const statuses = ["NEW", "FOLLOW_UP", "CUSTOMER", "ARCHIVED"];
 
 const statusLabels: Record<string, string> = {
-  NY: "Ny",
-  OPPFOLGING: "Oppfølging",
-  KUNDE: "Kunde",
-  ARKIVERT: "Arkivert",
+  NEW: "New",
+  FOLLOW_UP: "Follow Up",
+  CUSTOMER: "Customer",
+  ARCHIVED: "Archived",
 };
 
 export interface KanbanBoardProps {
