@@ -12,7 +12,7 @@ You can test the live application here:
 
 <br>
 
-Current full web application demo availability (YES/NO): **YES**
+Live application availability (YES/NO): **YES**
 
 ---
 
@@ -27,7 +27,7 @@ Current full web application demo availability (YES/NO): **YES**
 - Mobile-friendly and responsive design.
 - Front-end deployed on Vercel, and back-end and database deployed on Heroku.
 
-🙏 ***Upcoming Features:**
+🙏 **Upcoming Features:**
 - Drag-and-drop functionality in the Kanban view.
 - Profile page email and password update functionality.
 - Possibly a new color palette/scheme for light mode.
