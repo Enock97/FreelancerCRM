@@ -4,7 +4,7 @@ import KanbanColumn from "./KanbanColumn";
 import { Contact } from "../types/types";
 
 import { DndContext, closestCenter } from "@dnd-kit/core";
-import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 const statuses = ["NEW", "FOLLOW_UP", "CUSTOMER", "ARCHIVED"];
 
