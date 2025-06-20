@@ -1,11 +1,6 @@
 "use client";
-import React, { useState } from "react";
 import { Contact } from "../types/types";
 import DraggableCard from "./DraggableCard";
-import { useMutation, useQuery } from "@apollo/client";
-import { CREATE_ACTIVITY, DELETE_ACTIVITY } from "../app/graphql/mutations";
-import { GET_CONTACTS } from "../app/graphql/queries";
-
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 export interface KanbanColumnProps {
