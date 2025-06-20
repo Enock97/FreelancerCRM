@@ -9,6 +9,7 @@ import { useState } from "react";
 
 const ProfilePage = () => {
   const { data, loading, error } = useQuery(GET_PROFILE);
+  const user = data?.me;
   const [updateCurrentUser, { loading: updating }] = useMutation(UPDATE_CURRENT_USER);
   const [email, setEmail] = useState(user.email);
   const [password, setPassword] = useState("");
@@ -29,7 +30,6 @@ const ProfilePage = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
 
-  const user = data?.me;
   if (!user) return <div>No user data found.</div>;
 
   const totalActivities = user.contacts.reduce(
