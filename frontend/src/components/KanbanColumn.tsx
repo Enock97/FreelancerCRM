@@ -19,7 +19,6 @@ const statusOptions = [
 ];
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
-  status,
   label,
   contacts,
   onEdit,
