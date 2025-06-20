@@ -21,7 +21,7 @@ export const CREATE_CONTACT = gql`
 `;
 
 export const UPDATE_CONTACT = gql`
-  mutation UpdateContact($id: ID!, $input: ContactInput!) {
+  mutation UpdateContact($id: ID!, $input: ContactUpdateInput!) {
     updateContact(id: $id, input: $input) {
       id
       name
@@ -29,6 +29,7 @@ export const UPDATE_CONTACT = gql`
       phone
       company
       status
+      order
       note
       createdAt
       activities {
@@ -39,6 +40,7 @@ export const UPDATE_CONTACT = gql`
     }
   }
 `;
+
 
 export const GET_CONTACTS = gql`
   query GetContacts {

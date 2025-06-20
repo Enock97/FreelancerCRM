@@ -63,9 +63,7 @@ export const resolvers = {
       if (!contact || contact.userId !== Number(userId)) throw new Error("No access");
       return await prisma.contact.update({
         where: { id: Number(id) },
-        data: {
-          ...input,
-        },
+        data: input,
         include: { activities: true },
       });
     },
