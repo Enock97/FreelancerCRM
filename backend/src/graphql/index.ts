@@ -5,6 +5,15 @@ import { resolvers } from './resolvers';
 import { requireAuth } from '../middlewares/auth.middleware';
 import { ApolloContext } from '../types/apolloContext';
 import { json } from 'express';
+import jwt from 'jsonwebtoken';
+
+// You can adjust this interface as needed for your user object
+interface DecodedToken {
+  userId: string;
+  email: string;
+  iat?: number;
+  exp?: number;
+}
 
 const createGraphQLMiddleware = async () => {
   const server = new ApolloServer<ApolloContext>({
@@ -35,7 +44,7 @@ const createGraphQLMiddleware = async () => {
         }
         // === END JWT logic ===
         return {
-          user,
+          user: (req as any).user,
           req,
         };
       }
