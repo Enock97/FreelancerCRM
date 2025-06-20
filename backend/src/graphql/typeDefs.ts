@@ -15,6 +15,7 @@ const typeDefs = gql`
     phone: String
     company: String
     status: Status!
+    order: Int!
     note: String
     createdAt: String!
     activities: [Activity!]!
@@ -54,6 +55,7 @@ const typeDefs = gql`
   type Query {
     contacts: [Contact!]!
     me: User
+    activities: [Activity!]!
   }
 
   type Mutation {
@@ -66,7 +68,9 @@ const typeDefs = gql`
 
     login(email: String!, password: String!): AuthPayload!
     register(email: String!, password: String!): AuthPayload!
-    updateProfile(input: UpdateUserInput!): User!
+    
+    updateContactStatusAndOrder(id: ID!, status: Status!, order: Int!): Contact
+    updateCurrentUser(email: String, password: String): User
   }
 `;
 
