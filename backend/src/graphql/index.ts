@@ -44,7 +44,7 @@ const createGraphQLMiddleware = async () => {
         }
         // === END JWT logic ===
         return {
-          user: (req as any).user,
+          user,
           req,
         };
       }
