@@ -17,6 +17,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSubmit, onCancel, initialDa
     phone: initialData?.phone || "",
     company: initialData?.company || "",
     status: initialData?.status || "NEW",
+    order: initialData?.order || 0,
     note: initialData?.note || "",
   });
 

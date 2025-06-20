@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Status } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -115,17 +115,50 @@ export const resolvers = {
       const token = jwt.sign({ userId: user.id }, JWT_SECRET);
       return { token };
     },
-    updateProfile: async (_parent: any, { input }: any, context: any) => {
-      const userId = getUserIdFromContext(context);
-      if (!userId) throw new Error("Unauthorized");
-      const data: any = {};
-      if (input.email) data.email = input.email;
-      if (input.password) data.password = await bcrypt.hash(input.password, 10);
-      return await prisma.user.update({
-        where: { id: Number(userId) },
-        data,
+    
+    // --- New for Kanban drag-and-drop ---
+    updateContactStatusAndOrder: async (
+        _parent: any,
+        { id, status, order }: { id: number; status: string; order: number },
+        context: any,
+      ) => {
+      const { user } = context;
+      // Only allow editing own contacts
+      const contact = await prisma.contact.findUnique({ where: { id: Number(id) } });
+      if (!contact || contact.userId !== user.id) throw new Error("Not authorized");
+      // Update status and order
+      return prisma.contact.update({
+        where: { id: Number(id)  },
+        data: { status: Status[status as keyof typeof Status], order }
       });
+      
     },
+
+    // --- New for profile email/password update ---
+    updateCurrentUser: async (
+      _parent: any,
+      { email, password }: { email?: string; password?: string },
+      context: any
+    ) => {
+      try {
+        const { user } = context;
+        if (!user) throw new Error("Unauthorized");
+        const updates: { email?: string; password?: string } = {};
+        if (email) updates.email = email;
+        if (password) updates.password = await bcrypt.hash(password, 10);
+        if (!updates.email && !updates.password) throw new Error("No updates provided");
+        console.log("Updating user:", user.id, updates);
+        const updated = await prisma.user.update({
+          where: { id: Number(user.id) },
+          data: updates,
+        });
+        return updated;
+      } catch (err) {
+        console.error("updateCurrentUser error:", err);
+        throw err;
+      }
+    }
+
   },
 
   Contact: {

@@ -9,6 +9,7 @@ export const GET_CONTACTS = gql`
       phone
       company
       status
+      order
       note
       createdAt
       activities {

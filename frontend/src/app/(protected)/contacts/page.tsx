@@ -91,7 +91,7 @@ const ContactsPage: React.FC = () => {
             ) : (
               <>
                 <div className="dark:text-white">
-                  <span className="font-semibold text-2xl text-blue-400">{contact.name}</span> &ndash; {contact.email}
+                  <span className="font-semibold text-2xl text-yellow-400">{contact.name}</span> &ndash; {contact.email}
                   <div className="text-xl text-gray-500">Status: {contact.status}</div>
                   {contact.phone && <div className="text-xl">{contact.phone}</div>}
                   {contact.company && <div className="text-xl">{contact.company}</div>}

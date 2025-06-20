@@ -11,6 +11,7 @@ export interface Contact {
   phone?: string;
   company?: string;
   status: string;
+  order: number;
   note?: string;
   createdAt: string;
   activities?: Activity[];
