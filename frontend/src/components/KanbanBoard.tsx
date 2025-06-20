@@ -63,8 +63,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     }
     if (typeof sourceStatus === "undefined" || typeof targetStatus === "undefined") return;
 
-    let newColumns = { ...columns };
-    let movedCard = newColumns[sourceStatus][sourceIdx];
+    const newColumns = { ...columns };
+    const movedCard = newColumns[sourceStatus][sourceIdx];
 
     newColumns[sourceStatus] = newColumns[sourceStatus].filter((c) => String(c.id) !== String(active.id));
     newColumns[targetStatus].splice(targetIdx, 0, movedCard);
