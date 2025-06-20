@@ -21,10 +21,7 @@ jobs:
       # Optionally install dependencies and build, if your Heroku buildpacks don't handle it
       - name: Install dependencies
         run: npm ci
-
-      - name: Build project
-        run: npm run build
-
+        
       # (Optional) If you use Prisma generate during build, run it here too
       - name: Generate Prisma client
         run: npx prisma generate
