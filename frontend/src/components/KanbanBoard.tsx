@@ -3,7 +3,7 @@ import React from "react";
 import KanbanColumn from "./KanbanColumn";
 import { Contact } from "../types/types";
 
-import { DndContext, closestCenter } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 const statuses = ["NEW", "FOLLOW_UP", "CUSTOMER", "ARCHIVED"];
@@ -44,7 +44,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     );
   }, [contacts]);
 
-  const handleDragEnd = async (event: any) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
