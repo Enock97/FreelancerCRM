@@ -72,7 +72,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
 
   return (
     <div className="flex-1 min-w-[260px] bg-gray-200 dark:bg-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 rounded-lg shadow p-4 flex flex-col">
-      <h3 className="font-bold mb-4 text-3xl text-blue-600 text-center">{label}</h3>
+      <h3 className="font-bold mb-4 text-3xl text-yellow-600 text-center">{label}</h3>
       <div className="flex-1 flex flex-col gap-4">
         {contacts.length === 0 && (
           <div className="text-center text-gray-400 dark:text-gray-600">No contacts</div>
@@ -157,7 +157,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
               </form>
             ) : (
               <main className="this-needs-to-be-draggable dark:text-gray-300 space-y-1.5">
-                <div className="text-2xl font-bold text-blue-400">{contact.name}</div>
+                <div className="text-2xl font-bold text-yellow-400">{contact.name}</div>
                 <div className="text-base"><span className="font-semibold">Email: </span>{contact.email}</div>
                 <div className="text-base"><span className="font-semibold">Phone: </span>{contact.phone}</div>
                 <div className="text-base "><span className="font-semibold">Company: </span>{contact.company}</div>

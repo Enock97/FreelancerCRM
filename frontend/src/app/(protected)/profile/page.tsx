@@ -20,7 +20,7 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-xl mx-auto bg-gray-200 dark:bg-gray-900 rounded-xl shadow-md p-8 space-y-6 mt-8 border border-gray-100 dark:border-gray-800">
-      <h1 className="text-2xl font-bold text-center mb-4 text-blue-600 dark:text-blue-600">My Profile</h1>
+      <h1 className="text-2xl font-bold text-center mb-4 text-yellow-600 dark:text-yellow-600">My Profile</h1>
       <div>
         <span className="block text-gray-700 dark:text-gray-300">Email:</span>
         <span className="font-medium text-gray-900 dark:text-white">{user.email}</span>
