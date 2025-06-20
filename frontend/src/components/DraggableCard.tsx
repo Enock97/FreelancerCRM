@@ -34,9 +34,6 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
     cursor: "grab",
   };
 
-  // If you want to still support fallback HTML5 drag events for some actions, keep useRef
-  const cardRef = useRef<HTMLDivElement>(null);
-
   return (
     <div
       ref={setNodeRef}
