@@ -19,18 +19,16 @@ Live application availability (YES/NO): **YES**
 ## 💡 About the Application
 
 - Manage contacts with fields for name, email, company, status, note, and phone number.
-- Organize client workflows using a visual Kanban board.
+- Organize client workflows using a visual Kanban board with drag-and-drop functionality.
 - Log and track activities linked to each contact.
 - User authentication (registration, login, protected routes).
-- Profile page with total contacts and activities.
+- Profile page with total contacts and activities and email/password update.
 - Supports dark/light mode.
 - Mobile-friendly and responsive design.
 - Front-end deployed on Vercel, and back-end and database deployed on Heroku.
 
 🙏 **Upcoming Features:**
-- Drag-and-drop functionality in the Kanban view.
-- Profile page email and password update functionality.
-- Possibly a new color palette/scheme for light mode.
+- **Non currently**
 
 ---
 
