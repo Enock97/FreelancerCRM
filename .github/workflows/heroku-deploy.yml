@@ -16,7 +16,7 @@ jobs:
       # (optional) Add build/test steps here
 
       - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v4.2.0
+        uses: akhileshns/heroku-deploy@v4.0.0
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "freelancercrm-backend"
