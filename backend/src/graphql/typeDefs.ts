@@ -43,6 +43,17 @@ const typeDefs = gql`
     password: String
   }
 
+  input ContactUpdateInput {
+    name: String
+    email: String
+    phone: String
+    company: String
+    status: Status
+    order: Int
+    note: String
+  }
+
+
   type User {
     id: ID!
     email: String!
@@ -61,7 +72,7 @@ const typeDefs = gql`
 
   type Mutation {
     createContact(input: ContactInput!): Contact!
-    updateContact(id: ID!, input: ContactInput!): Contact!
+    updateContact(id: ID!, input: ContactUpdateInput!): Contact!
     deleteContact(id: ID!): Boolean!
 
     createActivity(contactId: ID!, description: String!): Activity!
