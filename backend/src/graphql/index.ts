@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken';
 
 // You can adjust this interface as needed for your user object
 interface DecodedToken {
-  userId: string;
+  userId: number;
   email: string;
   iat?: number;
   exp?: number;

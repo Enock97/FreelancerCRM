@@ -2,6 +2,9 @@
 import { Contact } from "../types/types";
 import DraggableCard from "./DraggableCard";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useMutation, useQuery } from "@apollo/client";
+import { CREATE_ACTIVITY, DELETE_ACTIVITY } from "../app/graphql/mutations";
+import { GET_CONTACTS } from "../app/graphql/queries";
 
 export interface KanbanColumnProps {
   status: string;
@@ -24,12 +27,27 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   onEdit,
   onDelete,
 }) => {
-  // [Your activities/editing logic unchanged if you have any.]
+  // ✅ Hooks must be here!
+  const [createActivity] = useMutation(CREATE_ACTIVITY);
+  const [deleteActivity] = useMutation(DELETE_ACTIVITY);
+  const { refetch } = useQuery(GET_CONTACTS);
+
+  // Handlers
+  const handleAddActivity = async (contactId: number, description: string) => {
+    if (!description.trim()) return;
+    await createActivity({ variables: { contactId, description } });
+    await refetch();
+  };
+
+  const handleDeleteActivity = async (activityId: number) => {
+    await deleteActivity({ variables: { id: activityId } });
+    await refetch();
+  };
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-800 rounded p-3 w-80 min-h-[340px] border border-gray-300 dark:border-gray-700 flex flex-col">
-      <div className="flex items-center justify-between mb-2">
-        <span className="font-bold text-lg text-gray-800 dark:text-gray-100">
+    <div className="bg-gray-100 min-w-[260px] dark:bg-gray-800 rounded p-3 w-80 min-h-[340px] border border-gray-300 dark:border-gray-700 flex flex-col">
+      <div className="flex items-center justify-between mb-2 text-center">
+        <span className="font-bold text-3xl text-yellow-600">
           {label}
         </span>
         <span className="bg-gray-300 dark:bg-gray-900 text-xs rounded px-2 py-0.5 text-gray-700 dark:text-gray-200">
@@ -45,6 +63,9 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
               statusOptions={statusOptions}
               onEdit={onEdit}
               onDelete={onDelete}
+              onAddActivity={handleAddActivity}
+              onDeleteActivity={handleDeleteActivity}
+              refetch={refetch}
             />
           ))}
         </div>

@@ -39,6 +39,7 @@ export type Contact = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   note?: Maybe<Scalars['String']['output']>;
+  order: Scalars['Int']['output'];
   phone?: Maybe<Scalars['String']['output']>;
   status: Status;
 };
@@ -48,6 +49,7 @@ export type ContactInput = {
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
   note?: InputMaybe<Scalars['String']['input']>;
+  order: Scalars['Int']['input'];
   phone?: InputMaybe<Scalars['String']['input']>;
   status: Status;
 };
@@ -61,7 +63,8 @@ export type Mutation = {
   login: AuthPayload;
   register: AuthPayload;
   updateContact: Contact;
-  updateProfile: User;
+  updateContactStatusAndOrder?: Maybe<Contact>;
+  updateCurrentUser?: Maybe<User>;
 };
 
 
@@ -104,12 +107,21 @@ export type MutationUpdateContactArgs = {
 };
 
 
-export type MutationUpdateProfileArgs = {
-  input: UpdateUserInput;
+export type MutationUpdateContactStatusAndOrderArgs = {
+  id: Scalars['ID']['input'];
+  order: Scalars['Int']['input'];
+  status: Status;
+};
+
+
+export type MutationUpdateCurrentUserArgs = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Query = {
   __typename?: 'Query';
+  activities: Array<Activity>;
   contacts: Array<Contact>;
   me?: Maybe<User>;
 };
@@ -210,6 +222,7 @@ export type ResolversTypes = {
   Contact: ResolverTypeWrapper<Contact>;
   ContactInput: ContactInput;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   Status: Status;
@@ -226,6 +239,7 @@ export type ResolversParentTypes = {
   Contact: Contact;
   ContactInput: ContactInput;
   ID: Scalars['ID']['output'];
+  Int: Scalars['Int']['output'];
   Mutation: {};
   Query: {};
   String: Scalars['String']['output'];
@@ -254,6 +268,7 @@ export type ContactResolvers<ContextType = ApolloContext, ParentType extends Res
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   note?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  order?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -267,10 +282,12 @@ export type MutationResolvers<ContextType = ApolloContext, ParentType extends Re
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   register?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'password'>>;
   updateContact?: Resolver<ResolversTypes['Contact'], ParentType, ContextType, RequireFields<MutationUpdateContactArgs, 'id' | 'input'>>;
-  updateProfile?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateProfileArgs, 'input'>>;
+  updateContactStatusAndOrder?: Resolver<Maybe<ResolversTypes['Contact']>, ParentType, ContextType, RequireFields<MutationUpdateContactStatusAndOrderArgs, 'id' | 'order' | 'status'>>;
+  updateCurrentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, Partial<MutationUpdateCurrentUserArgs>>;
 };
 
 export type QueryResolvers<ContextType = ApolloContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  activities?: Resolver<Array<ResolversTypes['Activity']>, ParentType, ContextType>;
   contacts?: Resolver<Array<ResolversTypes['Contact']>, ParentType, ContextType>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
 };

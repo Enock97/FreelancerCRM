@@ -34,6 +34,7 @@ const typeDefs = gql`
     phone: String
     company: String
     status: Status!
+    order: Int!
     note: String
   }
 

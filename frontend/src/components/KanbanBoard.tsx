@@ -61,7 +61,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         targetIdx = columns[status].indexOf(target);
       }
     }
-    if (typeof sourceStatus === "undefined" || typeof targetStatus === "undefined") return;
+    if (
+      typeof sourceStatus === "undefined" ||
+      typeof targetStatus === "undefined" ||
+      typeof sourceIdx === "undefined" ||
+      typeof targetIdx === "undefined"
+    ) {
+      return;
+    }
 
     const newColumns = { ...columns };
     const movedCard = newColumns[sourceStatus][sourceIdx];
@@ -85,6 +92,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
     await onEdit(movedCard, { status: targetStatus, order: targetIdx });
   };
+  
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
