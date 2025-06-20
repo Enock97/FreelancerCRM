@@ -98,9 +98,21 @@ export const REGISTER = gql`
   }
 `;
 
-export const UPDATE_PROFILE = gql`
-  mutation UpdateProfile($input: UpdateUserInput!) {
-    updateProfile(input: $input) {
+// Kanban drag/drop update
+export const UPDATE_CONTACT_STATUS_AND_ORDER = gql`
+  mutation UpdateContactStatusAndOrder($id: ID!, $status: Status!, $order: Int!) {
+    updateContactStatusAndOrder(id: $id, status: $status, order: $order) {
+      id
+      status
+      order
+    }
+  }
+`;
+
+// Profile update
+export const UPDATE_CURRENT_USER = gql`
+  mutation UpdateCurrentUser($email: String, $password: String) {
+    updateCurrentUser(email: $email, password: $password) {
       id
       email
     }
