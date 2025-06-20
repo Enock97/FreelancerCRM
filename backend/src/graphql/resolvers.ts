@@ -42,6 +42,31 @@ export const resolvers = {
         include: { contacts: true },
       });
     },
+        // --- New for Kanban drag-and-drop ---
+    async updateContactStatusAndOrder(parent, { id, status, order }, context) {
+      const { user, prisma } = context;
+      // Only allow editing own contacts
+      const contact = await prisma.contact.findUnique({ where: { id } });
+      if (!contact || contact.userId !== user.id) throw new Error("Not authorized");
+      // Update status and order
+      return prisma.contact.update({
+        where: { id },
+        data: { status, order }
+      });
+    },
+
+    // --- New for profile email/password update ---
+    async updateCurrentUser(parent, { email, password }, context) {
+      const { user, prisma } = context;
+      const updates = {};
+      if (email) updates.email = email;
+      if (password) updates.password = await bcrypt.hash(password, 10);
+      return prisma.user.update({
+        where: { id: user.id },
+        data: updates,
+      });
+    },
+    // ...other mutations
   },
 
   Mutation: {
