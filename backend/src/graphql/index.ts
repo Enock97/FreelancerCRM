@@ -19,9 +19,24 @@ const createGraphQLMiddleware = async () => {
     json(), 
     expressMiddleware(server, {
       context: async ({ req }) => {
+        // === JWT extraction logic added ===
+        let user = null;
+        const auth = req.headers.authorization;
+        if (auth && auth.startsWith("Bearer ")) {
+          const token = auth.split(" ")[1];
+          try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+            if (decoded && typeof decoded === "object" && "userId" in decoded) {
+              user = { id: (decoded as any).userId, email: (decoded as any).email };
+            }
+          } catch {
+            user = null;
+          }
+        }
+        // === END JWT logic ===
         return {
-          user: (req as any).user,
-          req
+          user,
+          req,
         };
       }
     }),
