@@ -36,7 +36,7 @@ const createGraphQLMiddleware = async () => {
           try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET!);
             if (decoded && typeof decoded === "object" && "userId" in decoded) {
-              user = { id: (decoded as any).userId, email: (decoded as any).email };
+              user = { userId: (decoded as any).userId, email: (decoded as any).email };
             }
           } catch {
             user = null;
