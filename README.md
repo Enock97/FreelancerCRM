@@ -28,7 +28,7 @@ Live application availability (YES/NO): **YES**
 - Full CI/CD front-end deployment to Vercel, and back-end and database deployment to Heroku.
 
 🙏 **Upcoming Features:**
-- **Non currently**
+- Unit/integration tests
 
 ---
 
