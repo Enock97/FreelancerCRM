@@ -26,9 +26,10 @@ Live application availability (YES/NO): **YES**
 - Supports dark/light mode.
 - Mobile-friendly and responsive design.
 - Full CI/CD front-end deployment to Vercel, and back-end and database deployment to Heroku.
+- Unit/Integration Tests.
 
 🙏 **Upcoming Features:**
-- Unit/integration tests
+- **Non Currently**
 
 ---
 
@@ -39,6 +40,7 @@ Live application availability (YES/NO): **YES**
 - **Database:** PostgreSQL
 - **Authentication:** JWT
 - **DevOps:** Docker, Kubernetes, GitHub Actions, Vercel, Heroku
+- **Testing:** Jest
 
 ---
 
