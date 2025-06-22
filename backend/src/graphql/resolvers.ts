@@ -152,7 +152,7 @@ export const resolvers = {
       if (Object.keys(updates).length === 0) throw new Error("No updates provided");
     
       const updated = await prisma.user.update({
-        where: { id: Number(user.userId) }, // ONLY update the logged-in user
+        where: { id: Number(id) }, // ONLY update the logged-in user
         data: updates,
       });
       return updated;
