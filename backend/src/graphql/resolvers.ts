@@ -5,16 +5,16 @@ import jwt from "jsonwebtoken";
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 
-function getUserIdFromContext(context: any): string | null {
-  if (context.user && context.user.id) {
-    return context.user.id.toString();
+function getUserIdFromContext(context: any): number | null {
+  if (context.user && context.user.userId) {
+    return Number(context.user.userId);
   }
   const auth = context.req?.headers?.authorization || "";
   if (auth.startsWith("Bearer ")) {
     try {
       const token = auth.slice(7);
       const payload = jwt.verify(token, JWT_SECRET) as any;
-      return payload.userId as string;
+      return Number(payload.userId);
     } catch {
       return null;
     }
@@ -116,20 +116,27 @@ export const resolvers = {
     
     // --- New for Kanban drag-and-drop ---
     updateContactStatusAndOrder: async (
-        _parent: any,
-        { id, status, order }: { id: number; status: string; order: number },
-        context: any,
-      ) => {
-      const { user } = context;
-      // Only allow editing own contacts
+      _parent: any,
+      { id, status, order }: { id: number; status: string; order: number },
+      context: any
+    ) => {
+      // Use getUserIdFromContext to always get the right user id as a number
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Unauthorized");
+    
+      // Make sure the contact exists and belongs to this user
       const contact = await prisma.contact.findUnique({ where: { id: Number(id) } });
-      if (!contact || contact.userId !== user.id) throw new Error("Not authorized");
+      if (!contact || contact.userId !== userId) throw new Error("Not authorized");
+    
       // Update status and order
       return prisma.contact.update({
-        where: { id: Number(id)  },
-        data: { status: Status[status as keyof typeof Status], order }
+        where: { id: Number(id) },
+        data: {
+          status,    // assuming status is already a valid Prisma enum string
+          order,
+        },
+        include: { activities: true }, // match your existing return shape
       });
-      
     },
 
     // --- New for profile email/password update ---
