@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
-import { AuthProvider, useAuth } from '../context/authcontext'
+import { AuthProvider, useAuth } from '../context/AuthContext'
 
 describe('AuthContext', () => {
   it('provides default values', () => {
