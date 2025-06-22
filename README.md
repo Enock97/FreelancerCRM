@@ -41,6 +41,7 @@ Live application availability (YES/NO): **YES**
 - **Authentication:** JWT
 - **DevOps:** Docker, Kubernetes, GitHub Actions, Vercel, Heroku
 - **Testing:** Jest
+- **Tools:** VS Code, AI (GPT-4), Framework Documentations, YouTube Guides, StackOverflow
 
 ---
 
