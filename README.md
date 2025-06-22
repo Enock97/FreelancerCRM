@@ -25,8 +25,7 @@ Live application availability (YES/NO): **YES**
 - Profile page with total amount of contacts and activities, and email/password update.
 - Supports dark/light mode.
 - Mobile-friendly and responsive design.
-- Full CI/CD front-end deployment to Vercel, and back-end and database deployment to Heroku.
-- Unit/Integration Tests.
+- Full front-end availability on Vercel, and back-end on Heroku.
 
 🙏 **Upcoming Features:**
 - **Non Currently**
