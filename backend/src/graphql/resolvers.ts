@@ -51,7 +51,7 @@ export const resolvers = {
       return await prisma.contact.create({
         data: {
           ...input,
-          userId,
+          userId: Number(userId),
         },
         include: { activities: true },
       });
