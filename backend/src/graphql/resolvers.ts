@@ -132,7 +132,7 @@ export const resolvers = {
       return prisma.contact.update({
         where: { id: Number(id) },
         data: {
-          status,    // assuming status is already a valid Prisma enum string
+          status: Status[status as keyof typeof Status],
           order,
         },
         include: { activities: true }, // match your existing return shape
