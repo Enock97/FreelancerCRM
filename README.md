@@ -6,9 +6,9 @@
 
 ## 🌐 Try the App
 
-You can test the live application here: 
-- **[Frontend Demo on Vercel](https://freelancercrm-deployment.vercel.app)**
-- **[Backend API Health on Heroku](https://freelancercrm-backend-838d0cf51a08.herokuapp.com/api/health)**
+Test the live application here: 
+- **[Live App (Vercel)🚀](https://freelancercrm-deployment.vercel.app)**
+- **[API Health Check (Heroku)🛠️](https://freelancercrm-backend-838d0cf51a08.herokuapp.com/api/health)**
 
 <br>
 
