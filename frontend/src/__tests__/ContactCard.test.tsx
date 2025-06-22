@@ -8,7 +8,7 @@ const contact: Contact = {
   email: 'jane@example.com',
   phone: '98765432',
   company: 'Doe Inc.',
-  status: 'IN_PROGRESS',
+  status: 'FOLLOW_UP',
   note: 'Important client',
   createdAt: new Date().toISOString(),
 }
