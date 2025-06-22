@@ -54,6 +54,16 @@ export type ContactInput = {
   status: Status;
 };
 
+export type ContactUpdateInput = {
+  company?: InputMaybe<Scalars['String']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  order?: InputMaybe<Scalars['Int']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Status>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createActivity: Activity;
@@ -103,7 +113,7 @@ export type MutationRegisterArgs = {
 
 export type MutationUpdateContactArgs = {
   id: Scalars['ID']['input'];
-  input: ContactInput;
+  input: ContactUpdateInput;
 };
 
 
@@ -221,6 +231,7 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Contact: ResolverTypeWrapper<Contact>;
   ContactInput: ContactInput;
+  ContactUpdateInput: ContactUpdateInput;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -238,6 +249,7 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   Contact: Contact;
   ContactInput: ContactInput;
+  ContactUpdateInput: ContactUpdateInput;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Mutation: {};

@@ -5,6 +5,8 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_ACTIVITY, DELETE_ACTIVITY } from "../app/graphql/mutations";
 import { GET_CONTACTS } from "../app/graphql/queries";
+import { useDroppable } from "@dnd-kit/core";
+
 
 export interface KanbanColumnProps {
   status: string;
@@ -12,6 +14,7 @@ export interface KanbanColumnProps {
   contacts: Contact[];
   onEdit: (contact: Contact, input: Partial<Contact>) => void | Promise<void>;
   onDelete: (id: number) => void | Promise<void>;
+  columnId: string;
 }
 
 const statusOptions = [
@@ -26,6 +29,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   contacts,
   onEdit,
   onDelete,
+  columnId,
 }) => {
   // ✅ Hooks must be here!
   const [createActivity] = useMutation(CREATE_ACTIVITY);
@@ -44,8 +48,10 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
     await refetch();
   };
 
+  const { setNodeRef } = useDroppable({ id: columnId });
+
   return (
-    <div className="bg-gray-100 min-w-[260px] dark:bg-gray-800 rounded p-3 w-80 min-h-[340px] border border-gray-300 dark:border-gray-700 flex flex-col">
+    <div ref={setNodeRef} className="bg-gray-100 min-w-[260px] dark:bg-gray-800 rounded p-3 w-80 min-h-[340px] border border-gray-300 dark:border-gray-700 flex flex-col">
       <div className="flex items-center justify-between mb-2 text-center">
         <span className="font-bold text-3xl text-yellow-600">
           {label}

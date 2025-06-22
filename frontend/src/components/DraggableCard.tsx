@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Contact } from "../types/types";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
 
 // --- Status options (should be imported/shared if used elsewhere) ---
 export const statusOptions = [
@@ -14,12 +15,12 @@ export const statusOptions = [
 
 interface DraggableCardProps {
   contact: Contact;
-  onEdit: (contact: Contact, input: Partial<Contact>) => void | Promise<void>;
+  onEdit: (contact: Contact, input: Partial<Contact> & { moveToLast?: boolean }) => void | Promise<void>;
   onDelete: (id: number) => void | Promise<void>;
   onAddActivity: (contactId: number, description: string) => Promise<void>;
   onDeleteActivity: (activityId: number) => Promise<void>;
   refetch: () => void;
-  statusOptions: { value: string; label: string }[];  // <-- ADD THIS LINE
+  statusOptions: { value: string; label: string }[];
 }
 
 const DraggableCard: React.FC<DraggableCardProps> = ({
@@ -29,6 +30,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
   onAddActivity,
   onDeleteActivity,
   refetch,
+  statusOptions,
 }) => {
   // dnd-kit integration
   const {
@@ -39,11 +41,11 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
     transition,
     isDragging,
   } = useSortable({ id: String(contact.id) });
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.6 : 1,
-    cursor: "grab",
   };
 
   // Local state for editing and activities
@@ -67,7 +69,15 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
 
   // Save edit
   const handleSave = async () => {
-    await onEdit(contact, editFields);
+    const patch: Partial<Contact> & { moveToLast?: boolean } = { ...editFields };
+    if (
+      editFields.status &&
+      editFields.status !== contact.status
+    ) {
+      // Instead of order: "moveToLast", use a flag
+      patch.moveToLast = true;
+    }
+    await onEdit(contact, patch);
     setEditing(false);
     setEditFields({});
   };
@@ -96,14 +106,24 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
   return (
     <div
       ref={setNodeRef}
-      {...attributes}
-      {...listeners}
       style={style}
-      className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col gap-2 mb-2 border border-gray-200 dark:border-gray-700"
+      className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col gap-2 mb-2 border border-gray-200 dark:border-gray-700 relative"
     >
+      {/* Drag handle */}
+      <span
+        {...attributes}
+        {...listeners}
+        className="absolute left-1 top-1 cursor-grab text-gray-400 hover:text-yellow-400 z-10"
+        title="Drag"
+        style={{ userSelect: "none" }}
+        tabIndex={-1}
+      >
+        <GripVertical size={18} />
+      </span>
+
       {editing ? (
         <form
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-2 dark:text-white"
           onSubmit={e => {
             e.preventDefault();
             handleSave();
