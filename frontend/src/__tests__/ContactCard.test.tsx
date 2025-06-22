@@ -1,14 +1,17 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import ContactCard from '../components/ContactCard'
-import { Contact } from '../types'
+import { Contact } from '../types/types'
+import '@testing-library/jest-dom'
+
 
 const contact: Contact = {
-  id: '1',
+  id: 1,
   name: 'Jane Doe',
   email: 'jane@example.com',
   phone: '98765432',
   company: 'Doe Inc.',
   status: 'FOLLOW_UP',
+  order: 0,
   note: 'Important client',
   createdAt: new Date().toISOString(),
 }
@@ -20,7 +23,6 @@ describe('ContactCard', () => {
         contact={contact}
         onDelete={jest.fn()}
         onUpdate={jest.fn()}
-        token="dummy-token"
       />
     )
 
@@ -39,7 +41,6 @@ describe('ContactCard', () => {
         contact={contact}
         onDelete={onDelete}
         onUpdate={onUpdate}
-        token="dummy-token"
       />
     )
 

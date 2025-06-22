@@ -1,7 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MockedProvider } from '@apollo/client/testing'
-import ContactForm from '../components/ContactForm'
-import { CREATE_CONTACT, GET_CONTACTS } from '../graphql/mutations'
+import ContactForm from '../app/(protected)/contacts/ContactForm'
+import { CREATE_CONTACT } from '../app/graphql/mutations'
+import '@testing-library/jest-dom'
+
 
 const mocks = [
   {
