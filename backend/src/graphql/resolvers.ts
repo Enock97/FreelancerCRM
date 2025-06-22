@@ -5,9 +5,10 @@ import jwt from "jsonwebtoken";
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 
+// Always expects context.user.id (number)
 function getUserIdFromContext(context: any): number | null {
-  if (context.user && context.user.userId) {
-    return Number(context.user.userId);
+  if (context.user && context.user.id) {
+    return Number(context.user.id);
   }
   const auth = context.req?.headers?.authorization || "";
   if (auth.startsWith("Bearer ")) {
@@ -22,14 +23,13 @@ function getUserIdFromContext(context: any): number | null {
   return null;
 }
 
-
 export const resolvers = {
   Query: {
     contacts: async (_parent: any, _args: any, context: any) => {
       const userId = getUserIdFromContext(context);
       if (!userId) throw new Error("Unauthorized");
       return await prisma.contact.findMany({
-        where: { userId: Number(userId) },
+        where: { userId },
         include: { activities: true },
         orderBy: { createdAt: "desc" },
       });
@@ -38,7 +38,7 @@ export const resolvers = {
       const userId = getUserIdFromContext(context);
       if (!userId) return null;
       return await prisma.user.findUnique({
-        where: { id: Number(userId) },
+        where: { id: userId },
         include: { contacts: true },
       });
     },
@@ -51,7 +51,7 @@ export const resolvers = {
       return await prisma.contact.create({
         data: {
           ...input,
-          userId: Number(userId),
+          userId,
         },
         include: { activities: true },
       });
@@ -60,7 +60,7 @@ export const resolvers = {
       const userId = getUserIdFromContext(context);
       if (!userId) throw new Error("Unauthorized");
       const contact = await prisma.contact.findUnique({ where: { id: Number(id) } });
-      if (!contact || contact.userId !== Number(userId)) throw new Error("No access");
+      if (!contact || contact.userId !== userId) throw new Error("No access");
       return await prisma.contact.update({
         where: { id: Number(id) },
         data: input,
@@ -71,7 +71,7 @@ export const resolvers = {
       const userId = getUserIdFromContext(context);
       if (!userId) throw new Error("Unauthorized");
       const contact = await prisma.contact.findUnique({ where: { id: Number(id) } });
-      if (!contact || contact.userId !== Number(userId)) throw new Error("No access");
+      if (!contact || contact.userId !== userId) throw new Error("No access");
       await prisma.activity.deleteMany({ where: { contactId: Number(id) } });
       await prisma.contact.delete({ where: { id: Number(id) } });
       return true;
@@ -80,7 +80,7 @@ export const resolvers = {
       const userId = getUserIdFromContext(context);
       if (!userId) throw new Error("Unauthorized");
       const contact = await prisma.contact.findUnique({ where: { id: Number(contactId) } });
-      if (!contact || contact.userId !== Number(userId)) throw new Error("No access");
+      if (!contact || contact.userId !== userId) throw new Error("No access");
       return await prisma.activity.create({
         data: { description, contactId: Number(contactId) },
       });
@@ -91,7 +91,7 @@ export const resolvers = {
       const activity = await prisma.activity.findUnique({ where: { id: Number(id) } });
       if (!activity) throw new Error("Not found");
       const contact = await prisma.contact.findUnique({ where: { id: Number(activity.contactId) } });
-      if (!contact || contact.userId !== Number(userId)) throw new Error("No access");
+      if (!contact || contact.userId !== userId) throw new Error("No access");
       await prisma.activity.delete({ where: { id: Number(id) } });
       return true;
     },
@@ -113,59 +113,43 @@ export const resolvers = {
       const token = jwt.sign({ userId: user.id }, JWT_SECRET);
       return { token };
     },
-    
-    // --- New for Kanban drag-and-drop ---
+
     updateContactStatusAndOrder: async (
       _parent: any,
       { id, status, order }: { id: number; status: string; order: number },
       context: any
     ) => {
-      // Use getUserIdFromContext to always get the right user id as a number
       const userId = getUserIdFromContext(context);
       if (!userId) throw new Error("Unauthorized");
-    
-      // Make sure the contact exists and belongs to this user
       const contact = await prisma.contact.findUnique({ where: { id: Number(id) } });
       if (!contact || contact.userId !== userId) throw new Error("Not authorized");
-    
-      // Update status and order
       return prisma.contact.update({
         where: { id: Number(id) },
         data: {
           status: Status[status as keyof typeof Status],
           order,
         },
-        include: { activities: true }, // match your existing return shape
+        include: { activities: true },
       });
     },
 
-    // --- New for profile email/password update ---
     updateCurrentUser: async (
       _parent: any,
       { email, password }: { email?: string; password?: string },
       context: any
     ) => {
-      try {
-        const { user } = context;
-        if (!user || !user.userId) throw new Error("Unauthorized");
-    
-        const updates: { email?: string; password?: string } = {};
-        if (email) updates.email = email;
-        if (password) updates.password = await bcrypt.hash(password, 10);
-        if (Object.keys(updates).length === 0) throw new Error("No updates provided");
-    
-        const updated = await prisma.user.update({
-          where: { id: Number(user.userId) }, // <--- Secure: use context
-          data: updates,
-        });
-    
-        return updated;
-      } catch (err) {
-        console.error("updateCurrentUser error:", err);
-        throw err;
-      }
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Unauthorized");
+      const updates: { email?: string; password?: string } = {};
+      if (email) updates.email = email;
+      if (password) updates.password = await bcrypt.hash(password, 10);
+      if (Object.keys(updates).length === 0) throw new Error("No updates provided");
+      const updated = await prisma.user.update({
+        where: { id: userId },
+        data: updates,
+      });
+      return updated;
     }
-
   },
 
   Contact: {
