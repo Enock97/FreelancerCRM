@@ -5,6 +5,7 @@
     "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
     "build": "npm exec tsc",
+    "test": "jest",
     "type-check": "tsc --noEmit",
     "seed": "ts-node ./prisma/seed.ts"
   },
