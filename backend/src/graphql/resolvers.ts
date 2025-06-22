@@ -140,16 +140,18 @@ export const resolvers = {
     ) => {
       try {
         const { user } = context;
-        if (!user) throw new Error("Unauthorized");
+        if (!user || !user.userId) throw new Error("Unauthorized");
+    
         const updates: { email?: string; password?: string } = {};
         if (email) updates.email = email;
         if (password) updates.password = await bcrypt.hash(password, 10);
-        if (!updates.email && !updates.password) throw new Error("No updates provided");
-        console.log("Updating user:", user.id, updates);
+        if (Object.keys(updates).length === 0) throw new Error("No updates provided");
+    
         const updated = await prisma.user.update({
-          where: { id: Number(user.id) },
+          where: { id: Number(user.userId) }, // <--- Secure: use context
           data: updates,
         });
+    
         return updated;
       } catch (err) {
         console.error("updateCurrentUser error:", err);
