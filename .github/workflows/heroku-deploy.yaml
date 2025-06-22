@@ -1,12 +1,12 @@
-name: Deploy to Heroku
+name: Test and Deploy to Heroku
 
 on:
   push:
     branches:
-      - main   # Or your production branch
+      - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,12 +18,30 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
 
-      # (Optional) Add build step if you have a build script
-      # - name: Build
-      #   run: npm run build
+      - name: Install frontend deps
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm run test -- --ci --passWithNoTests
+        continue-on-error: true
+
+      - name: Install backend deps
+        run: |
+          cd backend
+          npm ci
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          npm run test -- --ci --passWithNoTests
+        continue-on-error: true
 
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
@@ -34,4 +52,4 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "freelancercrm-backend"
           heroku_email: "enockladu@hotmail.com"
-          dontuseforce: false   # <--- force push, avoids the "pull before push" error
+          dontuseforce: false
