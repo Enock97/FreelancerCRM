@@ -18,7 +18,7 @@ const Navbar = () => {
   return (
     <nav className="w-full flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-900 shadow border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
       <div className="flex items-center space-x-6">
-        <Link href="/">
+        <Link href="/dashboard">
           <span className="font-extrabold text-xl tracking-tight text-gray-900 dark:text-white select-none">FreelancerCRM</span>
         </Link>
         {token && (
