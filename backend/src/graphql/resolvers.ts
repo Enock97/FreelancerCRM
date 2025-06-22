@@ -138,21 +138,21 @@ export const resolvers = {
       { email, password }: { email?: string; password?: string },
       context: any
     ) => {
-      const { user } = context;
-      if (!user || !user.userId) throw new Error("Unauthorized");
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Unauthorized");
     
       const updates: { email?: string; password?: string } = {};
       if (email) {
         // Check if the new email is already in use by another user
         const existing = await prisma.user.findUnique({ where: { email } });
-        if (existing && existing.id !== user.userId) throw new Error("Email already in use.");
+        if (existing && existing.id !== userId) throw new Error("Email already in use.");
         updates.email = email;
       }
       if (password) updates.password = await bcrypt.hash(password, 10);
       if (Object.keys(updates).length === 0) throw new Error("No updates provided");
     
       const updated = await prisma.user.update({
-        where: { id: Number(id) }, // ONLY update the logged-in user
+        where: { id: Number(userId) }, // << this line fixes your problem
         data: updates,
       });
       return updated;
