@@ -137,19 +137,29 @@ export const resolvers = {
       _parent: any,
       { email, password }: { email?: string; password?: string },
       context: any
-    ) => {
+      ) => {
       const userId = getUserIdFromContext(context);
       if (!userId) throw new Error("Unauthorized");
+    
       const updates: { email?: string; password?: string } = {};
-      if (email) updates.email = email;
+    
+      if (email) {
+        // Only run this check if the new email is different from the current email
+        const currentUser = await prisma.user.findUnique({ where: { id: userId } });
+        if (currentUser?.email !== email) {
+          const taken = await prisma.user.findUnique({ where: { email } });
+          if (taken) throw new Error("Email already in use");
+        }
+        updates.email = email;
+      }
       if (password) updates.password = await bcrypt.hash(password, 10);
       if (Object.keys(updates).length === 0) throw new Error("No updates provided");
+    
       const updated = await prisma.user.update({
         where: { id: userId },
         data: updates,
       });
       return updated;
-    }
   },
 
   Contact: {
