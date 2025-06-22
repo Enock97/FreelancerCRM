@@ -157,6 +157,7 @@ export const resolvers = {
       });
       return updated;
     },
+  },
 
   Contact: {
     activities: (parent: any) =>
