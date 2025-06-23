@@ -9,7 +9,7 @@ on:
 
 jobs:
 # ───────────────────────── Tests ─────────────────────────
-  test:
+  run-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -49,7 +49,7 @@ jobs:
         continue-on-error: true
 
 # ─────────────────────── Terraform ───────────────────────
-  terraform:
+  terraform-ci:
     needs: test                # ← run only if “test” job succeeds
     runs-on: ubuntu-latest
     env:
@@ -72,3 +72,33 @@ jobs:
       - name: Terraform Apply (main branch only)
         if: github.ref == 'refs/heads/main'
         run: terraform -chdir=infra apply -input=false -auto-approve
+  deploy-to-heroku:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm install
+
+      - name: Build TypeScript
+        working-directory: backend
+        run: npm run build
+
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.14.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: freelancermcrm-backend         # 👈 Replace with your real Heroku app name
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}          # 👈 Replace with your Heroku account email
+          usedocker: false
+          procfile: false
+        env:
+          NODE_ENV: production
