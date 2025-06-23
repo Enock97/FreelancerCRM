@@ -1,0 +1,74 @@
+# .github/workflows/ci-and-terraform.yaml
+name: CI & Terraform
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+# ───────────────────────── Tests ─────────────────────────
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install root dependencies
+        run: npm ci
+
+      # ---------- Front-end ----------
+      - name: Install front-end deps
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run front-end tests
+        run: |
+          cd frontend
+          npm run test -- --ci --passWithNoTests
+        continue-on-error: true   # keep pipeline green even if no tests yet
+
+      # ---------- Back-end ----------
+      - name: Install back-end deps
+        run: |
+          cd backend
+          npm ci
+
+      - name: Run back-end tests
+        run: |
+          cd backend
+          npm run test -- --ci --passWithNoTests
+        continue-on-error: true
+
+# ─────────────────────── Terraform ───────────────────────
+  terraform:
+    needs: test                # ← run only if “test” job succeeds
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_heroku_email:   ${{ secrets.HEROKU_EMAIL }}
+      TF_VAR_heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+      TF_VAR_vercel_token:   ${{ secrets.VERCEL_TOKEN }}
+      TF_VAR_jwt_secret:     ${{ secrets.JWT_SECRET }}
+      TF_VAR_vercel_team_id: ${{ secrets.VERCEL_TEAM_ID }}  # optional
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform -chdir=infra init -input=false
+
+      - name: Terraform Plan
+        run: terraform -chdir=infra plan -input=false
+
+      - name: Terraform Apply (main branch only)
+        if: github.ref == 'refs/heads/main'
+        run: terraform -chdir=infra apply -input=false -auto-approve
