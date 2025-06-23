@@ -1,0 +1,26 @@
+
+# .github/workflows/terraform.yml
+name: Terraform
+
+on:
+  pull_request:
+    paths: ["infra/**"]
+  push:
+    branches: ["main"]
+    paths: ["infra/**"]
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_heroku_email:   ${{ secrets.HEROKU_EMAIL }}
+      TF_VAR_heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+      TF_VAR_vercel_token:   ${{ secrets.VERCEL_TOKEN }}
+      TF_VAR_jwt_secret:     ${{ secrets.JWT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=infra init -input=false
+      - run: terraform -chdir=infra plan -input=false
+      - if: github.ref == 'refs/heads/main'
+        run: terraform -chdir=infra apply -input=false -auto-approve

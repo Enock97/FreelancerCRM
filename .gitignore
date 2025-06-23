@@ -72,3 +72,29 @@ kind.exe
 *.tar
 
 docker-compose.yaml
+
+# ─────────────────────────────
+# Terraform / IaC artefacts
+# ─────────────────────────────
+# Provider plugins, init cache & metadata
+infra/.terraform/
+infra/.terraform.lock.hcl
+
+# State files – sensitive, never commit
+*.tfstate
+*.tfstate.*
+
+# Plan output files
+*.tfplan
+
+# Auto-var files that may hold secrets
+*.auto.tfvars
+*.auto.tfvars.json
+terraform.tfvars
+
+# Crash logs
+crash.log
+
+# ─────────────────────────────
+# End Terraform section
+# ─────────────────────────────
