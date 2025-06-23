@@ -1,4 +1,4 @@
-# .github/workflows/ci-and-terraform.yml
+# .github/workflows/ci-tests-deploy-terraform.yml
 name: CI – Tests, Deploy, Terraform
 
 on:
@@ -8,60 +8,82 @@ on:
     branches: [main]
 
 jobs:
-# ─────────────── Tests ───────────────
+# ───────────────────────── Tests ─────────────────────────
   run-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: ✨ Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with: { node-version: 18 }
+      - name: ⚙️ Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-      - run: npm ci            # root
+      - name: 📦 Install root deps
+        run: npm ci
 
-      - run: npm ci            # frontend
+      # ---------- Front-end ----------
+      - name: 📦 Install front-end deps
+        run: npm ci
         working-directory: frontend
-      - run: npm test -- --ci --passWithNoTests
+
+      - name: 🧪 Run front-end tests
+        run: npm test -- --ci --passWithNoTests
         working-directory: frontend
         continue-on-error: true
 
-      - run: npm ci            # backend
+      # ---------- Back-end ----------
+      - name: 📦 Install back-end deps
+        run: npm ci
         working-directory: backend
-      - run: npm test -- --ci --passWithNoTests
+
+      - name: 🧪 Run back-end tests
+        run: npm test -- --ci --passWithNoTests
         working-directory: backend
         continue-on-error: true
 
-# ─────────── Deploy backend ───────────
+# ───────────────────── Deploy back-end ───────────────────
   deploy-heroku:
     needs: run-tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 18 }
+      - name: ✨ Checkout repository
+        uses: actions/checkout@v4
 
-      - run: npm ci
-        working-directory: backend
-      - run: npm run build
+      - name: ⚙️ Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: 📦 Install back-end deps
+        run: npm ci
         working-directory: backend
 
-      - name: Deploy to Heroku
+      - name: 🏗️ Build TypeScript
+        run: npm run build
+        working-directory: backend
+
+      - name: 📦 Install Heroku CLI
+        run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+
+      - name: 🚀 Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.14.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: freelancercrm-backend   # ← spell correctly
+          heroku_app_name: freelancercrm-backend   # ← ensure correct slug
           heroku_email:    ${{ secrets.HEROKU_EMAIL }}
           usedocker: false
           dontuseforce: false
         env:
           NODE_ENV: production
 
-# ───────────── Terraform ─────────────
+# ─────────────────────── Terraform ───────────────────────
   terraform-ci:
     needs: deploy-heroku
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write        # for future OIDC
+    permissions:                    # for future OIDC
+      id-token: write
       contents: read
     env:
       TF_VAR_heroku_email:       ${{ secrets.HEROKU_EMAIL }}
@@ -71,12 +93,20 @@ jobs:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - name: ✨ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Set up Terraform CLI
+        uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ env.TF_TOKEN_app_terraform_io }}
 
-      - run: terraform -chdir=infra init -input=false
-      - run: terraform -chdir=infra plan -input=false
-      - if: github.ref == 'refs/heads/main'
+      - name: 📂 Terraform init
+        run: terraform -chdir=infra init -input=false
+
+      - name: 🔍 Terraform plan
+        run: terraform -chdir=infra plan -input=false
+
+      - name: 🚀 Terraform apply (main only)
+        if: github.ref == 'refs/heads/main'
         run: terraform -chdir=infra apply -input=false -auto-approve
