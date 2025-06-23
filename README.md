@@ -76,7 +76,7 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+### Learn More
 
 To learn more about Next.js, take a look at the following resources:
 
@@ -92,6 +92,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 - Node.js v18+
 - Docker + Docker Compose
 - (Optional) `kubectl` and a local Kubernetes cluster (e.g. minikube or kind)
+- (Optional) Terraform configurations
 
 ### 1. Clone the repo
 
@@ -170,6 +171,59 @@ kubectl apply -f k8s/
 > This sets up the backend, frontend, and database in a Kubernetes cluster. You must ensure your local cluster supports persistent volumes (e.g., via `local-path-provisioner`).
 
 ---
+
+### 7. (Optional) Infrastructure & CI/CD (Terraform + GitHub Actions)
+
+This repo ships with **100 % reproducible infrastructure‑as‑code**.  
+Everything that Vercel, Heroku and the CI pipeline need lives in **`/infra`** (Terraform) and **`.github/workflows/ci-tests-deploy-terraform.yml`** (GitHub Actions).
+
+| Layer | Technology | How to use it locally |
+|-------|------------|-----------------------|
+| Front‑end hosting | **Vercel provider** | `cd infra && terraform apply` creates / updates the Vercel project and triggers a deployment. |
+| API + database | **Heroku provider** | Same `terraform apply` provisions the Heroku app, attaches a Postgres **essential‑0** plan, and wires config vars. |
+| Remote state | **Terraform Cloud Free** | State is stored remotely (see `infra/backend.tf`). Run `terraform login` once or export `TF_TOKEN_app_terraform_io=<your user token>` before `terraform init`. |
+| CI/CD | **GitHub Actions** | One workflow runs tests, deploys the backend slug to Heroku, then applies Terraform. No Heroku autodeploy needed. |
+
+### Quick start (one‑time bootstrap)
+
+```bash
+# install Terraform >= 1.7 locally
+cd infra
+
+# 1️⃣ log in so Terraform can talk to Terraform Cloud
+terraform login   # or set TF_TOKEN_app_terraform_io
+
+# 2️⃣ set the secrets Terraform needs
+export TF_VAR_heroku_email="you@example.com"
+export TF_VAR_heroku_api_key="heroku-******"
+export TF_VAR_vercel_token="vcst_******"
+export TF_VAR_jwt_secret="super-secret-jwt-string"
+
+# 3️⃣ spin everything up
+terraform init
+terraform apply   # review → yes
+```
+
+After this:
+
+* `npm test` + `npm run build` are already baked into the GitHub workflow.  
+* Pushing to **`main`** automatically runs tests → deploys backend → applies Terraform → deploys front‑end.  
+* Need a staging copy? Run `terraform workspace new staging && terraform apply`.
+
+### Changing cloud resources
+
+* **Heroku stack** – edit `stack = "heroku-24"` in `infra/main.tf`.  
+* **Database plan** – change `plan = "heroku-postgresql:essential-1"` and `apply`.  
+* **New env vars** – add them under `heroku_app_config_association.api_env` and commit.
+
+### Disabling duplicate Heroku builds
+
+Because the GitHub workflow already deploys the slug, **disable “Automatic Deploys”** in the Heroku dashboard to avoid a second build/release.
+
+---
+
+> **Why Terraform?**  
+> One command (`terraform apply`) recreates the full Vercel + Heroku stack, including CI secrets and JWTs, so anyone can fork the repo and spin up an identical environment in five minutes.
 
 
 ## 👨‍💻 Developer
