@@ -39,7 +39,7 @@ Live application availability (YES/NO): **YES**
 - **Database:** PostgreSQL
 - **Authentication:** JWT
 - **DevOps:** Docker, Kubernetes, GitHub Actions, Vercel, Heroku
-- **Testing:** Jest
+- **Testing:** Jest, Cypress
 - **Tools:** VS Code, AI (GPT-4), Framework Documentations, YouTube Guides, StackOverflow
 
 ---
