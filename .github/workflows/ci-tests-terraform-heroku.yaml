@@ -1,5 +1,5 @@
-# .github/workflows/ci-and-terraform.yaml
-name: CI - Tests & Terraform
+# .github/workflows/ci-and-terraform.yml
+name: CI – Tests, Deploy, Terraform
 
 on:
   pull_request:
@@ -8,50 +8,61 @@ on:
     branches: [main]
 
 jobs:
-# ───────────────────────── Tests ─────────────────────────
+# ─────────────── Tests ───────────────
   run-tests:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+      - uses: actions/setup-node@v4
+        with: { node-version: 18 }
 
-      - name: Install root dependencies
-        run: npm ci
+      - run: npm ci            # root
 
-      # ---------- Front-end ----------
-      - name: Install front-end deps
-        run: |
-          cd frontend
-          npm ci
-
-      - name: Run front-end tests
-        run: |
-          cd frontend
-          npm run test -- --ci --passWithNoTests
-        continue-on-error: true   # keep pipeline green even if no tests yet
-
-      # ---------- Back-end ----------
-      - name: Install back-end deps
-        run: |
-          cd backend
-          npm ci
-
-      - name: Run back-end tests
-        run: |
-          cd backend
-          npm run test -- --ci --passWithNoTests
+      - run: npm ci            # frontend
+        working-directory: frontend
+      - run: npm test -- --ci --passWithNoTests
+        working-directory: frontend
         continue-on-error: true
 
-# ─────────────────────── Terraform ───────────────────────
-  terraform-ci:
-    needs: test                # ← run only if “test” job succeeds
+      - run: npm ci            # backend
+        working-directory: backend
+      - run: npm test -- --ci --passWithNoTests
+        working-directory: backend
+        continue-on-error: true
+
+# ─────────── Deploy backend ───────────
+  deploy-heroku:
+    needs: run-tests
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 18 }
+
+      - run: npm ci
+        working-directory: backend
+      - run: npm run build
+        working-directory: backend
+
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.14.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: freelancercrm-backend   # ← spell correctly
+          heroku_email:    ${{ secrets.HEROKU_EMAIL }}
+          usedocker: false
+          dontuseforce: false
+        env:
+          NODE_ENV: production
+
+# ───────────── Terraform ─────────────
+  terraform-ci:
+    needs: deploy-heroku
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write        # for future OIDC
+      contents: read
     env:
       TF_VAR_heroku_email:       ${{ secrets.HEROKU_EMAIL }}
       TF_VAR_heroku_api_key:     ${{ secrets.HEROKU_API_KEY }}
@@ -62,43 +73,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ env.TF_TOKEN_app_terraform_io }}
 
-      - name: Terraform Init
-        run: terraform -chdir=infra init -input=false
-
-      - name: Terraform Plan
-        run: terraform -chdir=infra plan -input=false
-
-      - name: Terraform Apply (main branch only)
-        if: github.ref == 'refs/heads/main'
+      - run: terraform -chdir=infra init -input=false
+      - run: terraform -chdir=infra plan -input=false
+      - if: github.ref == 'refs/heads/main'
         run: terraform -chdir=infra apply -input=false -auto-approve
-  deploy-to-heroku:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install backend dependencies
-        working-directory: backend
-        run: npm install
-
-      - name: Build TypeScript
-        working-directory: backend
-        run: npm run build
-
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.14.15
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: freelancermcrm-backend         # 👈 Replace with your real Heroku app name
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}          # 👈 Replace with your Heroku account email
-          usedocker: false
-          procfile: false
-        env:
-          NODE_ENV: production
