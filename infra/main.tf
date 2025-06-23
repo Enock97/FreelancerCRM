@@ -1,9 +1,8 @@
 # infra/main.tf
 # ----------- Heroku backend ------------------
 resource "heroku_app" "api" {
-  name   = "freelancercrm-api"
+  name   = "freelancercrm-backend"
   region = var.region
-  stack  = "heroku-22"
 }
 
 resource "heroku_addon" "db" {
