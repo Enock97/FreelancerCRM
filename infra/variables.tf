@@ -21,4 +21,5 @@ variable "jwt_secret" {
 # This one is referenced in main.tf (Heroku app region)
 variable "region" {
   type    = string
+  default = "us"
 }
