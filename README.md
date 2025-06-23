@@ -1,6 +1,6 @@
 # ⭐ FreelancerCRM
 
-**FreelancerCRM** is a Minimum Viable Product (MVP) version of a modern CRM web application built for freelancers and small teams who need a simple overview of client relationships, activities, and communication — all presented in a user-friendly, responsive dashboard with a drag-and-drop Kanban interface.
+**FreelancerCRM** is a Minimum Viable Product (MVP) version of a modern CRM web application built for learning purposes and include a simple overview of client relationships, activities, and communication — all presented in a user-friendly, responsive dashboard with a drag-and-drop Kanban interface.
 
 ---
 
@@ -17,7 +17,7 @@ Live application availability (YES/NO): **YES**
 ---
 
 ## 💡 About the Application
-Kanban CRM in React 18/Next.js (Vercel) + GraphQL/REST API (Heroku). CI/CD with GitHub Actions, infra in Terraform, blue-green rollout logic proven on local K3s + Helm.
+Kanban CRM in React 18/Next.js 14 (Vercel) + GraphQL/REST API (Heroku). CI/CD with GitHub Actions, infra in Terraform, blue-green rollout logic proven on local K3s + Helm.
 
 - Manage contacts with fields for name, email, company, status, note, and phone number.
 - Organize client workflows using a visual Kanban board with drag-and-drop functionality.
@@ -38,7 +38,7 @@ Kanban CRM in React 18/Next.js (Vercel) + GraphQL/REST API (Heroku). CI/CD with 
 - **Backend:** Express.js (Node.js/TypeScript), REST, GraphQL (Apollo Server), Prisma ORM
 - **Database:** PostgreSQL
 - **Authentication:** JWT
-- **DevOps:** Docker, Kubernetes, GitHub Actions, Vercel, Heroku
+- **DevOps:** Docker, Kubernetes, Terraform, GitHub Actions, Vercel, Heroku
 - **Testing:** Jest, Cypress
 - **Tools:** VS Code, AI (GPT-4), Framework Documentations, YouTube Guides, StackOverflow
 
