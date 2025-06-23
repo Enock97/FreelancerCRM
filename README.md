@@ -17,6 +17,7 @@ Live application availability (YES/NO): **YES**
 ---
 
 ## 💡 About the Application
+Kanban CRM in React 18/Next.js (Vercel) + GraphQL/REST API (Heroku). CI/CD with GitHub Actions, infra in Terraform, blue-green rollout logic proven on local K3s + Helm.
 
 - Manage contacts with fields for name, email, company, status, note, and phone number.
 - Organize client workflows using a visual Kanban board with drag-and-drop functionality.
@@ -25,7 +26,6 @@ Live application availability (YES/NO): **YES**
 - Profile page with total amount of contacts and activities, and email/password update.
 - Supports dark/light mode.
 - Mobile-friendly and responsive design.
-- Full front-end availability on Vercel, and back-end on Heroku.
 
 🙏 **Upcoming Features:**
 - **Non Currently**

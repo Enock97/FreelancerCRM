@@ -1,5 +1,5 @@
 # .github/workflows/ci-and-terraform.yaml
-name: CI & Terraform
+name: CI - Tests & Terraform
 
 on:
   pull_request:
@@ -53,11 +53,11 @@ jobs:
     needs: test                # ← run only if “test” job succeeds
     runs-on: ubuntu-latest
     env:
-      TF_VAR_heroku_email:   ${{ secrets.HEROKU_EMAIL }}
-      TF_VAR_heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-      TF_VAR_vercel_token:   ${{ secrets.VERCEL_TOKEN }}
-      TF_VAR_jwt_secret:     ${{ secrets.JWT_SECRET }}
-      TF_VAR_vercel_team_id: ${{ secrets.VERCEL_TEAM_ID }}  # optional
+      TF_VAR_heroku_email:       ${{ secrets.HEROKU_EMAIL }}
+      TF_VAR_heroku_api_key:     ${{ secrets.HEROKU_API_KEY }}
+      TF_VAR_vercel_token:       ${{ secrets.VERCEL_TOKEN }}
+      TF_VAR_jwt_secret:         ${{ secrets.JWT_SECRET }}
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
