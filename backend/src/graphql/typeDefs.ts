@@ -53,6 +53,12 @@ const typeDefs = gql`
     note: String
   }
 
+  input ContactOrderInput {
+    id: ID!
+    order: Int!
+    status: Status!
+  }
+
 
   type User {
     id: ID!
@@ -83,6 +89,8 @@ const typeDefs = gql`
     
     updateContactStatusAndOrder(id: ID!, status: Status!, order: Int!): Contact
     updateCurrentUser(email: String, password: String): User
+
+    reorderContacts(input: [ContactOrderInput!]!): Boolean!
   }
 `;
 

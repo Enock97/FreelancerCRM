@@ -5,7 +5,6 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 
-// --- Status options (should be imported/shared if used elsewhere) ---
 export const statusOptions = [
   { value: "NEW", label: "New" },
   { value: "FOLLOW_UP", label: "Follow Up" },
@@ -15,7 +14,7 @@ export const statusOptions = [
 
 interface DraggableCardProps {
   contact: Contact;
-  onEdit: (contact: Contact, input: Partial<Contact> & { moveToLast?: boolean }) => void | Promise<void>;
+  onEdit: (contact: Contact, input: Partial<Contact>) => void | Promise<void>;
   onDelete: (id: number) => void | Promise<void>;
   onAddActivity: (contactId: number, description: string) => Promise<void>;
   onDeleteActivity: (activityId: number) => Promise<void>;
@@ -32,7 +31,6 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
   refetch,
   statusOptions,
 }) => {
-  // dnd-kit integration
   const {
     attributes,
     listeners,
@@ -48,18 +46,15 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
     opacity: isDragging ? 0.6 : 1,
   };
 
-  // Local state for editing and activities
   const [editing, setEditing] = useState(false);
   const [editFields, setEditFields] = useState<Partial<Contact>>({});
   const [activityInput, setActivityInput] = useState<string>("");
 
-  // Start edit
   const startEdit = () => {
     setEditing(true);
     setEditFields({ ...contact });
   };
 
-  // Handle field changes
   const handleEditField = (field: keyof Contact, value: string) => {
     setEditFields((prev) => ({
       ...prev,
@@ -67,28 +62,17 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
     }));
   };
 
-  // Save edit
   const handleSave = async () => {
-    const patch: Partial<Contact> & { moveToLast?: boolean } = { ...editFields };
-    if (
-      editFields.status &&
-      editFields.status !== contact.status
-    ) {
-      // Instead of order: "moveToLast", use a flag
-      patch.moveToLast = true;
-    }
-    await onEdit(contact, patch);
+    await onEdit(contact, editFields);
     setEditing(false);
     setEditFields({});
   };
 
-  // Cancel edit
   const handleCancel = () => {
     setEditing(false);
     setEditFields({});
   };
 
-  // Add activity
   const handleAddActivity = async () => {
     const description = activityInput.trim();
     if (!description) return;
@@ -97,7 +81,6 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
     refetch();
   };
 
-  // Delete activity
   const handleDeleteActivity = async (activityId: number) => {
     await onDeleteActivity(activityId);
     refetch();
@@ -109,7 +92,6 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
       style={style}
       className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col gap-2 mb-2 border border-gray-200 dark:border-gray-700 relative"
     >
-      {/* Drag handle */}
       <span
         {...attributes}
         {...listeners}
@@ -120,7 +102,6 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
       >
         <GripVertical size={18} />
       </span>
-
       {editing ? (
         <form
           className="flex flex-col gap-2 dark:text-white"
@@ -159,7 +140,6 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
             onChange={e => handleEditField("company", e.target.value)}
             placeholder="Company"
           />
-          {/* Status dropdown */}
           <select
             className="rounded px-2 py-1 border dark:bg-gray-900"
             value={editFields.status ?? contact.status}
@@ -204,7 +184,6 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
             <span className="font-semibold">Status: </span> {contact.status}
           </div>
           <div className="text-sm w-full max-w-full break-words"><span className="font-semibold">Note: </span>{contact.note}</div>
-          {/* Activities */}
           <div className="mt-2 flex flex-col gap-1">
             <div className="font-semibold text-gray-700 dark:text-gray-200 mb-1">Activities:</div>
             <ul className="flex flex-col gap-1">
@@ -225,7 +204,6 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
                 <li className="text-xs text-gray-400">No activities</li>
               )}
             </ul>
-            {/* Add new activity input */}
             <div className="flex flex-row items-center gap-2 mt-2 w-full">
               <input
                 type="text"
@@ -249,11 +227,10 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
               </button>
             </div>
           </div>
-          {/* --- END ACTIVITIES --- */}
           <div className="flex gap-2 mt-2">
             <button
               onClick={startEdit}
-              className="px-3 py-1 bg-blue-600 text-white rounded"
+              className="px-3 py-1 bg-yellow-600 text-white rounded"
             >
               Edit
             </button>
@@ -270,4 +247,4 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
   );
 };
 
-export default DraggableCard;
+export default React.memo(DraggableCard);

@@ -2,9 +2,10 @@
 import React from "react";
 import KanbanColumn from "./KanbanColumn";
 import { Contact } from "../types/types";
-
 import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
-//import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useMutation } from "@apollo/client";
+import { REORDER_CONTACTS } from "../app/graphql/mutations"; // <-- You must define this mutation
 
 const statuses = ["NEW", "FOLLOW_UP", "CUSTOMER", "ARCHIVED"];
 
@@ -46,16 +47,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     );
   }, [contacts]);
 
+  const [reorderContacts] = useMutation(REORDER_CONTACTS);
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    // Find the card being moved
-    let sourceStatus: string | undefined;
-    let sourceIdx: number | undefined;
-    let targetStatus: string | undefined;
-    let targetIdx: number | undefined;
-
+    let sourceStatus, targetStatus, sourceIdx, targetIdx;
     for (const status of statuses) {
       const idx = columns[status].findIndex((c) => String(c.id) === String(active.id));
       if (idx > -1) {
@@ -68,14 +66,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         targetIdx = overIdx;
       }
     }
-
-    // If dropped on empty column (not over another card)
-    if (!targetStatus) {
-      // Try to extract status from over.id (column drop area)
-      if (statuses.includes(String(over.id))) {
-        targetStatus = String(over.id);
-        targetIdx = columns[targetStatus].length;
-      }
+    if (!targetStatus && statuses.includes(String(over.id))) {
+      targetStatus = String(over.id);
+      targetIdx = columns[targetStatus].length;
     }
 
     if (
@@ -90,15 +83,11 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     const newColumns = { ...columns };
     const movedCard = newColumns[sourceStatus][sourceIdx];
 
-    // Remove from source
     newColumns[sourceStatus] = newColumns[sourceStatus].filter(
       (c) => String(c.id) !== String(active.id)
     );
-
-    // Insert into target at correct index
     newColumns[targetStatus].splice(targetIdx, 0, movedCard);
 
-    // Update orders and status for all cards in both columns
     newColumns[targetStatus] = newColumns[targetStatus].map((card, idx) => ({
       ...card,
       status: targetStatus,
@@ -110,37 +99,42 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         order: idx,
       }));
     }
-
     setColumns(newColumns);
 
-    await onEdit(movedCard, { status: targetStatus, order: targetIdx });
-    /*
-    try {
-      await onEdit(movedCard, { status: targetStatus, order: targetIdx });
-    } catch (err) {
-      // Error handling: up to you (no dialog spam)
-      // Optionally set a global error state here if you want to display somewhere
-    } */
+    // Prepare the batch update payload
+    const updates = [
+      ...newColumns[sourceStatus].map((c) => ({
+        id: c.id,
+        order: c.order,
+        status: c.status,
+      })),
+      ...newColumns[targetStatus].map((c) => ({
+        id: c.id,
+        order: c.order,
+        status: c.status,
+      })),
+    ];
+
+    await reorderContacts({ variables: { input: updates } });
   };
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <div className="flex flex-row w-full gap-6 overflow-x-auto min-h-[80vh]">
-        {statuses.map((status) => (
-          <KanbanColumn
-            key={status}
-            status={status}
-            label={statusLabels[status]}
-            contacts={columns[status]}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            /** 👇👇👇 Add this prop */
-            columnId={status}
-          />
-        ))}
+        <SortableContext items={statuses} strategy={verticalListSortingStrategy}>
+          {statuses.map((status) => (
+            <KanbanColumn
+              key={status}
+              status={status}
+              label={statusLabels[status]}
+              contacts={columns[status]}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))}
+        </SortableContext>
       </div>
     </DndContext>
-
   );
 };
 

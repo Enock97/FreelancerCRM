@@ -1,5 +1,6 @@
 "use client";
 import { Contact } from "../types/types";
+import React from "react";
 import DraggableCard from "./DraggableCard";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useMutation, useQuery } from "@apollo/client";
@@ -7,14 +8,12 @@ import { CREATE_ACTIVITY, DELETE_ACTIVITY } from "../app/graphql/mutations";
 import { GET_CONTACTS } from "../app/graphql/queries";
 import { useDroppable } from "@dnd-kit/core";
 
-
 export interface KanbanColumnProps {
   status: string;
   label: string;
   contacts: Contact[];
   onEdit: (contact: Contact, input: Partial<Contact>) => void | Promise<void>;
   onDelete: (id: number) => void | Promise<void>;
-  columnId: string;
 }
 
 const statusOptions = [
@@ -29,14 +28,12 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   contacts,
   onEdit,
   onDelete,
-  columnId,
+  status,
 }) => {
-  // ✅ Hooks must be here!
   const [createActivity] = useMutation(CREATE_ACTIVITY);
   const [deleteActivity] = useMutation(DELETE_ACTIVITY);
   const { refetch } = useQuery(GET_CONTACTS);
 
-  // Handlers
   const handleAddActivity = async (contactId: number, description: string) => {
     if (!description.trim()) return;
     await createActivity({ variables: { contactId, description } });
@@ -48,10 +45,13 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
     await refetch();
   };
 
-  const { setNodeRef } = useDroppable({ id: columnId });
+  const { setNodeRef } = useDroppable({ id: status });
 
   return (
-    <div ref={setNodeRef} className="bg-gray-100 min-w-[260px] dark:bg-gray-800 rounded p-3 w-80 min-h-[340px] border border-gray-300 dark:border-gray-700 flex flex-col">
+    <div
+      ref={setNodeRef}
+      className="bg-gray-100 min-w-[260px] dark:bg-gray-800 rounded p-3 w-80 min-h-[340px] border border-gray-300 dark:border-gray-700 flex flex-col"
+    >
       <div className="flex items-center justify-between mb-2 text-center">
         <span className="font-bold text-3xl text-yellow-600">
           {label}
@@ -63,7 +63,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
       <SortableContext items={contacts.map(c => String(c.id))} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-2">
           {contacts.map((contact) => (
-            <DraggableCard
+            <MemoDraggableCard
               key={contact.id}
               contact={contact}
               statusOptions={statusOptions}
@@ -80,4 +80,6 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   );
 };
 
-export default KanbanColumn;
+const MemoDraggableCard = React.memo(DraggableCard);
+
+export default React.memo(KanbanColumn);

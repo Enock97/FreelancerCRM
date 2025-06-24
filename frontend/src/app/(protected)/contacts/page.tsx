@@ -164,7 +164,7 @@ const ContactsPage: React.FC = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(contact)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                    className="bg-yellow-600 text-white px-3 py-1 rounded"
                   >
                     Edit
                   </button>

@@ -157,6 +157,27 @@ export const resolvers = {
       });
       return updated;
     },
+
+    reorderContacts: async (_parent: any, { input }: any, context: any) => {
+      const userId = getUserIdFromContext(context);
+      if (!userId) throw new Error("Unauthorized");
+
+      // Validate all contacts belong to this user
+      const ids = input.map((c: any) => Number(c.id));
+      const found = await prisma.contact.findMany({ where: { id:  { in: ids }, userId: Number(userId) } });
+      if (found.length !== ids.length) throw new Error("No access");
+
+      // Batch update
+      const ops = input.map((c: any) =>
+        prisma.contact.update({
+          where: { id: Number(c.id) },
+          data: { order: c.order, status: c.status },
+        })
+      );
+      await prisma.$transaction(ops);
+      return true;
+    },
+
   },
 
   Contact: {

@@ -54,6 +54,12 @@ export type ContactInput = {
   status: Status;
 };
 
+export type ContactOrderInput = {
+  id: Scalars['ID']['input'];
+  order: Scalars['Int']['input'];
+  status: Status;
+};
+
 export type ContactUpdateInput = {
   company?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
@@ -72,6 +78,7 @@ export type Mutation = {
   deleteContact: Scalars['Boolean']['output'];
   login: AuthPayload;
   register: AuthPayload;
+  reorderContacts: Scalars['Boolean']['output'];
   updateContact: Contact;
   updateContactStatusAndOrder?: Maybe<Contact>;
   updateCurrentUser?: Maybe<User>;
@@ -108,6 +115,11 @@ export type MutationLoginArgs = {
 export type MutationRegisterArgs = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+
+export type MutationReorderContactsArgs = {
+  input: Array<ContactOrderInput>;
 };
 
 
@@ -231,6 +243,7 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Contact: ResolverTypeWrapper<Contact>;
   ContactInput: ContactInput;
+  ContactOrderInput: ContactOrderInput;
   ContactUpdateInput: ContactUpdateInput;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
@@ -249,6 +262,7 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   Contact: Contact;
   ContactInput: ContactInput;
+  ContactOrderInput: ContactOrderInput;
   ContactUpdateInput: ContactUpdateInput;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
@@ -293,6 +307,7 @@ export type MutationResolvers<ContextType = ApolloContext, ParentType extends Re
   deleteContact?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteContactArgs, 'id'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
   register?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'password'>>;
+  reorderContacts?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationReorderContactsArgs, 'input'>>;
   updateContact?: Resolver<ResolversTypes['Contact'], ParentType, ContextType, RequireFields<MutationUpdateContactArgs, 'id' | 'input'>>;
   updateContactStatusAndOrder?: Resolver<Maybe<ResolversTypes['Contact']>, ParentType, ContextType, RequireFields<MutationUpdateContactStatusAndOrderArgs, 'id' | 'order' | 'status'>>;
   updateCurrentUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, Partial<MutationUpdateCurrentUserArgs>>;

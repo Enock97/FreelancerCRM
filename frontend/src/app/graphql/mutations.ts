@@ -120,3 +120,9 @@ export const UPDATE_CURRENT_USER = gql`
     }
   }
 `;
+
+export const REORDER_CONTACTS = gql`
+  mutation ReorderContacts($input: [ContactOrderInput!]!) {
+    reorderContacts(input: $input)
+  }
+`;
