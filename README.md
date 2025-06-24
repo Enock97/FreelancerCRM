@@ -27,8 +27,8 @@ Kanban CRM in React 18/Next.js 14 (Vercel) + GraphQL/REST API (Heroku). CI/CD wi
 - Supports dark/light mode.
 - Mobile-friendly and responsive design.
 
-🙏 **Upcoming Features:**
-- **Non Currently**
+🙏 **Upcoming Features/Fixes:**
+- Fix buggy drag-and-drop UX on the kanban board UI
 
 ---
 
