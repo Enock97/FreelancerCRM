@@ -2,10 +2,9 @@
 import React from "react";
 import KanbanColumn from "./KanbanColumn";
 import { Contact } from "../types/types";
-import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, pointerWithin } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { useMutation } from "@apollo/client";
-import { REORDER_CONTACTS } from "../app/graphql/mutations"; // <-- You must define this mutation
+import DraggableCard from "./DraggableCard";
 
 const statuses = ["NEW", "FOLLOW_UP", "CUSTOMER", "ARCHIVED"];
 
@@ -20,50 +19,101 @@ export interface KanbanBoardProps {
   contacts: Contact[];
   onEdit: (contact: Contact, input: Partial<Contact>) => void | Promise<void>;
   onDelete: (id: number) => void | Promise<void>;
+  reorderContacts: (input: { id: number; status: string; order: number }[]) => Promise<void>;
 }
+
+const statusOptions = [
+  { value: "NEW", label: "New" },
+  { value: "FOLLOW_UP", label: "Follow Up" },
+  { value: "CUSTOMER", label: "Customer" },
+  { value: "ARCHIVED", label: "Archived" },
+];
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
   contacts,
   onEdit,
   onDelete,
+  reorderContacts,
 }) => {
   const [columns, setColumns] = React.useState<Record<string, Contact[]>>(() =>
     statuses.reduce((acc, status) => {
       acc[status] = contacts
-        .filter((c: Contact) => c.status === status)
+        .filter((c) => c.status === status)
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       return acc;
     }, {} as Record<string, Contact[]>)
   );
 
+  const [activeCard, setActiveCard] = React.useState<Contact | null>(null);
+  const [, setIsDragging] = React.useState(false);
+
+  // Helper to compare the "shape" of columns vs contacts
+function columnsEqual(columns: Record<string, Contact[]>, contacts: Contact[]): boolean {
+  // Flatten all columns into one list, sort by id, compare id+order+status
+  const localFlat = Object.values(columns).flat().sort((a, b) => a.id - b.id);
+  const contactFlat = [...contacts].sort((a, b) => a.id - b.id);
+  if (localFlat.length !== contactFlat.length) return false;
+  return localFlat.every((c, i) =>
+    c.id === contactFlat[i].id &&
+    c.status === contactFlat[i].status &&
+    c.order === contactFlat[i].order
+  );
+}
+
+
   React.useEffect(() => {
-    setColumns(
-      statuses.reduce((acc, status) => {
-        acc[status] = contacts
-          .filter((c: Contact) => c.status === status)
-          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-        return acc;
-      }, {} as Record<string, Contact[]>)
-    );
+    // Only re-sync if server data disagrees with local (after mutation, etc)
+    if (!columnsEqual(columns, contacts)) {
+      setColumns(
+        statuses.reduce((acc, status) => {
+          acc[status] = contacts
+            .filter((c) => c.status === status)
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+          return acc;
+        }, {} as Record<string, Contact[]>)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contacts]);
 
-  const [reorderContacts] = useMutation(REORDER_CONTACTS);
+  const handleDragStart = (event: DragStartEvent) => {
+    setIsDragging(true);
+    const { active } = event;
+    for (const status of statuses) {
+      const card = columns[status].find((c) => String(c.id) === String(active.id));
+      if (card) {
+        setActiveCard(card);
+        break;
+      }
+    }
+  };
 
   const handleDragEnd = async (event: DragEndEvent) => {
+    setActiveCard(null);
+    setIsDragging(false);
+
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    let sourceStatus, targetStatus, sourceIdx, targetIdx;
+    let sourceStatus: string | undefined;
+    let sourceIdx: number | undefined;
     for (const status of statuses) {
       const idx = columns[status].findIndex((c) => String(c.id) === String(active.id));
       if (idx > -1) {
         sourceStatus = status;
         sourceIdx = idx;
+        break;
       }
-      const overIdx = columns[status].findIndex((c) => String(c.id) === String(over.id));
-      if (overIdx > -1) {
+    }
+
+    let targetStatus: string | undefined;
+    let targetIdx: number | undefined;
+    for (const status of statuses) {
+      const idx = columns[status].findIndex((c) => String(c.id) === String(over.id));
+      if (idx > -1) {
         targetStatus = status;
-        targetIdx = overIdx;
+        targetIdx = idx;
+        break;
       }
     }
     if (!targetStatus && statuses.includes(String(over.id))) {
@@ -80,46 +130,52 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       return;
     }
 
+    // Defensive copy
     const newColumns = { ...columns };
-    const movedCard = newColumns[sourceStatus][sourceIdx];
 
-    newColumns[sourceStatus] = newColumns[sourceStatus].filter(
-      (c) => String(c.id) !== String(active.id)
-    );
-    newColumns[targetStatus].splice(targetIdx, 0, movedCard);
+    // Always remove the moved card from its source array
+    const sourceArr = [...newColumns[sourceStatus]];
+    const [movedCard] = sourceArr.splice(sourceIdx, 1);
 
-    newColumns[targetStatus] = newColumns[targetStatus].map((card, idx) => ({
-      ...card,
+    // Remove from target column as well, in case it's mistakenly present
+    const targetArr = [...newColumns[targetStatus]].filter((c) => String(c.id) !== String(active.id));
+
+    // Insert in new target position
+    targetArr.splice(targetIdx, 0, { ...movedCard, status: targetStatus });
+
+    // Rebuild column objects (order is always 0...N)
+    const updatedSource = sourceArr.map((c, idx) => ({
+      id: Number(c.id),
+      status: sourceStatus,
+      order: idx,
+    }));
+    const updatedTarget = targetArr.map((c, idx) => ({
+      id: Number(c.id),
       status: targetStatus,
       order: idx,
     }));
-    if (sourceStatus !== targetStatus) {
-      newColumns[sourceStatus] = newColumns[sourceStatus].map((card, idx) => ({
-        ...card,
-        order: idx,
-      }));
-    }
-    setColumns(newColumns);
 
-    // Prepare the batch update payload
-    const updates = [
-      ...newColumns[sourceStatus].map((c) => ({
-        id: c.id,
-        order: c.order,
-        status: c.status,
-      })),
-      ...newColumns[targetStatus].map((c) => ({
-        id: c.id,
-        order: c.order,
-        status: c.status,
-      })),
-    ];
+    // Optimistically update UI with NO duplicates
+    setColumns({
+      ...newColumns,
+      [sourceStatus]: sourceArr,
+      [targetStatus]: targetArr,
+    });
 
-    await reorderContacts({ variables: { input: updates } });
+    // Fire mutation but do NOT await (keeps UI snappy)
+    reorderContacts([...updatedSource, ...updatedTarget]).catch(() => {
+      // Optionally: show error, refetch, or rollback here
+    });
   };
 
+
+
   return (
-    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext
+      collisionDetection={pointerWithin}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div className="flex flex-row w-full gap-6 overflow-x-auto min-h-[80vh]">
         <SortableContext items={statuses} strategy={verticalListSortingStrategy}>
           {statuses.map((status) => (
@@ -134,6 +190,19 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           ))}
         </SortableContext>
       </div>
+      <DragOverlay>
+        {activeCard && (
+          <DraggableCard
+            contact={activeCard}
+            statusOptions={statusOptions}
+            onEdit={() => {}}
+            onDelete={() => {}}
+            onAddActivity={async () => {}}
+            onDeleteActivity={async () => {}}
+            refetch={() => {}}
+          />
+        )}
+      </DragOverlay>
     </DndContext>
   );
 };

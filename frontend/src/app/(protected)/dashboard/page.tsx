@@ -2,13 +2,22 @@
 import React from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import KanbanBoard from "../../../components/KanbanBoard";
-import { GET_CONTACTS, DELETE_CONTACT, UPDATE_CONTACT } from "../../graphql/mutations";
+import { GET_CONTACTS, DELETE_CONTACT, UPDATE_CONTACT, REORDER_CONTACTS } from "../../graphql/mutations";
 import { Contact } from "../../../types/types";
 
 const DashboardPage = () => {
   const { data, loading, error, refetch } = useQuery(GET_CONTACTS);
   const [deleteContact] = useMutation(DELETE_CONTACT);
   const [updateContact] = useMutation(UPDATE_CONTACT);
+  const [reorderContactsMutation] = useMutation(REORDER_CONTACTS);
+
+  const handleReorderContacts = async (input: { id: number; status: string; order: number }[]) => {
+    await reorderContactsMutation({
+      variables: { input }
+    });
+    refetch();
+  };
+
 
   const handleDeleteContact = async (id: number) => {
     try {
@@ -58,6 +67,7 @@ const DashboardPage = () => {
         contacts={data?.contacts || []}
         onEdit={handleEditContact}
         onDelete={handleDeleteContact}
+        reorderContacts={handleReorderContacts}
       />
     </div>
   );
