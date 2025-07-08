@@ -24,7 +24,7 @@ Kanban CRM in React 18/Next.js 14 (Vercel) + GraphQL/REST API (Heroku). CI/CD wi
 - Log and track activities linked to each contact.
 - User authentication (registration, login, protected routes).
 - Profile page with total amount of contacts and activities, and email/password update.
-- Supports dark/light mode.
+- Supports dark/light mode with a toggle button.
 - Mobile-friendly and responsive design.
 
 🙏 **Upcoming Features/Fixes:**
