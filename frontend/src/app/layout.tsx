@@ -8,6 +8,9 @@ import Navbar from "../components/Navbar";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="no" suppressHydrationWarning>
+      <head>
+        <title>Freelancer CRM</title>
+      </head>
       <body className="bg-gray-100 dark:bg-gray-950 min-h-screen">
         <AuthProvider>
           <DarkModeProvider>

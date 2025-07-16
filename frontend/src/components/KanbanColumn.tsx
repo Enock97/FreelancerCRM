@@ -3,9 +3,8 @@ import { Contact } from "../types/types";
 import React from "react";
 import DraggableCard from "./DraggableCard";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { CREATE_ACTIVITY, DELETE_ACTIVITY } from "../app/graphql/mutations";
-import { GET_CONTACTS } from "../app/graphql/queries";
 import { useDroppable } from "@dnd-kit/core";
 
 export interface KanbanColumnProps {
@@ -14,6 +13,7 @@ export interface KanbanColumnProps {
   contacts: Contact[];
   onEdit: (contact: Contact, input: Partial<Contact>) => void | Promise<void>;
   onDelete: (id: number) => void | Promise<void>;
+  refetch: () => void;
 }
 
 const statusOptions = [
@@ -29,10 +29,10 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   onEdit,
   onDelete,
   status,
+  refetch,
 }) => {
   const [createActivity] = useMutation(CREATE_ACTIVITY);
   const [deleteActivity] = useMutation(DELETE_ACTIVITY);
-  const { refetch } = useQuery(GET_CONTACTS);
 
   const handleAddActivity = async (contactId: number, description: string) => {
     if (!description.trim()) return;
@@ -64,7 +64,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
         <div className="flex flex-col gap-2">
           {contacts.map((contact) => (
             <MemoDraggableCard
-              key={contact.id}
+              key={`${contact.id}-${(contact.activities?.length ?? 0)}`}
               contact={contact}
               statusOptions={statusOptions}
               onEdit={onEdit}

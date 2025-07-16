@@ -2,7 +2,8 @@
 import React from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import KanbanBoard from "../../../components/KanbanBoard";
-import { GET_CONTACTS, DELETE_CONTACT, UPDATE_CONTACT, REORDER_CONTACTS } from "../../graphql/mutations";
+import { GET_CONTACTS } from '../../graphql/queries'
+import { DELETE_CONTACT, UPDATE_CONTACT, REORDER_CONTACTS } from "../../graphql/mutations";
 import { Contact } from "../../../types/types";
 
 const DashboardPage = () => {
@@ -68,6 +69,7 @@ const DashboardPage = () => {
         onEdit={handleEditContact}
         onDelete={handleDeleteContact}
         reorderContacts={handleReorderContacts}
+        refetch={refetch}
       />
     </div>
   );

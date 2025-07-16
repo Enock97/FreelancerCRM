@@ -20,6 +20,7 @@ export interface KanbanBoardProps {
   onEdit: (contact: Contact, input: Partial<Contact>) => void | Promise<void>;
   onDelete: (id: number) => void | Promise<void>;
   reorderContacts: (input: { id: number; status: string; order: number }[]) => Promise<void>;
+  refetch: () => void;
 }
 
 const statusOptions = [
@@ -34,6 +35,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onEdit,
   onDelete,
   reorderContacts,
+  refetch,
 }) => {
   const [columns, setColumns] = React.useState<Record<string, Contact[]>>(() =>
     statuses.reduce((acc, status) => {
@@ -48,17 +50,18 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const [, setIsDragging] = React.useState(false);
 
   // Helper to compare the "shape" of columns vs contacts
-function columnsEqual(columns: Record<string, Contact[]>, contacts: Contact[]): boolean {
-  // Flatten all columns into one list, sort by id, compare id+order+status
-  const localFlat = Object.values(columns).flat().sort((a, b) => a.id - b.id);
-  const contactFlat = [...contacts].sort((a, b) => a.id - b.id);
-  if (localFlat.length !== contactFlat.length) return false;
-  return localFlat.every((c, i) =>
-    c.id === contactFlat[i].id &&
-    c.status === contactFlat[i].status &&
-    c.order === contactFlat[i].order
-  );
-}
+  function columnsEqual(columns: Record<string, Contact[]>, contacts: Contact[]): boolean {
+    const localFlat = Object.values(columns).flat().sort((a, b) => a.id - b.id);
+    const contactFlat = [...contacts].sort((a, b) => a.id - b.id);
+    if (localFlat.length !== contactFlat.length) return false;
+    return localFlat.every((c, i) =>
+      c.id === contactFlat[i].id &&
+      c.status === contactFlat[i].status &&
+      c.order === contactFlat[i].order &&
+      (c.activities?.length ?? 0) === (contactFlat[i].activities?.length ?? 0)
+    );
+  }
+
 
 
   React.useEffect(() => {
@@ -186,6 +189,7 @@ function columnsEqual(columns: Record<string, Contact[]>, contacts: Contact[]): 
               contacts={columns[status]}
               onEdit={onEdit}
               onDelete={onDelete}
+              refetch={refetch}
             />
           ))}
         </SortableContext>
@@ -199,7 +203,7 @@ function columnsEqual(columns: Record<string, Contact[]>, contacts: Contact[]): 
             onDelete={() => {}}
             onAddActivity={async () => {}}
             onDeleteActivity={async () => {}}
-            refetch={() => {}}
+            refetch={async () => {}}
           />
         )}
       </DragOverlay>
