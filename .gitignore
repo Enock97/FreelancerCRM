@@ -35,7 +35,7 @@ k8s/pg-secrets.yaml   # inneholder Password, holdes kun lokalt
 # ─── Docker ──────────────────────────────────────────────────────
 *.localbuild          # egne tmp-filer
 # ─── Node / general ──────────────────────────────────────────────
-node_modules/
+/node_modules
 *.env
 .env*
 dist/
