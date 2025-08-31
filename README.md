@@ -21,6 +21,7 @@ Kanban CRM in React 18/Next.js 14 (Vercel) + GraphQL/REST API (Heroku). CI/CD wi
 
 - Manage contacts with fields for name, email, company, status, note, and phone number.
 - Organize client workflows using a visual Kanban board with drag-and-drop functionality.
+- Includes search, filter, generate and reset contacts button.
 - Log and track activities linked to each contact.
 - User authentication (registration, login, protected routes).
 - Profile page with total amount of contacts and activities, and email/password update.

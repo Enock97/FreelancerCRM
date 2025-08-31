@@ -177,9 +177,9 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
       ) : (
         <main className="dark:text-gray-300 space-y-1.5">
           <div className="text-2xl font-bold text-yellow-400">{contact.name}</div>
-          <div className="text-base"><span className="font-semibold">Email: </span>{contact.email}</div>
+          <div className="text-base break-words break-all whitespace-normal overflow-hidden"><span className="font-semibold ">Email: </span>{contact.email}</div>
           <div className="text-base"><span className="font-semibold">Phone: </span>{contact.phone}</div>
-          <div className="text-base"><span className="font-semibold">Company: </span>{contact.company}</div>
+          <div className="text-base break-words break-all whitespace-normal overflow-hidden"><span className="font-semibold">Company: </span>{contact.company}</div>
           <div className="text-base dark:text-gray-500">
             <span className="font-semibold">Status: </span> {contact.status}
           </div>

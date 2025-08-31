@@ -14,7 +14,7 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onEdit, onDelete }) 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col gap-2">
       <div className="font-semibold">{contact.name}</div>
-      <div className="text-xs text-gray-500">{contact.email}</div>
+      <div className="text-xs text-gray-500 ">{contact.email}</div>
       <div className="text-xs text-gray-500">{contact.phone}</div>
       <div className="text-xs text-gray-500">{contact.company}</div>
       <div className="text-xs text-gray-500">
