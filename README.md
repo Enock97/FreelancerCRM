@@ -17,8 +17,9 @@ Live application availability (YES/NO): **YES**
 ---
 
 ## 💡 About the Application
-Kanban CRM in React 18/Next.js 14 (Vercel) + GraphQL/REST API (Heroku). CI/CD with GitHub Actions, infra in Terraform, blue-green rollout logic proven on local K3s + Helm.
+I built FreelancerCRM for freelancers to manage client relationships. It has a Kanban board UI built with React/Next.js and Tailwind, and a secure Node/Express back-end with both REST and GraphQL endpoints backed by PostgreSQL. I set up JWT authentication, CI/CD with GitHub Actions, and deployed the front-end to Vercel and the back-end to Heroku. I also experimented with infrastructure-as-code using Terraform and lightweight Kubernetes (K3s) although I wouldn’t call myself proficient there yet, but it gave me valuable exposure to how modern apps can be deployed and scaled.
 
+The application contains the following features:
 - Manage contacts with fields for name, email, company, status, note, and phone number.
 - Organize client workflows using a visual Kanban board with drag-and-drop functionality.
 - Includes search, filter, generate and reset contacts buttons.
