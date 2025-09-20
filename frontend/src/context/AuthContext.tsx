@@ -6,7 +6,7 @@ import { ApolloProvider } from '@apollo/client/react';
 import { setContext } from '@apollo/client/link/context';
 
 const GRAPHQL_ENDPOINT =
-  process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || 'https://freelancercrm-backend-838d0cf51a08.herokuapp.com/api/graphql';
+  process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || 'http://localhost:5000/api/graphql';
 
 type AuthContextValue = {
   token: string | null;
