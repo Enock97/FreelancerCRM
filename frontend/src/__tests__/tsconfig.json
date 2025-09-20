@@ -3,8 +3,8 @@
   "compilerOptions": {
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["jest", "node", "@testing-library/jest-dom"]
+    "types": ["jest", "node"]          // <— removed '@testing-library/jest-dom'
   },
-  "include": ["**/*", "../../jest.setup.ts", "../**/*"],
+  "include": ["**/*", "../../jest.setup.ts"],
   "exclude": ["../../cypress", "../../node_modules"]
 }
