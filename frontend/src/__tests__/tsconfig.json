@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["jest", "node", "@testing-library/jest-dom"]
+  },
+  "include": ["**/*", "../../jest.setup.ts", "../**/*"],
+  "exclude": ["../../cypress", "../../node_modules"]
+}

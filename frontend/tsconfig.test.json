@@ -1,7 +1,9 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": ["jest", "@testing-library/jest-dom", "node"]
+    "types": ["jest", "node", "@testing-library/jest-dom"],
+    "noEmit": true
   },
-  "include": ["src/__tests__"]
+  "include": ["__tests__/**/*", "src/**/*", "jest.setup.ts"],
+  "exclude": ["cypress", "node_modules"]
 }

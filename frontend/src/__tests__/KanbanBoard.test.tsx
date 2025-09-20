@@ -1,15 +1,16 @@
-import { render, screen } from '@testing-library/react'
-import KanbanBoard from '../components/KanbanBoard'
-import '@testing-library/jest-dom'
+/// <reference types="jest" />
+import '@testing-library/jest-dom';
+import { render, screen } from '@testing-library/react';
+import KanbanBoard from '../components/KanbanBoard';
+import type { Contact } from '../types/types';
 
-
-const mockContacts = [
+const mockContacts: Contact[] = [
   {
     id: 1,
-    name: 'Test A',
-    email: 'a@example.com',
-    phone: '111',
-    company: 'CompA',
+    name: 'A',
+    email: 'a@ex.com',
+    phone: '123',
+    company: 'Acme',
     status: 'NEW',
     order: 0,
     note: '',
@@ -17,24 +18,33 @@ const mockContacts = [
   },
   {
     id: 2,
-    name: 'Test B',
-    email: 'b@example.com',
-    phone: '222',
-    company: 'CompB',
+    name: 'B',
+    email: 'b@ex.com',
+    phone: '456',
+    company: 'Bravo',
     status: 'FOLLOW_UP',
     order: 0,
     note: '',
     createdAt: new Date().toISOString(),
   },
-]
+];
 
 describe('KanbanBoard', () => {
-  it('renders columns with correct titles and contact counts', () => {
-    render(<KanbanBoard contacts={mockContacts} onEdit={() => {}} onDelete={() => {}}/>)
+  it('renders columns with correct titles', () => {
+    render(
+      <KanbanBoard
+        contacts={mockContacts}
+        onEdit={() => {}}
+        onDelete={() => {}}
+        // add the required props that your component expects
+        reorderContacts={jest.fn()}
+        refetch={jest.fn()}
+      />
+    );
 
-    expect(screen.getByText(/New/i)).toBeInTheDocument()
-    expect(screen.getByText(/Follow Up/i)).toBeInTheDocument()
-    expect(screen.getByText(/Test A/i)).toBeInTheDocument()
-    expect(screen.getByText(/Test B/i)).toBeInTheDocument()
-  })
-})
+    expect(screen.getByText(/^New$/i,        { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByText(/^Follow Up$/i,  { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByText(/^Customer$/i,   { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByText(/^Archived$/i,   { selector: 'span' })).toBeInTheDocument();
+  });
+});

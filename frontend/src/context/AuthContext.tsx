@@ -1,68 +1,74 @@
-"use client";
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
+'use client';
 
-interface AuthContextType {
+import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
+import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client/react';
+import { setContext } from '@apollo/client/link/context';
+
+const GRAPHQL_ENDPOINT =
+  process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || 'http://localhost:5000/api/graphql';
+
+type AuthContextValue = {
   token: string | null;
-  setToken: (token: string | null) => void;
+  setToken: (t: string | null) => void;
   logout: () => void;
-}
+};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:5000/api/graphql";
+const AuthContext = createContext<AuthContextValue>({
+  token: null,
+  setToken: () => {},
+  logout: () => {},
+});
 
 function makeApolloClient(token: string | null) {
   const httpLink = new HttpLink({ uri: GRAPHQL_ENDPOINT });
-  const authLink = setContext((_, { headers }) => ({
-    headers: {
-      ...headers,
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-  }));
+
+  // Use a broadly-compatible setContext signature and cast prev context safely.
+  const authLink = setContext((_, prev) => {
+    const prevHeaders =
+      (prev as { headers?: Record<string, string> | undefined }).headers ?? {};
+    return {
+      headers: {
+        ...prevHeaders,
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    };
+  });
+
   return new ApolloClient({
     link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
-    connectToDevTools: process.env.NODE_ENV === "development",
   });
 }
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+// Avoid `{}` empty-object type by giving an explicit props shape
+type AuthProviderProps = { children: React.ReactNode };
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setTokenState] = useState<string | null>(null);
-  const [client, setClient] = useState(() => makeApolloClient(null));
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    setTokenState(stored);
-    setClient(makeApolloClient(stored));
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (saved) setTokenState(saved);
   }, []);
 
-  useEffect(() => {
-    setClient(makeApolloClient(token));
-  }, [token]);
-
-  const setToken = (newToken: string | null) => {
-    setTokenState(newToken);
-    if (typeof window !== "undefined") {
-      if (newToken) localStorage.setItem("token", newToken);
-      else localStorage.removeItem("token");
+  const setToken = (t: string | null) => {
+    setTokenState(t);
+    if (typeof window !== 'undefined') {
+      if (t) localStorage.setItem('token', t);
+      else localStorage.removeItem('token');
     }
   };
 
   const logout = () => setToken(null);
 
+  const client = useMemo(() => makeApolloClient(token), [token]);
+
   return (
     <AuthContext.Provider value={{ token, setToken, logout }}>
-      <ApolloProvider client={client}>
-        {children}
-      </ApolloProvider>
+      <ApolloProvider client={client}>{children}</ApolloProvider>
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
-  return ctx;
-};
+export const useAuth = () => useContext(AuthContext);
