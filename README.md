@@ -3,7 +3,7 @@
 **FreelancerCRM** is an advanced-level Minimum Viable Product (MVP) version of a modern CRM web application built for learning purposes and upskill reasons, and includes an overview of client relationships, activities, and communication — all presented in a user-friendly, responsive dashboard with a drag-and-drop Kanban interface.
 
 ---
- 
+
 ## 🌐 Try the App
 
 Test the live application here: 
@@ -17,7 +17,7 @@ Live application availability (YES/NO): **YES**
 ---
 
 ## 💡 About the Application
-I built FreelancerCRM to challenge myself, so I can enhance my development competency by creating a complete fullstack solo project while also exploring different technologies not previously well known to me. The application has a Kanban board UI built with React/Next.js and Tailwind, and a secure Node/Express back-end with both REST and GraphQL endpoints backed by PostgreSQL. I set up JWT authentication, CI/CD with GitHub Actions, and deployed the front-end to Vercel and the back-end to Heroku. I also experimented with infrastructure-as-code using Terraform and lightweight Kubernetes (K3s) although I wouldn’t call myself proficient there yet, but it gave me valuable exposure to how modern apps can be deployed and scaled.
+I built FreelancerCRM to challenge myself, so I can enhance my development competency by creating a complete full-stack solo project while also exploring different technologies not previously well known to me. The application has a Kanban board UI built with React/Next.js and Tailwind, and a secure Node/Express back-end with both REST and GraphQL endpoints backed by PostgreSQL. I set up JWT authentication, CI/CD with GitHub Actions, and deployed the front-end to Vercel and the back-end to Heroku. I also experimented with infrastructure-as-code using Terraform and lightweight Kubernetes (K3s) although I wouldn’t call myself proficient there yet, but it gave me valuable exposure to how modern apps can be deployed and scaled.
 
 The application contains the following features:
 - Manage contacts with fields for name, email, company, status, note, and phone number.
