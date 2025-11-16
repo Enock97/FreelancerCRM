@@ -3,7 +3,7 @@
 **FreelancerCRM** is an advanced-level Minimum Viable Product (MVP) version of a modern CRM web application built for learning purposes and upskill reasons, and includes an overview of client relationships, activities, and communication — all presented in a user-friendly, responsive dashboard with a drag-and-drop Kanban interface.
 
 ---
-
+ 
 ## 🌐 Try the App
 
 Test the live application here: 
